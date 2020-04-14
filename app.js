@@ -23,8 +23,6 @@ var app = express();
 // load static web main page
 const path = require('path');
 
-var a;
-
 app.use(express.static(path.join(__dirname, 'front/spending-tracker')))
 app.get('/', function (req, res) {
     res.send('Main page loading properly!');
