@@ -1,15 +1,6 @@
 var express = require("express")
 var router = express.Router();
-
-// db init
-const sqlite3 = require('sqlite3').verbose();
-
-let db = new sqlite3.Database('../test.db', (err) => {
-    if (err) {
-      console.error(err.message);
-    }
-    console.log('Connected to the test database!');
-});
+var db = require('../models/db')
 
 
 router.get('/record', (req, res)=>{
@@ -19,6 +10,7 @@ router.get('/record', (req, res)=>{
         var postSQL = "INSERT INTO table01(name, number) VALUES(?,?)";
         db.run(postSQL, postData);
     });
+    console.log(postData);
     res.send('Add name: ' + postData[0] +', number: '+ postData[1]+ ' into db Successfully!');
 });
 
