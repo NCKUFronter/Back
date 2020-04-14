@@ -17,7 +17,7 @@ router.get('/', (req, res)=>{
     db.serialize(function() {
         db.all("SELECT rowid AS id, name, number FROM table01", [], (err, rows) => {
             // send to index.js
-            res.send(rows);
+            res.status(200).send(rows);
         });
     });
 });
@@ -29,7 +29,7 @@ router.post('/', (req, res)=>{
         var postSQL = "INSERT INTO table01(name, number) VALUES(?,?)";
         db.run(postSQL, postData);
     });
-    res.send('Add name: ' + postData[0] +', number: '+ postData[1]+ ' into db Successfully!');
+    res.status(201).send('Add name: ' + postData[0] +', number: '+ postData[1]+ ' into db Successfully!');
 });
 
 router.put('/',(req, res)=>{
@@ -40,7 +40,7 @@ router.put('/',(req, res)=>{
         db.all("SELECT rowid AS id, name, number FROM table01", [], (err, rows) => {
             console.log(rows);
         });
-        res.send('Got a PUT request at /record');
+        res.status(201).send('Got a PUT request at /record');
     });
 });
 

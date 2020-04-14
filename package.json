@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "mocha": "^7.1.1",
+    "should": "^13.2.3",
     "sqlite3": "^4.1.1"
   }
 }
