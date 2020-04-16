@@ -17,6 +17,11 @@ router.get('/', (req, res)=>{
     db.serialize(function() {
         db.all("SELECT rowid AS id, name, number FROM table01", [], (err, rows) => {
             // send to index.js
+            if(err)
+            {
+                console.log(err);
+                res.status(404);
+            }
             res.status(200).send(rows);
         });
     });
@@ -51,7 +56,7 @@ router.delete('/',(req, res)=>{
             // console.log(rows);
         });
     });
-    res.send('Delete row: ' + req.body.id+ ' from db Successfully!');
+    res.status(200).send('Delete row: ' + req.body.id+ ' from db Successfully!');
 });
 
 module.exports = router;
