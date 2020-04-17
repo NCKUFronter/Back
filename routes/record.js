@@ -1,14 +1,9 @@
 var express = require("express")
 var router = express.Router();
-//var db = require('../models/db')
+//var db = require('./models/db')
+var client = require('../models/mongo')
+client = client.client
 
-// mongoDB init
-const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb+srv://uidd:1111@uidd-cluster-8k7z8.mongodb.net/uidd-db?retryWrites=true&w=majority";
-const client = MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-client.connect(err => {
-    if (err) throw err;
-});
 
 
 // GET from database 
