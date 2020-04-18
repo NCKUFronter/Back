@@ -15,15 +15,30 @@ router.get('/', function (req, res) {
     })
 });
 
+// GET certain data from database
+router.get('/:id', function (req, res) {
+    var id = req.params.id;
+    const getData = {
+        recordId: parseInt(id)
+    };
+    const collection = client.db("uidd-db").collection("uidd");
+    collection.find(getData).toArray(function (err, result) {
+        console.log(result);
+        if (err) throw err;
+        res.status(200).send(result);
+    })
+});
+
+
 // Post the info
 router.post('/', function (req, res) {
     const collection = client.db("uidd-db").collection("uidd");
     collection.countDocuments(function (err, count) {
         collection.find({}).sort({ recordId: 1 }).toArray(function (err, result) {
             const id = 0;
-            if (count != 0) {
-                id = result[count - 1].recordId;
-            }
+            // if (count != 0) {
+            //     id = result[count - 1].recordId;
+            // }
             const postData = {
                 recordId: id + 1,
                 name: req.body.name,
@@ -59,15 +74,15 @@ router.put('/', function (req, res) {
 });
 
 // DELETE certain row
-router.delete('/', function (req, res) {
+router.delete('/:id', function (req, res) {
     var deleteFilter = {
-        recordId: req.body.id
+        recordId: parseInt(req.params.id)
     };
     const collection = client.db("uidd-db").collection("uidd");
     collection.deleteOne(deleteFilter, (err, result) => {
         console.log(req.body.id, deleteFilter, result.result.n);
     })
-    res.status(201).send('Delete row: ' + req.body.id + ' from db Successfully!');
+    res.status(201).send('Delete row: ' + req.params.id + ' from db Successfully!');
 });
 
 module.exports = router;
