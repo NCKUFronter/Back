@@ -57,7 +57,7 @@ router.post('/', function (req, res) {
     })
 });
 
-// PUT to update certain row update info
+// PUT to update certain row info
 router.put('/', function (req, res) {
     var putFilter = {
         recordId: req.body.id

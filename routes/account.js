@@ -37,11 +37,11 @@ router.post('/', function (req, res) {
                 id = result[count - 1].accountId;
             }
             const postData = {
-                accountId: id + 1,
+                accountId: id + 1,              // sort
                 account: req.body.account,
                 password: req.body.password,
                 username: req.body.username,
-                family: req.body.family
+                family: req.body.family         // if user has no family?
             };
             collection.insertOne(postData, function (err, res) {
                 if (err) throw err;

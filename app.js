@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.use('/record', require('./routes/record'));
-app.use('/account', require('./routes/account'));
+app.use('/account', require('./routes/account'));   // /account to record user info
 
 // Run the server
 const port = 3000;
