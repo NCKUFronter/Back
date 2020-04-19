@@ -67,20 +67,19 @@ app.post("/record", function (req, res) {
       .find({})
       .sort({ recordId: 1 })
       .toArray(function (err, result) {
-        // const id = 0;
+        const id = 0;
+        if (count != 0) {
+            id = result[count-1].recordId;
+        }
         /*
-            if (count != 0) {
-                id = result[count-1].recordId;
-            }
-            */
-        /*
-            const postData = {
-                recordId: id+ 1,
-                name: req.body.name,
-                number: req.body.number
-            };
-            */
         const postData = {
+            recordId: id+ 1,
+            name: req.body.name,
+            number: req.body.number
+        };
+        */
+        const postData = {
+          recordId: id+ 1,
           recordType: req.body.recordType,
           money: req.body.money,
           account: req.body.account,
@@ -109,8 +108,8 @@ app.post("/record", function (req, res) {
 // PUT to update certain row
 app.put("/record", function (req, res) {
   const putFilter = {
-    // recordId: req.body.id
-    _id: req.body.id,
+    recordId: req.body.id
+    // _id: req.body.id,
   };
   const putData = {
     $set: {
@@ -137,11 +136,11 @@ app.put("/record", function (req, res) {
 // DELETE certain row
 app.delete("/record", function (req, res) {
   const deleteFilter = {
-    // recordId: req.body.id
+    recordId: req.body.id
 
     // refer:
     // https://stackoverflow.com/questions/4932928/remove-by-id-in-mongodb-console
-    _id: ObjectId(req.body.id),
+    // _id: ObjectId(req.body.id),
   };
   const collection = client.db("uidd-db").collection("uidd");
   collection.deleteOne(deleteFilter, (err, result) => {
