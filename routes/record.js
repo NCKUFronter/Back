@@ -40,15 +40,19 @@ router.post('/', function (req, res) {
             //     id = result[count - 1].recordId;
             // }
             const postData = {
+                recordType: req.body.type,
                 recordId: id + 1,
                 name: req.body.name,
-                number: req.body.number
+                price: req.body.price,
+                classification: req.body.classification,
+                account: req.body.account,
+                date: req.body.date
             };
             collection.insertOne(postData, function (err, res) {
                 if (err) throw err;
                 console.log('1 document inserted.');
             })
-            res.status(201).send('Add name: ' + postData['name'] + ', number: ' + postData['number'] + ' into db Successfully!');
+            res.status(201).send('Add name: ' + postData['name'] + ', price: ' + postData['price'] + ' into db Successfully!');
         })
     })
 });
@@ -60,8 +64,12 @@ router.put('/', function (req, res) {
     };
     var putData = {
         $set: {
+            recordType: req.body.type,
             name: req.body.name,
-            number: req.body.number
+            price: req.body.price,
+            classification: req.body.classification,
+            account: req.body.account,
+            date: req.body.date
         }
     };
     const collection = client.db("uidd-db").collection("uidd");

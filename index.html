@@ -10,11 +10,19 @@
     <div class="jumbotron jumbotron-fluid">
         <div class="container">
             <h1 class="display-4">UIDD Back End</h1>
-            <p class="lead">Demo</p>
+            <p class="lead" id="account">Account: Fronter</p>
+            <p id="date">Date: 2020-04-19</p>
         </div>
     </div>
     <form id="post-form">
         <div class="form-row m-0">
+            <div class="form-group col-md-4 d-block mx-auto">
+                <label for="inputIO">Input/Output</label>
+                <select id="post-io" class="form-control">
+                    <option selected>Input</option>
+                    <option>Ouput</option>
+                </select>
+            </div>
             <div class="form-group col-md-4 d-block mx-auto">
                 <label for="exampleInputName">Name</label>
                 <input type="text" class="form-control" id="post-name" aria-describedby="nameHelp" placeholder="Enter name">
@@ -22,10 +30,18 @@
         </div>
         <div class="form-row m-0">
             <div class="form-group col-md-4 d-block mx-auto">
-                <label for="exampleInputNumber">Number</label>
-                <input type="text" class="form-control" id="post-number" placeholder="Enter Number">
+                <label for="exampleInputPrice">Price</label>
+                <input type="text" class="form-control" id="post-price" placeholder="Enter Price">
                 
             </div>
+        </div>
+        <div class="form-group col-md-4 d-block mx-auto">
+            <label for="classification">Classification</label>
+            <select id="post-classification" class="form-control">
+                <option selected>Breakfast</option>
+                <option>Lunch</option>
+                <option>Dinner</option>
+            </select>
         </div>
         <div class="form-group col-md-4 d-block mx-auto">
             <button type="submit" class="btn btn-primary d-block mx-auto">Submit</button>
@@ -38,7 +54,7 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
-                    <th scope="col">Number</th>
+                    <th scope="col">Price</th>
                     <th scope="col">Edit</th>
                     <th scope="col">Delete</th>
                 </tr>

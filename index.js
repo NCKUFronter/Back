@@ -9,8 +9,13 @@ function generateHtml(data) {
         `
         <tr record-id="${item['id']}" class="text-center">
             <th scope="row">${item['id']}</th>
+            <td class="price text-break">${item['io']}</td>
             <td class="name text-break">${item['name']}</td>
-            <td class="number text-break">${item['number']}</td>
+            <td class="price text-break">${item['price']}</td>
+            <td class="classification text-break">${item['classification']}</td>
+            <td class="account text-break">${item['account']}</td>
+            <td class="date text-break">${item['date']}</td>
+
             <td class="text-center">
                 <button record-id="${item['id']}" class="btn btnEdit" type="button">
                     <img src="https://svgshare.com/i/JLZ.svg">
@@ -32,11 +37,19 @@ $.get('./record', {}, (data) => {
 
 // Call POST request via ajax to app.js
 function getPostData() {
+    const io = $("#post-io").val();
     const name = $("#post-name").val();
-    const number = $("#post-number").val()
+    const price = $("#post-price").val();
+    const classification = $("#post-classification").val();
+    const account = $("#account").val();
+    const date = $("#date").val();
     return {
+        'io': io,
         'name': name,
-        'number': number
+        'price': price,
+        'classification': classification,
+        'account': account,
+        'date': date
     }
 }
 $('#post-form button[type="submit"]').click((e) => {
@@ -51,12 +64,12 @@ $('#post-form button[type="submit"]').click((e) => {
 function getPutData(recordId) {
     const recordElement = $(`tr[record-id='${recordId}'`);
     const newName = recordElement.find('#put-name').val();
-    const newNumber = recordElement.find('#put-number').val();
+    const newPrice = recordElement.find('#put-price').val();
     const element =
         `
             <th scope="row">${recordId}</th>
             <td class="name">${newName}</td>
-            <td class="number">${newNumber}</td>
+            <td class="price">${newPrice}</td>
             <td class="text-center">
                 <button record-id="${recordId}" class="btn btnEdit" type="button">
                     <img src="https://svgshare.com/i/JLZ.svg">
@@ -72,7 +85,7 @@ function getPutData(recordId) {
     recordElement.removeClass('on-edit')
     return {
         'name': newName,
-        'number': newNumber,
+        'price': newPrice,
         'id': recordId
     }
 }
@@ -98,17 +111,17 @@ $("body").delegate(".btnUpdate", "click", function (e) {
 // Edit record-row
 function showEditForm(recordId) {
     const recordElement = $(`tr[record-id='${recordId}'`);
-    const oldAssetNum = recordElement.find('.name').text()
-    const oldTMCNum = recordElement.find('.number').text()
+    const oldName = recordElement.find('.name').text()
+    const oldPrice = recordElement.find('.price').text()
     
     const formHtml = 
     `
     <th scope="row">${recordId}</th>
     <td class="name text-break text-center">
-        <input record-old-name="${oldAssetNum}" type="text" aria-label="name" class="form-control" id="put-name" placeholder="Name" value=${oldAssetNum}>
+        <input record-old-name="${oldName}" type="text" aria-label="name" class="form-control" id="put-name" placeholder="Name" value=${oldAssetNum}>
     </td>
-    <td class="number text-break text-center">
-        <input record-old-number="${oldTMCNum}"  type="text" aria-label="name" class="form-control" id="put-number" placeholder="No." value=${oldTMCNum}>
+    <td class="price text-break text-center">
+        <input record-old-price="${oldPrice}"  type="text" aria-label="name" class="form-control" id="put-price" placeholder="No." value=${oldTMCNum}>
     </td>
     <td class="text-center d-flex">
         <button type="button" record-id="${recordId}" class="btn btn-sm btn-success btnUpdate d-block mx-auto">O</button>
@@ -128,12 +141,12 @@ $("body").delegate(".btnEdit", "click", function (e) {
 function cancelEditForm(recordId) {
     const recordElement = $(`tr[record-id='${recordId}'`);
     const oldName = recordElement.find('#put-name').attr('record-old-name');
-    const oldNumber = recordElement.find('#put-number').attr('record-old-number');
+    const oldPrice = recordElement.find('#put-price').attr('record-old-price');
     const element =
         `
             <th scope="row">${recordId}</th>
             <td class="name">${oldName}</td>
-            <td class="number">${oldNumber}</td>
+            <td class="price">${oldPrice}</td>
             <td class="text-center">
                 <button record-id="${recordId}" class="btn btnEdit" type="button">
                     <img src="https://svgshare.com/i/JLZ.svg">
