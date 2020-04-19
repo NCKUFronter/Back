@@ -26,7 +26,8 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-app.use('/record',require('./routes/record'));
+app.use('/record', require('./routes/record'));
+app.use('/account', require('./routes/account'));
 
 // Run the server
 const port = 3000;
