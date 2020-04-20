@@ -2,7 +2,7 @@
 function loadData(data) {
     const dataHtml = generateHtml(data);
     $('#show-record').append(dataHtml);
-}
+};
 function generateHtml(data) {
     let elementsHtml = '';
     for (item of data) {
@@ -17,22 +17,22 @@ function generateHtml(data) {
 
             <td class="text-center">
                 <button record-id="${item['recordId']}" class="btn btnEdit" type="button">
-                    E
+                    <p>E</p>
                 </button>
             </td>
             <td class="text-center">
                 <button record-id="${item['recordId']}" class="btn btnDelete" type="button">
-                    D
+                    <p>D</p>
                 </button>
             </td>
         </tr>`;
         elementsHtml += element;
     }
     return elementsHtml;
-}
+};
 $.get('./record', {}, (data) => {
     loadData(data)
-})
+});
 
 // Call POST request via ajax to app.js
 function getPostData() {
@@ -45,8 +45,8 @@ function getPostData() {
         'money': money,
         'category': category,
         'account': account
-    }
-}
+    };
+};
 $('#post-form button[type="submit"]').click((e) => {
     // POST list to /record
     postData = getPostData()
@@ -54,7 +54,7 @@ $('#post-form button[type="submit"]').click((e) => {
     $.post('./record', postData, (data, status) => {
         console.log('success!');
         alert(data, status);
-    })
+    });
 });
 
 // Call PUT request via ajax to app.js
@@ -73,12 +73,12 @@ function getPutData(recordId) {
             <td class="account">${newAccount}</td>
             <td class="text-center">
                 <button record-id="${recordId}" class="btn btnEdit" type="button">
-                    E
+                    <p>E</p>
                 </button
             </td>
             <td class="text-center">
                 <button record-id="${recordId}" class="btn btnDelete" type="button">
-                    D
+                    <p>D</p>
                 </button>
             </td>
         `;
@@ -90,8 +90,8 @@ function getPutData(recordId) {
         'money': newMoney,
         'category': newCategory,
         'account': newAccount
-    }
-}
+    };
+};
 
 // Create PUT ajax
 $.put = function(url, data){
@@ -100,7 +100,7 @@ $.put = function(url, data){
       type: 'PUT',
       data: data
     });
-}
+};
 
 $("body").delegate(".btnUpdate", "click", function (e) {
     e.preventDefault()
@@ -109,8 +109,9 @@ $("body").delegate(".btnUpdate", "click", function (e) {
     const recordId = $(this).attr('record-id');
     putData = getPutData(recordId)
     $.put('./record', putData, function(data, status) {
+        console.log('123');
         alert (data, status);
-    })
+    });
 });
 
 // Edit record-row
@@ -166,21 +167,21 @@ function cancelEditForm(recordId) {
             <td class="account">${oldAccount}</td>
             <td class="text-center">
                 <button record-id="${recordId}" class="btn btnEdit" type="button">
-                    E
+                    <p>E</p>
                 </button
             </td>
             <td class="text-center">
                 <button record-id="${recordId}" class="btn btnDelete" type="button">
-                    D
+                    <p>D</p>
                 </button>
             </td>
         `;
     recordElement.html(element);
     recordElement.removeClass('on-edit')
-}
+};
 $("body").delegate(".btnCancel", "click", function (e) {
     const recordId = $(this).attr('record-id');
-    cancelEditForm(recordId)
+    cancelEditForm(recordId);
 });
 
 // Delete row
@@ -191,27 +192,27 @@ $.delete = function(url, data, callback){
         data: data,
         success: callback,
     });
-}
+};
 $("body").delegate(".btnDelete", "click", function (e) {
     const recordId = $(this).attr('record-id');
     $.delete(`./record/${recordId}`, function(data, status) {
         alert(data, status);
         location.reload();
-    })
+    });
 });
 
-function generateExpenseGraph (total) {
-}
+// function generateExpenseGraph (total) {
+// }
 
 $("body").delegate(".btnTotal", "click", function (e) {
 // Create statistical graph
-    $.get(`./record`, {recordType: "Expense"}, (data) => {
+    $.get(`./record`, {recordType: "expense"}, (data) => {
         var total = parseInt(0);
         console.log(data);
         var total = parseInt(0)
         for (item of data) {
             total += parseInt(item.money);
         }
-        generateExpenseGraph(total)
-    })
+        // generateExpenseGraph(total)
+    });
 });
