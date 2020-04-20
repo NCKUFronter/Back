@@ -213,9 +213,5 @@ $("body").delegate(".btnTotal", "click", function (e) {
             total += parseInt(item.money);
         }
         generateExpenseGraph(total)
-            // $.get(`./record/:${id}`, { category: "traffic"}, (data) => {
-            //     console.log(data.money);
-            //     // show total expense/income of all "traffic"
-            // })
     })
 });

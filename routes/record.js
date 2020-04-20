@@ -7,7 +7,6 @@ client = client.client
 // GET from database 
 router.get('/', function (req, res) {
     if (req.query.recordType) {
-        console.log('querying');
         const getData = {
             recordType: req.query.recordType
         };
@@ -28,24 +27,10 @@ router.get('/', function (req, res) {
 });
 
 // GET certain data from database
-// router.get('/:id', function (req, res) {
-//     var id = req.params.id;
-//     const getData = {
-//         recordId: parseInt(id)
-//     };
-//     const collection = client.db("uidd-db").collection("uidd");
-//     collection.find(getData).toArray(function (err, result) {
-//         if (err) throw err;
-//         res.status(200).send(result);
-//     })
-// });
-
-// GET certain data from database with filter
 router.get('/:id', function (req, res) {
     var id = req.params.id;
     const getData = {
-        recordId: parseInt(id),
-        recordType: req.query.recordType
+        recordId: parseInt(id)
     };
     const collection = client.db("uidd-db").collection("uidd");
     collection.find(getData).toArray(function (err, result) {
