@@ -4,55 +4,77 @@ var router = express.Router();
 var client = require('../models/mongo')
 client = client.client
 
-
-
 // GET from database 
 router.get('/', function (req, res) {
-    const collection = client.db("uidd-db").collection("uidd");
-    collection.find({}).sort({ recordId: 1 }).toArray(function (err, result) {
-        if (err) throw err;
-        res.status(200).send(result);
-    })
+    if (req.query.recordType) {
+        console.log('querying');
+        const getData = {
+            recordType: req.query.recordType
+        };
+        const collection = client.db("uidd-db").collection("uidd");
+        collection.find(getData).toArray(function (err, result) {
+            if (err) throw err;
+            res.status(200).send(result);
+        })
+    }
+    else {
+        const collection = client.db("uidd-db").collection("uidd");
+        collection.find().sort({ recordId: 1 }).toArray(function (err, result) {
+            if (err) throw err;
+            res.status(200).send(result);
+        })
+    }
+    
 });
 
 // GET certain data from database
+// router.get('/:id', function (req, res) {
+//     var id = req.params.id;
+//     const getData = {
+//         recordId: parseInt(id)
+//     };
+//     const collection = client.db("uidd-db").collection("uidd");
+//     collection.find(getData).toArray(function (err, result) {
+//         if (err) throw err;
+//         res.status(200).send(result);
+//     })
+// });
+
+// GET certain data from database with filter
 router.get('/:id', function (req, res) {
     var id = req.params.id;
     const getData = {
-        recordId: parseInt(id)
+        recordId: parseInt(id),
+        recordType: req.query.recordType
     };
     const collection = client.db("uidd-db").collection("uidd");
     collection.find(getData).toArray(function (err, result) {
-        console.log(result);
         if (err) throw err;
         res.status(200).send(result);
     })
 });
-
 
 // Post the info
 router.post('/', function (req, res) {
     const collection = client.db("uidd-db").collection("uidd");
     collection.countDocuments(function (err, count) {
         collection.find({}).sort({ recordId: 1 }).toArray(function (err, result) {
-            const id = 0;
-            // if (count != 0) {
-            //     id = result[count - 1].recordId;
-            // }
+            var id = 0;
+            if (count != 0) {
+                id = result[count - 1].recordId;
+            }
             const postData = {
-                recordType: req.body.type,
                 recordId: id + 1,
-                name: req.body.name,
-                price: req.body.price,
-                classification: req.body.classification,
+                recordType: req.body.recordType,
+                money: req.body.money,
+                category: req.body.category,
                 account: req.body.account,
-                date: req.body.date
             };
             collection.insertOne(postData, function (err, res) {
                 if (err) throw err;
                 console.log('1 document inserted.');
             })
-            res.status(201).send('Add name: ' + postData['name'] + ', price: ' + postData['price'] + ' into db Successfully!');
+            res.status(201).send('Add Category: ' + postData['category'] + ', money: ' + postData['money'] + ' into db Successfully!');
         })
     })
 });
@@ -65,11 +87,9 @@ router.put('/', function (req, res) {
     var putData = {
         $set: {
             recordType: req.body.type,
-            name: req.body.name,
-            price: req.body.price,
-            classification: req.body.classification,
+            money: req.body.money,
+            category: req.body.category,
             account: req.body.account,
-            date: req.body.date
         }
     };
     const collection = client.db("uidd-db").collection("uidd");
@@ -77,7 +97,6 @@ router.put('/', function (req, res) {
         if (err) throw err;
         console.log("1 document updated");
     })
-
     res.status(201).send('Got a PUT request at /record');
 });
 
@@ -88,7 +107,7 @@ router.delete('/:id', function (req, res) {
     };
     const collection = client.db("uidd-db").collection("uidd");
     collection.deleteOne(deleteFilter, (err, result) => {
-        console.log(req.body.id, deleteFilter, result.result.n);
+        console.log(req.params.id, deleteFilter, result.result.n);
     })
     res.status(201).send('Delete row: ' + req.params.id + ' from db Successfully!');
 });

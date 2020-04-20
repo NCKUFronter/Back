@@ -1,3 +1,4 @@
+// Load data from db
 function loadData(data) {
     const dataHtml = generateHtml(data);
     $('#show-record').append(dataHtml);
@@ -7,23 +8,21 @@ function generateHtml(data) {
     for (item of data) {
         const element =
         `
-        <tr record-id="${item['id']}" class="text-center">
-            <th scope="row">${item['id']}</th>
-            <td class="price text-break">${item['io']}</td>
-            <td class="name text-break">${item['name']}</td>
-            <td class="price text-break">${item['price']}</td>
-            <td class="classification text-break">${item['classification']}</td>
+        <tr record-id="${item['recordId']}" class="text-center">
+            <th scope="row">${item['recordId']}</th>
+            <td class="type text-break">${item['recordType']}</td>
+            <td class="money text-break">${item['money']}</td>
+            <td class="category text-break">${item['category']}</td>
             <td class="account text-break">${item['account']}</td>
-            <td class="date text-break">${item['date']}</td>
 
             <td class="text-center">
-                <button record-id="${item['id']}" class="btn btnEdit" type="button">
-                    <img src="https://svgshare.com/i/JLZ.svg">
+                <button record-id="${item['recordId']}" class="btn btnEdit" type="button">
+                    E
                 </button>
             </td>
             <td class="text-center">
-                <button record-id="${item['id']}" class="btn btnDelete" type="button">
-                    <img src="https://svgshare.com/i/JLi.svg">
+                <button record-id="${item['recordId']}" class="btn btnDelete" type="button">
+                    D
                 </button>
             </td>
         </tr>`;
@@ -37,25 +36,23 @@ $.get('./record', {}, (data) => {
 
 // Call POST request via ajax to app.js
 function getPostData() {
-    const io = $("#post-io").val();
-    const name = $("#post-name").val();
-    const price = $("#post-price").val();
-    const classification = $("#post-classification").val();
-    const account = $("#account").val();
-    const date = $("#date").val();
+    const type = $("#post-type").val();
+    const money = $("#post-money").val();
+    const category = $("#post-category").val();
+    const account = $("#post-account").val();
     return {
-        'io': io,
-        'name': name,
-        'price': price,
-        'classification': classification,
-        'account': account,
-        'date': date
+        'recordType': type,
+        'money': money,
+        'category': category,
+        'account': account
     }
 }
 $('#post-form button[type="submit"]').click((e) => {
     // POST list to /record
     postData = getPostData()
-    $.post('./record', postData, function(data, status) {
+    console.log(postData);
+    $.post('./record', postData, (data, status) => {
+        console.log('success!');
         alert(data, status);
     })
 });
@@ -63,32 +60,39 @@ $('#post-form button[type="submit"]').click((e) => {
 // Call PUT request via ajax to app.js
 function getPutData(recordId) {
     const recordElement = $(`tr[record-id='${recordId}'`);
-    const newName = recordElement.find('#put-name').val();
-    const newPrice = recordElement.find('#put-price').val();
+    const newType = recordElement.find('#put-type').val();
+    const newMoney = recordElement.find('#put-money').val();
+    const newCategory = recordElement.find('#put-category').val();
+    const newAccount = recordElement.find('#put-account').val();
     const element =
         `
             <th scope="row">${recordId}</th>
-            <td class="name">${newName}</td>
-            <td class="price">${newPrice}</td>
+            <td class="type">${newType}</td>
+            <td class="money">${newMoney}</td>
+            <td class="category">${newCategory}</td>
+            <td class="account">${newAccount}</td>
             <td class="text-center">
                 <button record-id="${recordId}" class="btn btnEdit" type="button">
-                    <img src="https://svgshare.com/i/JLZ.svg">
+                    E
                 </button
             </td>
             <td class="text-center">
                 <button record-id="${recordId}" class="btn btnDelete" type="button">
-                    <img src="https://svgshare.com/i/JLi.svg">
+                    D
                 </button>
             </td>
         `;
     recordElement.html(element);
     recordElement.removeClass('on-edit')
     return {
-        'name': newName,
-        'price': newPrice,
-        'id': recordId
+        'id': recordId,
+        'recordType': newType,
+        'money': newMoney,
+        'category': newCategory,
+        'account': newAccount
     }
 }
+
 // Create PUT ajax
 $.put = function(url, data){
     return $.ajax({
@@ -97,6 +101,7 @@ $.put = function(url, data){
       data: data
     });
 }
+
 $("body").delegate(".btnUpdate", "click", function (e) {
     e.preventDefault()
 
@@ -111,17 +116,25 @@ $("body").delegate(".btnUpdate", "click", function (e) {
 // Edit record-row
 function showEditForm(recordId) {
     const recordElement = $(`tr[record-id='${recordId}'`);
-    const oldName = recordElement.find('.name').text()
-    const oldPrice = recordElement.find('.price').text()
+    const oldType = recordElement.find('.type').text();
+    const oldMoney = recordElement.find('.money').text();
+    const oldCategory = recordElement.find('.category').text();
+    const oldAccount = recordElement.find('.account').text();
     
     const formHtml = 
     `
     <th scope="row">${recordId}</th>
-    <td class="name text-break text-center">
-        <input record-old-name="${oldName}" type="text" aria-label="name" class="form-control" id="put-name" placeholder="Name" value=${oldAssetNum}>
+    <td class="type text-break text-center">
+        <input record-old-type="${oldType}" type="text" aria-label="type" class="form-control" id="put-type" placeholder="Type" value=${oldType}>
     </td>
-    <td class="price text-break text-center">
-        <input record-old-price="${oldPrice}"  type="text" aria-label="name" class="form-control" id="put-price" placeholder="No." value=${oldTMCNum}>
+    <td class="money text-break text-center">
+        <input record-old-money="${oldMoney}"  type="text" aria-label="money" class="form-control" id="put-money" placeholder="No." value=${oldMoney}>
+    </td>
+    <td class="category text-break text-center">
+        <input record-old-category="${oldCategory}"  type="text" aria-label="category" class="form-control" id="put-category" placeholder="No." value=${oldCategory}>
+    </td>
+    <td class="account text-break text-center">
+        <input record-old-account="${oldAccount}"  type="text" aria-label="account" class="form-control" id="put-account" placeholder="No." value=${oldAccount}>
     </td>
     <td class="text-center d-flex">
         <button type="button" record-id="${recordId}" class="btn btn-sm btn-success btnUpdate d-block mx-auto">O</button>
@@ -140,21 +153,25 @@ $("body").delegate(".btnEdit", "click", function (e) {
 
 function cancelEditForm(recordId) {
     const recordElement = $(`tr[record-id='${recordId}'`);
-    const oldName = recordElement.find('#put-name').attr('record-old-name');
-    const oldPrice = recordElement.find('#put-price').attr('record-old-price');
+    const oldType = recordElement.find('#put-type').attr('record-old-type');
+    const oldMoney = recordElement.find('#put-money').attr('record-old-money');
+    const oldCategory = recordElement.find('#put-category').attr('record-old-category');
+    const oldAccount = recordElement.find('#put-account').attr('record-old-account');
     const element =
         `
             <th scope="row">${recordId}</th>
-            <td class="name">${oldName}</td>
-            <td class="price">${oldPrice}</td>
+            <td class="type">${oldType}</td>
+            <td class="money">${oldMoney}</td>
+            <td class="category">${oldCategory}</td>
+            <td class="account">${oldAccount}</td>
             <td class="text-center">
                 <button record-id="${recordId}" class="btn btnEdit" type="button">
-                    <img src="https://svgshare.com/i/JLZ.svg">
+                    E
                 </button
             </td>
             <td class="text-center">
                 <button record-id="${recordId}" class="btn btnDelete" type="button">
-                    <img src="https://svgshare.com/i/JLi.svg">
+                    D
                 </button>
             </td>
         `;
@@ -176,11 +193,29 @@ $.delete = function(url, data, callback){
     });
 }
 $("body").delegate(".btnDelete", "click", function (e) {
-    const recordId = {
-        'id': $(this).attr('record-id')
-    };
-    $.delete('./record', recordId, function(data, status) {
+    const recordId = $(this).attr('record-id');
+    $.delete(`./record/${recordId}`, function(data, status) {
         alert(data, status);
         location.reload();
+    })
+});
+
+function generateExpenseGraph (total) {
+}
+
+$("body").delegate(".btnTotal", "click", function (e) {
+// Create statistical graph
+    $.get(`./record`, {recordType: "Expense"}, (data) => {
+        var total = parseInt(0);
+        console.log(data);
+        var total = parseInt(0)
+        for (item of data) {
+            total += parseInt(item.money);
+        }
+        generateExpenseGraph(total)
+            // $.get(`./record/:${id}`, { category: "traffic"}, (data) => {
+            //     console.log(data.money);
+            //     // show total expense/income of all "traffic"
+            // })
     })
 });
