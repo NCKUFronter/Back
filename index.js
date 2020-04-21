@@ -30,7 +30,7 @@ function generateHtml(data) {
     }
     return elementsHtml;
 };
-$.get('./record', {}, (data) => {
+$.get('/record', {}, (data) => {
     loadData(data)
 });
 
@@ -48,12 +48,11 @@ function getPostData() {
     };
 };
 $('#post-form button[type="submit"]').click((e) => {
+    e.preventDefault();
     // POST list to /record
     postData = getPostData()
-    console.log(postData);
-    $.post('./record', postData, (data, status) => {
-        console.log('success!');
-        alert(data, status);
+    $.post('/record', postData, (data) => {
+        alert(data);
     });
 });
 
@@ -94,11 +93,12 @@ function getPutData(recordId) {
 };
 
 // Create PUT ajax
-$.put = function(url, data){
+$.put = function(url, data, callback){
     return $.ajax({
       url: url,
       type: 'PUT',
-      data: data
+      data: data,
+      success: callback
     });
 };
 
@@ -107,9 +107,8 @@ $("body").delegate(".btnUpdate", "click", function (e) {
 
     // Catch id and value of each update-input
     const recordId = $(this).attr('record-id');
-    putData = getPutData(recordId)
-    $.put('./record', putData, function(data, status) {
-        console.log('123');
+    const putData = getPutData(recordId);
+    $.put('/record', putData, function(data, status) {
         alert (data, status);
     });
 });
@@ -195,7 +194,8 @@ $.delete = function(url, data, callback){
 };
 $("body").delegate(".btnDelete", "click", function (e) {
     const recordId = $(this).attr('record-id');
-    $.delete(`./record/${recordId}`, function(data, status) {
+    $.delete(`/record/${recordId}`, {}, function(data, status) {
+        
         alert(data, status);
         location.reload();
     });
