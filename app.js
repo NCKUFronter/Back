@@ -7,19 +7,21 @@
 //     }
 //     console.log('Connected to the test database!');
 // });
+require("dotenv").config();
 
 // mongoDB init
 const { ObjectId, MongoClient } = require("mongodb");
 
 // const MongoClient = require("mongodb").MongoClient;
-const uri =
-  "mongodb+srv://uidd:1111@uidd-cluster-8k7z8.mongodb.net/uidd-db?retryWrites=true&w=majority";
+const uri = "mongodb+srv://uidd:1111@uidd-cluster-8k7z8.mongodb.net/uidd-db?retryWrites=true&w=majority";
 const client = MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
 client.connect((err) => {
   if (err) throw err;
+  console.log("DB connect successfully");
 });
 
 // app init
@@ -67,9 +69,9 @@ app.post("/record", function (req, res) {
       .find({})
       .sort({ recordId: 1 })
       .toArray(function (err, result) {
-        const id = 0;
+        let id = 0;
         if (count != 0) {
-            id = result[count-1].recordId;
+          id = result[count - 1].recordId;
         }
         /*
         const postData = {
@@ -79,11 +81,13 @@ app.post("/record", function (req, res) {
         };
         */
         const postData = {
-          recordId: id+ 1,
+          recordId: id + 1,
           recordType: req.body.recordType,
           money: req.body.money,
-          account: req.body.account,
-          category: req.body.category,
+          ledger: req.body.ledger,
+          categoryId: req.body.categoryId,
+          date: req.body.date,
+          detail: req.body.detail,
         };
         collection.insertOne(postData, function (err, res) {
           if (err) throw err;
@@ -106,10 +110,10 @@ app.post("/record", function (req, res) {
 });
 
 // PUT to update certain row
-app.put("/record", function (req, res) {
+app.put("/record/:id", function (req, res) {
   const putFilter = {
-    recordId: req.body.id
-    // _id: req.body.id,
+    // recordId: req.body.id,
+    _id: req.params.id,
   };
   const putData = {
     $set: {
@@ -134,13 +138,13 @@ app.put("/record", function (req, res) {
 });
 
 // DELETE certain row
-app.delete("/record", function (req, res) {
+app.delete("/record/:id", function (req, res) {
   const deleteFilter = {
-    recordId: req.body.id
+    // recordId: req.body.id,
 
     // refer:
     // https://stackoverflow.com/questions/4932928/remove-by-id-in-mongodb-console
-    // _id: ObjectId(req.body.id),
+    _id: ObjectId(req.params.id),
   };
   const collection = client.db("uidd-db").collection("uidd");
   collection.deleteOne(deleteFilter, (err, result) => {

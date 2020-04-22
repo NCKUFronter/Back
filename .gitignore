@@ -11,3 +11,4 @@ gulpfile.js
 ngrok
 *.sh
 yarn.lock
+.env
