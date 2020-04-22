@@ -84,7 +84,7 @@ function getPutData(recordId) {
     recordElement.html(element);
     recordElement.removeClass('on-edit')
     return {
-        'id': recordId,
+        'recordId': recordId,
         'recordType': newType,
         'money': newMoney,
         'category': newCategory,

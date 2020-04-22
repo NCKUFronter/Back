@@ -1,6 +1,6 @@
 var express = require("express")
 var router = express.Router();
-//var db = require('./models/db')
+
 var client = require('../models/mongo')
 client = client.client
 
@@ -52,8 +52,15 @@ router.post('/', function (req, res) {
                 recordId: id + 1,
                 recordType: req.body.recordType,
                 money: req.body.money,
-                category: req.body.category,
-                account: req.body.account,
+                ledger: req.body.ledger,
+                date: req.body.date,
+                reviseDate: req.body.reviseDate,
+                hashtag: req.body.hashtag,
+                userId: req.body.userId,
+                payback: req.body.payback,
+                from: req.body.from,
+                categoryId: req.body.categoryId,
+                detail: req.body.detail
             };
             collection.insertOne(postData, function (err, res) {
                 if (err) throw err;
@@ -67,14 +74,21 @@ router.post('/', function (req, res) {
 // PUT to update certain row info
 router.put('/', function (req, res) {
     var putFilter = {
-        recordId: req.body.id
+        recordId: req.body.recordId
     };
     var putData = {
         $set: {
-            recordType: req.body.type,
+            recordType: req.body.recordType,
             money: req.body.money,
-            category: req.body.category,
-            account: req.body.account,
+            ledger: req.body.ledger,
+            date: req.body.date,
+            reviseDate: req.body.reviseDate,
+            hashtag: req.body.hashtag,
+            userId: req.body.userId,
+            payback: req.body.payback,
+            from: req.body.from,
+            categoryId: req.body.categoryId,
+            detail: req.body.detail
         }
     };
     const collection = client.db("uidd-db").collection("uidd");
