@@ -163,8 +163,21 @@ app.delete("/record/:id", function (req, res) {
 });
 
 // Run the server
+const fs = require('fs');
+const https = require('https');
+let hasCert = false;
+try {
+  var key = fs.readFileSync('./cert/key.pem');
+  var cert = fs.readFileSync('./cert/cert.pem');
+  hasCert = true;
+} catch(err) {
+  hasCert = false;
+}
+console.log('has cert: ' + hasCert)
+
 const port = process.env.PORT || 3000;
-app.listen(port, function () {
+const server = (hasCert) ? https.createServer({key, cert }, app) : app;
+server.listen(port, function () {
   console.log(`Example app listening on port ${port}!`);
 });
 
