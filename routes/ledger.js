@@ -1,85 +1,144 @@
-var express = require("express")
-var router = express.Router();
+// @ts-check
+const { fetchNextId, collections } = require("../models/mongo");
+const { LedgerSchema } = require("../models/ledger.model");
+const validatePipe = require("../middleware/validate-pipe");
+const router = require("express").Router();
 
-var client = require('../models/mongo')
-client = client.client
+// 假設已經 connectDB
+const ledger_coll = collections.ledger;
 
-// GET from database 
-router.get('/', function (req, res) {
-    const collection = client.db("uidd-db").collection("ledger");
-    collection.find().sort({ ledgerId: 1 }).toArray(function (err, result) {
+// GET from database
+router.get(
+  "/",
+  validatePipe("query", LedgerSchema, { context: { partial: true } }),
+  function (req, res) {
+    ledger_coll
+      .find()
+      // .sort({ ledgerId: 1 })
+      .toArray(function (err, result) {
         if (err) throw err;
         res.status(200).send(result);
-    })
-});
+      });
+  }
+);
 
 // GET certain data from database
-router.get('/:id', function (req, res) {
-    var ledgerId = req.params.id;
-    const getData = {
-        ledgerId: parseInt(ledgerId)
-    };
-    const collection = client.db("uidd-db").collection("ledger");
-    collection.find(getData).toArray(function (err, result) {
-        if (err) throw err;
-        res.status(200).send(result);
-    })
+router.get("/:id", function (req, res) {
+  const getData = { _id: parseInt(req.params.id, 10) };
+
+  ledger_coll.find(getData).toArray(function (err, result) {
+    if (err) throw err;
+    res.status(200).send(result);
+  });
 });
 
 // Post the info
-router.post('/', function (req, res) {
-    const collection = client.db("uidd-db").collection("ledger");
-    collection.countDocuments(function (err, count) {
-        collection.find({}).sort({ ledgerId: 1 }).toArray(function (err, result) {
-            var id = 0;
-            if (count != 0) {
-                id = result[count - 1].ledgerId;
-            }
-            const postData = {
-                ledgerId: id + 1,
-                userIds: userIds,
-                ledgerName: req.body.ledgerName,
-                admin: admin
-            };
-            collection.insertOne(postData, function (err, res) {
-                if (err) throw err;
-                console.log('1 ledger info inserted.');
-            })
-            res.status(201).send('Success!');
-        })
-    })
+router.post("/", validatePipe("body", LedgerSchema), async function (req, res) {
+  const postData = {
+    _id: await fetchNextId(ledger_coll.collectionName),
+    ...req.body,
+  };
+
+  ledger_coll.insertOne(postData, function (err, result) {
+    if (err) throw err;
+    console.log("1 ledger info inserted.");
+    res.status(201).send(result.ops[0]);
+  });
+
+  /*
+  ledger_coll.countDocuments(function (err, count) {
+    ledger_coll
+      .find({})
+      .sort({ ledgerId: 1 })
+      .toArray(function (err, result) {
+        let id = 0;
+        if (count != 0) {
+          id = result[count - 1].ledgerId;
+        }
+        const postData = {
+          ledgerId: id + 1,
+          userIds: req.body.userIds,
+          ledgerName: req.body.ledgerName,
+          admin: req.body.admin,
+        };
+        ledger_coll.insertOne(postData, function (err, res) {
+          if (err) throw err;
+          console.log("1 ledger info inserted.");
+        });
+        res.status(201).send("Success!");
+      });
+  });
+      */
 });
 
 // PUT to update certain row info
-router.put('/', function (req, res) {
-    var putFilter = {
-        ledgerId: req.body.ledgerId
+router.put(
+  "/:id",
+  validatePipe("body", LedgerSchema),
+  function (req, res) {
+    const putFilter = { _id: parseInt(req.params.id, 10) };
+
+    const putData = {
+      $set: req.body,
+      /*{
+        userIds: req.body.userIds,
+        ledgerName: req.body.ledgerName,
+        admin: req.body.admin,
+      },*/
     };
-    var putData = {
-        $set: {
-            userIds: userIds,
-            ledgerName: req.body.ledgerName,
-            admin: admin
-        }
-    };
-    const collection = client.db("uidd-db").collection("ledger");
-    collection.updateOne(putFilter, putData, function (err, res) {
+
+    ledger_coll.findOneAndUpdate(
+      putFilter,
+      putData,
+      { returnOriginal: false },
+      function (err, result) {
         if (err) throw err;
         console.log("1 document updated");
-    })
-    res.status(201).send('Got a PUT request at /ledger');
-});
+        res.status(200).send(result.value);
+      }
+    );
+  }
+);
+
+// PATCH to update certain row info
+router.patch(
+  "/:id",
+  validatePipe("body", LedgerSchema, { context: { partial: true } }),
+  function (req, res) {
+    const patchFilter = { _id: parseInt(req.params.id, 10) };
+    const patchData = {
+      $set: req.body,
+    };
+
+    ledger_coll.findOneAndUpdate(
+      patchFilter,
+      patchData,
+      { returnOriginal: false },
+      function (err, result) {
+        if (err) throw err;
+        console.log("1 document updated");
+        res.status(200).send(result.value);
+      }
+    );
+  }
+);
 
 // DELETE certain row
-router.delete('/:id', function (req, res) {
-    var deleteFilter = {
-        ledgerId: parseInt(req.params.id)
-    };
-    const collection = client.db("uidd-db").collection("ledger");
-    collection.deleteOne(deleteFilter, (err, result) => {
-        console.log('Delete row: '+ req.params.id+ ' with filter: '+ deleteFilter+ '. Deleted: '+ result.result.n);
-    })
-    res.status(201).send('Delete row: ' + req.params.id + ' from db Successfully!');
+router.delete("/:id", function (req, res) {
+  const deleteFilter = { _id: parseInt(req.params.id, 10) };
+  ledger_coll.deleteOne(deleteFilter, (err, result) => {
+    console.log(
+      "Delete row: " +
+        req.params.id +
+        " with filter: " +
+        deleteFilter +
+        ". Deleted: " +
+        result.result.n
+    );
+    res
+      .status(200)
+      .send("Delete row: " + req.params.id + " from db Successfully!");
+  });
 });
 
 module.exports = router;

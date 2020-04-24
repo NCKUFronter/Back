@@ -1,3 +1,5 @@
+// @ts-check
+
 // sqlite3 db init
 // const sqlite3 = require('sqlite3').verbose();
 
@@ -8,36 +10,57 @@
 //     console.log('Connected to the test database!');
 // });
 
-
-// app init
-var express = require('express');
-var app = express();
+require("dotenv").config();
+const express = require("express");
+const bodyParser = require("body-parser");
+const fs = require("fs");
+const https = require("https");
+const cors = require("cors");
 
 // load static web main page
-const path = require('path');
+const path = require("path");
+const { connectDB } = require("./models/mongo");
 
-app.use(express.static(__dirname))
-app.get('/', function (req, res) {
-    res.send('Main page loading properly!');
-});
+async function startup() {
+  await connectDB();
 
-// POST into database
-const bodyParser = require('body-parser')
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+  // app init
+  const app = express();
 
-app.use('/record', require('./routes/record'));
-app.use('/user', require('./routes/user'));   // /account to record user info
-app.use('/category', require('./routes/category'));
-app.use('/ledger', require('./routes/ledger'));   // /account to record user info
+  // Plugins
+  // @ts-ignore
+  app.use(cors());
 
+  app.use(express.static(__dirname));
+  app.get("/", function (req, res) {
+    res.send("Main page loading properly!");
+  });
 
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json());
 
-// Run the server
-const port = 3000;
-app.listen(port, function () {
-    console.log(`Example app listening on port ${port}!`)
-})
+  // Router
+  app.use("/record", require("./routes/record"));
+  app.use("/user", require("./routes/user")); // /account to record user info
+  app.use("/category", require("./routes/category"));
+  app.use("/ledger", require("./routes/ledger")); // /account to record user info
+
+  // Run the server
+  let KeyCert = null;
+  try {
+    const key = fs.readFileSync(process.env.KEY_PEM);
+    const cert = fs.readFileSync(process.env.CERT_PEM);
+    KeyCert = { key, cert };
+  } catch (err) {}
+  console.log("has cert: " + Boolean(KeyCert));
+
+  const port = process.env.PORT || 3000;
+  const server = KeyCert ? https.createServer(KeyCert, app) : app;
+  server.listen(port, function () {
+    console.log(`App listening on port ${port}!`);
+  });
+}
+startup();
 
 // Close the database
 // Code here

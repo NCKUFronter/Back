@@ -1,81 +1,127 @@
-var express = require("express")
-var router = express.Router();
+// @ts-check
+const { collections, fetchNextId } = require("../models/mongo");
+const { CategorySchema } = require("../models/category.model");
+const validatePipe = require("../middleware/validate-pipe");
+const router = require("express").Router();
 
-var client = require('../models/mongo')
-client = client.client
+// 假設已經 connectDB
+const category_coll = collections.category;
 
-// GET from database 
-router.get('/', function (req, res) {
-    const collection = client.db("uidd-db").collection("category");
-    collection.find().sort({ categoryId: 1 }).toArray(function (err, result) {
+// GET from database
+router.get(
+  "/",
+  validatePipe("query", CategorySchema, { context: { partial: true } }),
+  function (req, res) {
+    category_coll
+      .find(req.query)
+      // .sort({ categoryId: 1 })
+      .toArray(function (err, result) {
         if (err) throw err;
         res.status(200).send(result);
-    })
-});
+      });
+  }
+);
 
 // GET certain data from database
-router.get('/:id', function (req, res) {
-    var categoryId = req.params.id;
-    const getData = {
-        categoryId: parseInt(categoryId)
-    };
-    const collection = client.db("uidd-db").collection("category");
-    collection.find(getData).toArray(function (err, result) {
-        if (err) throw err;
-        res.status(200).send(result);
-    })
+router.get("/:id", function (req, res) {
+  const getData = { _id: parseInt(req.params.id, 10) };
+  category_coll.findOne(getData, function (err, result) {
+    if (err) throw err;
+    res.status(200).send(result);
+  });
 });
 
 // Post the info
-router.post('/', function (req, res) {
-    const collection = client.db("uidd-db").collection("category");
-    collection.countDocuments(function (err, count) {
-        collection.find({}).sort({ categoryId: 1 }).toArray(function (err, result) {
-            var id = 0;
-            if (count != 0) {
-                id = result[count - 1].categoryId;
-            }
-            const postData = {
-                categoryId: id + 1,
-                categoryName: req.body.categoryName
-            };
-            collection.insertOne(postData, function (err, res) {
-                if (err) throw err;
-                console.log('1 category info inserted.');
-            })
-            res.status(201).send('Success!');
-        })
-    })
+router.post("/", validatePipe("body", CategorySchema), async function (
+  req,
+  res
+) {
+  const postData = {
+    _id: await fetchNextId(category_coll.collectionName),
+    ...req.body,
+  };
+  category_coll.insertOne(postData, function (err, result) {
+    if (err) throw err;
+    console.log("1 category info inserted.");
+    res.status(201).send(result.ops[0]);
+  });
+
+  /*
+  category_coll.countDocuments(function (err, count) {
+    category_coll
+      .find({})
+      .sort({ categoryId: 1 })
+      .toArray(function (err, result) {
+        let id = 0;
+        if (count != 0) {
+          id = result[count - 1].categoryId;
+        }
+        const postData = {
+          categoryId: id + 1,
+          categoryName: req.body.categoryName,
+        };
+      });
+  });
+  */
 });
 
 // PUT to update certain row info
-router.put('/', function (req, res) {
-    var putFilter = {
-        categoryId: req.body.categoryId
-    };
-    var putData = {
-        $set: {
-            categoryName: req.body.categoryName
-        }
-    };
-    const collection = client.db("uidd-db").collection("category");
-    collection.updateOne(putFilter, putData, function (err, res) {
-        if (err) throw err;
-        console.log("1 document updated");
-    })
-    res.status(201).send('Got a PUT request at /category');
+router.put("/:id", validatePipe("body", CategorySchema), function (req, res) {
+  const putFilter = {
+    _id: parseInt(req.params.id, 10),
+  };
+  const putData = {
+    $set: req.body,
+  };
+
+  category_coll.findOneAndUpdate(
+    putFilter,
+    putData,
+    { returnOriginal: false },
+    function (err, result) {
+      if (err) throw err;
+      console.log("1 document updated");
+      res.status(200).send(result.value);
+    }
+  );
 });
 
-// DELETE certain row
-router.delete('/:id', function (req, res) {
-    var deleteFilter = {
-        categoryId: parseInt(req.params.id)
+// PATCH to update certain row info
+router.patch(
+  "/:id",
+  validatePipe("body", CategorySchema, { context: { partial: true } }),
+  function (req, res) {
+    const patchFilter = { _id: parseInt(req.params.id, 10) };
+    const patchData = {
+      $set: req.body,
     };
-    const collection = client.db("uidd-db").collection("category");
-    collection.deleteOne(deleteFilter, (err, result) => {
-        console.log('Delete row: '+ req.params.id+ ' with filter: '+ deleteFilter+ '. Deleted: '+ result.result.n);
-    })
-    res.status(201).send('Delete row: ' + req.params.id + ' from db Successfully!');
+
+    category_coll.findOneAndUpdate(
+      patchFilter,
+      patchData,
+      { returnOriginal: false },
+      function (err, result) {
+        if (err) throw err;
+        console.log("1 document updated");
+        res.status(200).send(result.value);
+      }
+    );
+  }
+);
+
+// DELETE certain row
+router.delete("/:id", function (req, res) {
+  const deleteFilter = {
+    _id: parseInt(req.params.id, 10),
+  };
+  category_coll.deleteOne(deleteFilter, (err, result) => {
+    console.log(
+      `Delete row: ${req.params.id} with filter: ${deleteFilter}. Deleted: ${result.result.n}`
+    );
+    res
+      .status(200)
+      .send("Delete row: " + req.params.id + " from db Successfully!");
+  });
 });
 
 module.exports = router;
