@@ -21,15 +21,15 @@ router.post('/',
 //         res.json({ id: req.user.id, username: req.user.username });
 // });
 
-router.get('/', function(req, res, next) {
-    passport.authenticate('local', function(err, user, info) {
-        if (err) return next(err);
-        if (!user) return res.redirect('/');
-        req.logIn(user, function(err) {
-            if (err) return next(err);
-            return res.redirect('/user/'+ user.username);
-        });
-    })(req, res, next);
-})
+router.get('/auth/google',
+    passport.authenticate('google', { scope: ['profile'] }));
+
+router.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.send('Log In Success!');
+});
+
+
 
 module.exports = router;

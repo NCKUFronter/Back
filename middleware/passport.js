@@ -1,42 +1,40 @@
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const { collections } = require('../models/mongo');
+const keys = require('../config/keys')
 
-passport.use(new LocalStrategy(
-  // 這是 verify callback
-  function(username, password, done) {
-    const user_coll = collections.user;
-    user_coll.findOne({ name: username }, function (err, user) {
-      console.log(user);
-      if (err) { return done(err); }
-      
-      // 如果使用者不存在
-      if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
-      }
-
-      // 如果使用者密碼錯誤
-      if (user.password != password) {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
-
-      // 認證成功，回傳使用者資訊 user
-      return done(null, user);
-    });
-  }
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: keys.googleClientID,
+      clientSecret: keys.googleClientSecret,
+      callbackURL: "/login/auth/google/callback"
+    },
+    // 這是 verify callback
+    function(accessToken, refreshToken, profile, done) {
+      const user_coll = collections.user;
+      // console.log(accessToken);
+      // console.log(refreshToken);
+      user_coll.findOneAndUpdate(
+        { _id: 2 },
+        { $set: { googleID: profile.id }}
+      , function (err, user) {
+        return done(err, user);
+      });
+    }
 ));
 
-// passport.serializeUser(function(user, done) {
-//     done(null, user.id);
-//   });
-  
-// passport.deserializeUser(function(id, done) {
-//     collections.user.findById(id, function(err, user) {
-//       done(err, user);
-//     });
-//   });
+passport.serializeUser(function(user, done) {
+  done(null, user.value._id);
+});
+passport.deserializeUser(function(id, done) {
+  user_coll.find({_id: id}, function(err, user) {
+    done(err, user);
+  });
+});
+
 
 module.exports = {
     passport, 
-    LocalStrategy,
+    GoogleStrategy,
 };
