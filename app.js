@@ -16,6 +16,10 @@ const bodyParser = require("body-parser");
 const fs = require("fs");
 const https = require("https");
 const cors = require("cors");
+const { passport } = require('./middleware/passport');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+var flash = require('connect-flash');
 
 // load static web main page
 const path = require("path");
@@ -35,15 +39,24 @@ async function startup() {
   app.get("/", function (req, res) {
     res.send("Main page loading properly!");
   });
+  app.use(cookieParser());
+  app.use(session({ secret: "cats" }));
 
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
+
+  //LogIn
+  
+  app.use(passport.initialize())
+  app.use(passport.session())
+  app.use(flash())
 
   // Router
   app.use("/record", require("./routes/record"));
   app.use("/user", require("./routes/user")); // /account to record user info
   app.use("/category", require("./routes/category"));
   app.use("/ledger", require("./routes/ledger")); // /account to record user info
+  app.use("/login", require("./routes/login"));
 
   // Run the server
   let KeyCert = null;

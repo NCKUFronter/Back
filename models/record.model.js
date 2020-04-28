@@ -13,14 +13,14 @@ const RecordSchema = Joi.object({
   categoryId: JoiRequireWhen(Joi.number().min(0)),
 
   // 應該辨識使用者身份自動填入
-  // userId: JoiRequireWhen(Joi.number().min(0)),
+  userId: JoiRequireWhen(Joi.number().min(0)),
 
   date: JoiRequireWhen(Joi.date()),
 
   hashtags: Joi.array().items(Joi.string()),
 
-  detail: Joi.string(),
-});
+  detail: Joi.string().allow(""),
+}).not({});
 
 class RecordModel {
   /** @type {number} */

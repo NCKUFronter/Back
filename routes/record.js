@@ -8,10 +8,7 @@ const router = require("express").Router();
 const record_coll = collections.record;
 
 // GET from database
-router.get(
-  "/",
-  validatePipe("query", RecordSchema, { context: { partial: true } }),
-  function (req, res) {
+router.get("/", function (req, res) {
     record_coll.find(req.query).toArray(function (err, result) {
       if (err) throw err;
       res.status(200).send(result);
@@ -157,8 +154,7 @@ router.patch(
         if (err) throw err;
         console.log("1 document updated");
         res.status(200).send(result.value);
-      }
-    );
+    });
   }
 );
 

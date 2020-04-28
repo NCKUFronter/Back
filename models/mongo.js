@@ -11,6 +11,7 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
 });
 
+
 const collections = {
   /** @type {Collection} */
   record: null,
