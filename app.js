@@ -16,7 +16,7 @@ const bodyParser = require("body-parser");
 const fs = require("fs");
 const https = require("https");
 const cors = require("cors");
-const { passport } = require('./middleware/passport');
+const { passportLocal } = require('./middleware/passport-local');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 var flash = require('connect-flash');
@@ -47,8 +47,8 @@ async function startup() {
 
   //LogIn
   
-  app.use(passport.initialize())
-  app.use(passport.session())
+  app.use(passportLocal.initialize())
+  app.use(passportLocal.session())
   app.use(flash())
 
   // Router
@@ -57,6 +57,8 @@ async function startup() {
   app.use("/category", require("./routes/category"));
   app.use("/ledger", require("./routes/ledger")); // /account to record user info
   app.use("/login", require("./routes/login"));
+  app.use("/login-local", require("./routes/login-local"));
+  
 
   // Run the server
   let KeyCert = null;
