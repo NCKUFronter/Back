@@ -1,9 +1,7 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-const { fetchNextId, collections } = require('../models/mongo');
+const { collections } = require('../models/mongo');
 const keys = require('../config/keys')
-
-
 
 passport.use(
   new GoogleStrategy(
@@ -12,11 +10,9 @@ passport.use(
       clientSecret: keys.googleClientSecret,
       callbackURL: "/login/auth/google/callback"
     },
-    // 這是 verify callback
-    async function(accessToken, refreshToken, profile, done) {
+    function(accessToken, refreshToken, profile, done) {
+      console.log(profile)
       const user_coll = collections.user;
-      // console.log(accessToken);
-      // console.log(refreshToken);
       user_coll.updateOne(
         // { _id: id, googleID: profile.id}
         { googleID: profile.id },
@@ -30,7 +26,6 @@ passport.use(
 ));
 
 passport.serializeUser(function(user, done) {
-  // done(null, user.insertedId);
   done(null, user.upsertedId._id);
 });
 passport.deserializeUser(function(id, done) {
@@ -42,5 +37,5 @@ passport.deserializeUser(function(id, done) {
 
 module.exports = {
     passport, 
-    GoogleStrategy,
+    GoogleStrategy
 };
