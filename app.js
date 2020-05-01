@@ -1,25 +1,16 @@
 // @ts-check
 
-// sqlite3 db init
-// const sqlite3 = require('sqlite3').verbose();
-
-// let db = new sqlite3.Database('./test.db', (err) => {
-//     if (err) {
-//       console.error(err.message);
-//     }
-//     console.log('Connected to the test database!');
-// });
-
 require("dotenv").config();
 const express = require("express");
+// const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const https = require("https");
 const cors = require("cors");
-const { passportLocal } = require('./middleware/passport-local');
-const session = require('express-session');
-const cookieParser = require('cookie-parser');
-var flash = require('connect-flash');
+const { AppPassport } = require("./middleware/app-passport");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
+const flash = require("connect-flash");
 
 // load static web main page
 const path = require("path");
@@ -32,24 +23,27 @@ async function startup() {
   const app = express();
 
   // Plugins
-  // @ts-ignore
-  app.use(cors());
+  app.use(
+    cors({
+      credentials: true,
+      origin: (_origin, cb) => cb(null, true), // 給前端用
+    })
+  );
 
   app.use(express.static(__dirname));
   app.get("/", function (req, res) {
     res.send("Main page loading properly!");
   });
   app.use(cookieParser());
-  app.use(session({ secret: "cats" }));
+  app.use(session({ secret: "cats", resave: false, saveUninitialized: false }));
 
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
-  //LogIn
-  
-  app.use(passportLocal.initialize())
-  app.use(passportLocal.session())
-  app.use(flash())
+  // LogIn
+  app.use(AppPassport.initialize());
+  app.use(AppPassport.session());
+  app.use(flash());
 
   // Router
   app.use("/record", require("./routes/record"));
@@ -58,7 +52,6 @@ async function startup() {
   app.use("/ledger", require("./routes/ledger")); // /account to record user info
   app.use("/login", require("./routes/login"));
   app.use("/login-local", require("./routes/login-local"));
-  
 
   // Run the server
   let KeyCert = null;
