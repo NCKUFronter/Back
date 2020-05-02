@@ -62,4 +62,8 @@ module.exports = {
   collections,
   fetchNextId,
   fetchNowId,
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 40982b219b7a7202fccddeb2498869ef689884ee
