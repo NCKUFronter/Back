@@ -3,7 +3,7 @@ const Joi = require("@hapi/joi");
 const { JoiRequireWhen } = require("./utils");
 
 const LedgerSchema = Joi.object({
-  name: JoiRequireWhen(Joi.string()),
+  name: JoiRequireWhen(Joi.string())
 });
 
 class LedgerModel {
@@ -17,7 +17,7 @@ class LedgerModel {
   admin;
 
   /** @type {string[]} */
-  userIds;
+  user;
 }
 
 module.exports = {

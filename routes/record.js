@@ -3,12 +3,13 @@ const { collections, fetchNextId } = require("../models/mongo");
 const { RecordSchema } = require("../models/record.model");
 const validatePipe = require("../middleware/validate-pipe");
 const router = require("express").Router();
-
+const { AppPassport } = require('../middleware/app-passport')
 // 假設已經 connectDB
 const record_coll = collections.record;
 
 // GET from database
 router.get("/", function (req, res) {
+    console.log(req.sessionID);
     record_coll.find(req.query).toArray(function (err, result) {
       if (err) throw err;
       res.status(200).send(result);

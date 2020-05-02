@@ -12,6 +12,7 @@ router.get(
   "/",
   validatePipe("query", CategorySchema, { context: { partial: true } }),
   function (req, res) {
+    console.log({session: req.session, user: req.user})
     category_coll
       .find(req.query)
       // .sort({ categoryId: 1 })

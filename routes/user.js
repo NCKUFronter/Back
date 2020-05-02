@@ -12,6 +12,7 @@ router.get(
   "/",
   validatePipe("query", UserSchema, { context: { partial: true } }),
   function (req, res) {
+    console.log({session: req.session, user: req.user})
     user_coll
       .find(req.query)
       // .sort({ userId: 1 })

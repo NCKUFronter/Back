@@ -11,7 +11,6 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
 });
 
-
 const collections = {
   /** @type {Collection} */
   record: null,
@@ -52,9 +51,15 @@ async function fetchNextId(coll_name) {
   return coll_document.value.nowId;
 }
 
+async function fetchNowId(coll_name) {
+  const coll_document = await collections.counter.findOne({ _id: coll_name });
+  return coll_document.value.nowId;
+}
+
 module.exports = {
   client,
   connectDB,
   collections,
   fetchNextId,
+  fetchNowId,
 };

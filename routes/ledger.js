@@ -3,15 +3,21 @@ const { fetchNextId, collections } = require("../models/mongo");
 const { LedgerSchema } = require("../models/ledger.model");
 const validatePipe = require("../middleware/validate-pipe");
 const router = require("express").Router();
+const ObjectId = require("mongodb").ObjectId
+const DBref = require("mongodb").DBRef
 
 // 假設已經 connectDB
 const ledger_coll = collections.ledger;
-
 // GET from database
 router.get(
   "/",
   validatePipe("query", LedgerSchema, { context: { partial: true } }),
-  function (req, res) {
+  async function (req, res) {
+    ledger_coll.aggregate([
+      { $lookup: { from: 'user', localField: "pass", foreignField: "password", as: "UserData" } }
+    ]).toArray((err, result) => {
+      console.log(result);
+    })
     ledger_coll
       .find()
       // .sort({ ledgerId: 1 })
@@ -36,7 +42,7 @@ router.get("/:id", function (req, res) {
 router.post("/", validatePipe("body", LedgerSchema), async function (req, res) {
   const postData = {
     _id: await fetchNextId(ledger_coll.collectionName),
-    ...req.body,
+    ...req.body
   };
 
   ledger_coll.insertOne(postData, function (err, result) {
@@ -71,32 +77,39 @@ router.post("/", validatePipe("body", LedgerSchema), async function (req, res) {
       */
 });
 
+
+// const objectid = new ObjectID("5ea94a17ca96d5395fe83cdf")
+// const dbref = new DBref("user", objectid)
 // PUT to update certain row info
 router.put(
   "/:id",
-  validatePipe("body", LedgerSchema),
+  validatePipe("body", LedgerSchema, { context: { partial: true } }),
   function (req, res) {
+    console.log(new ObjectId("5ea94a17ca96d5395fe83cdf"))
     const putFilter = { _id: parseInt(req.params.id, 10) };
-
     const putData = {
-      $set: req.body,
-      /*{
+      // $set: {test: 1,
+      //   ...req.body,}
+      $set: {pass: "123"}
+      /*{}
         userIds: req.body.userIds,
         ledgerName: req.body.ledgerName,
         admin: req.body.admin,
       },*/
     };
-
+    
     ledger_coll.findOneAndUpdate(
       putFilter,
       putData,
       { returnOriginal: false },
       function (err, result) {
         if (err) throw err;
+        
         console.log("1 document updated");
         res.status(200).send(result.value);
       }
     );
+    
   }
 );
 
