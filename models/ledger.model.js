@@ -5,7 +5,7 @@ const { JoiRequireWhen } = require("./utils");
 const LedgerSchema = Joi.object({
   userIds: JoiRequireWhen(Joi.array().items(Joi.string().regex(/[0-9]/).allow(null))),
   ledgerName: JoiRequireWhen(Joi.string().regex(/[a-zA-Z0-9]/)),
-  admin: JoiRequireWhen(Joi.string().regex(/[0-9]/).allow(null))
+  adminId: JoiRequireWhen(Joi.string().regex(/[0-9]/).allow(null))
 }).not({});
 
 class LedgerModel {
@@ -16,7 +16,7 @@ class LedgerModel {
   ledgerName;
 
   /** @type {string} */
-  admin;
+  adminId;
 
   /** @type {string[]} */
   userIds;

@@ -37,10 +37,14 @@ test("accept invitation", async () => {
 
   invitation = await findLast(collections.invitation);
   assert.equal(invitation.type, 1);
+
+  const ledger = await collections.ledger.findOne({ _id: invitation.ledgerId });
+  assert.equal(new Set(ledger.userIds).size, ledger.userIds.length);
+  assert.equal(ledger.userIds.includes("3"), true)
 });
 
 test("reject invitation", async () => {
-  await doInviteTest("2", "1", "3");
+  await doInviteTest("1", "1", "3");
 
   /** @type {InvitationModel} */
   let invitation = await findLast(collections.invitation);
@@ -49,6 +53,10 @@ test("reject invitation", async () => {
   invitation = await findLast(collections.invitation);
   assert.equal(invitation.type, 0);
   assert.notEqual(invitation.answerTime, null);
+
+  const ledger = await collections.ledger.findOne({ _id: invitation.ledgerId });
+  assert.equal(new Set(ledger.userIds).size, ledger.userIds.length);
+  assert.equal(ledger.userIds.includes("3"), false)
 });
 
 module.exports = test;

@@ -5,6 +5,7 @@ const {
   simpleInsertOne,
   workInTransaction,
 } = require("../models/mongo");
+const assert = require("assert");
 const { InvitationModel, LedgerModel, UserModel } = require("../models");
 
 /**
@@ -15,25 +16,18 @@ const { InvitationModel, LedgerModel, UserModel } = require("../models");
  */
 async function invite(ledger, fromUser, toUser) {
   // 假設參數都是對的，不做任何正確性檢查
-
-  if (!ledger.userIds) ledger.userIds = [];
-  ledger.userIds.push(toUser._id);
+  assert.equal(
+    ledger.adminId == fromUser._id || ledger.userIds.includes(fromUser._id),
+    true
+  );
+  assert.equal(
+    ledger.adminId != toUser._id || !ledger.userIds.includes(toUser._id),
+    true
+  );
 
   const invitation = new InvitationModel(ledger._id, fromUser._id, toUser._id);
   return workInTransaction(async (session) => {
-    const ledger_prom = collections.ledger.updateOne(
-      { _id: ledger._id },
-      { $set: { userIds: ledger.userIds } },
-      { session }
-    );
-
-    const invit_prom = simpleInsertOne(
-      collections.invitation,
-      invitation,
-      session
-    );
-
-    await Promise.all([ledger_prom, invit_prom]);
+    await simpleInsertOne(collections.invitation, invitation, session);
   });
 }
 
@@ -44,20 +38,28 @@ async function invite(ledger, fromUser, toUser) {
  */
 async function answerInvitation(invitation, answer) {
   // 假設參數都是對的，不做任何正確性檢查
+  assert.equal(invitation.type, 2);
+
   if (!(invitation instanceof InvitationModel))
     invitation = InvitationModel.fromObject(invitation);
-
   invitation.answer(answer);
-  try {
-    await collections.invitation.updateOne(
+
+  return workInTransaction(async (session) => {
+    let ledger_prom = null;
+    if (invitation.type == 1) {
+      ledger_prom = collections.ledger.updateOne(
+        { _id: invitation.ledgerId },
+        { $addToSet: { userIds: invitation.toUserId } },
+        { session }
+      );
+    }
+
+    const invit_prom = collections.invitation.updateOne(
       { _id: invitation._id },
       { $set: invitation }
     );
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-  return true;
+    await Promise.all([ledger_prom, invit_prom]);
+  });
 }
 
 module.exports = {
