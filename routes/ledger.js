@@ -28,7 +28,7 @@ router.get(
 
 // GET certain data from database
 router.get("/:id", function (req, res) {
-  const getData = { _id: parseInt(req.params.id, 10) };
+  const getData = { _id: req.params.id };
 
   ledger_coll.find(getData).toArray(function (err, result) {
     if (err) throw err;
@@ -56,7 +56,7 @@ router.post("/", validatePipe("body", LedgerSchema), async function (req, res) {
       _id: await fetchNextId(ledger_coll.collectionName),
       admin: null,
       userId: [null],
-      ...req.body
+      ...req.body,
     }
     ledger_coll.insertOne(postData, function (err, result) {
       if (err) throw err;
@@ -94,7 +94,7 @@ router.put(
   "/:id",
   validatePipe("body", LedgerSchema, { context: { partial: true } }),
   function (req, res) {
-    const putFilter = { _id: parseInt(req.params.id, 10) };
+    const putFilter = { _id: req.params.id };
     const putData = {
       $set: {
         ...req.body
@@ -119,7 +119,7 @@ router.patch(
   "/:id",
   validatePipe("body", LedgerSchema, { context: { partial: true } }),
   function (req, res) {
-    const patchFilter = { _id: parseInt(req.params.id, 10) };
+    const patchFilter = { _id: req.params.id };
     const patchData = {
       $set: req.body,
     };
@@ -138,7 +138,7 @@ router.patch(
 
 // DELETE certain row
 router.delete("/:id", function (req, res) {
-  const deleteFilter = { _id: parseInt(req.params.id, 10) };
+  const deleteFilter = { _id: req.params.id };
   ledger_coll.deleteOne(deleteFilter, (err, result) => {
     console.log(
       "Delete row: " +

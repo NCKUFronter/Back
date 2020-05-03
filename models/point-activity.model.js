@@ -1,5 +1,14 @@
+// @ts-check
+const Joi = require("@hapi/joi");
+const { JoiNumberString } = require("./utils");
+
+const TransferPointsSchema = Joi.object({
+  ledgerId: JoiNumberString.required(),
+  email: Joi.string().email().required(),
+});
+
 class PointActivityModel {
-  /** @type {number=} */
+  /** @type {string} */
   _id;
 
   /** @type {string} */
@@ -8,17 +17,11 @@ class PointActivityModel {
   /** @type {string=} */
   subtype;
 
-  /** @type {number} */
-  fromId;
-
-  /** @type {number} */
-  toId;
-
-  /** @type {Date} */
+  /** @type {string} */
   time;
 
   /**
-   * @param {string} type
+   * @param {'new' | 'transfer' | 'consume'} type
    * @param {string} subtype
    * @param {number} amount
    * @param {number} fromId
@@ -29,13 +32,35 @@ class PointActivityModel {
     this.type = type;
     this.subtype = subtype;
     this.amount = amount;
-    this.fromId = fromId;
-    this.toId = toId;
-    this.detail = detail;
+    if (detail) this.detail = detail;
     this.time = new Date().toISOString();
+
+    switch (type) {
+      case "new":
+        /** @type {number} */
+        this.fromRecordId = fromId;
+        /** @type {number} */
+        this.toUserId = toId;
+        break;
+      case "transfer":
+        /** @type {number} */
+        this.fromUserId = fromId;
+        /** @type {number} */
+        this.toUserId = toId;
+        break;
+      case "consume":
+        /** @type {number} */
+        this.fromUserId = fromId;
+        /** @type {number} */
+        this.toGoodsId = toId;
+        break;
+      default:
+        throw `Unknown record type: ${type}`;
+    }
   }
 }
 
 module.exports = {
   PointActivityModel,
+  TransferPointsSchema,
 };

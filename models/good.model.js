@@ -9,7 +9,7 @@ const GoodSchema = Joi.object({
 }).not({});
 
 class GoodModel {
-  /** @type {number} */
+  /** @type {string} */
   _id;
 
   /** @type {string} */

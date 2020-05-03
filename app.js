@@ -15,6 +15,27 @@ const { connectDB, collections, client } = require("./models/mongo");
 
 async function startup() {
   await connectDB();
+  await collections.category.drop();
+  await client.db().createCollection('category');
+  collections.category.insertMany([
+    {
+      _id: "1",
+      name: "食物",
+    },
+    {
+      _id: "2",
+      name: "交通",
+    },
+    {
+      _id: "3",
+      name: "治裝",
+    },
+    {
+      _id: "4",
+      name: "娛樂",
+    },
+  ])
+
 
   // App init
   const app = express();

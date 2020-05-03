@@ -17,8 +17,28 @@ async function checkActivity(type, subtype, amount, fromId, toId) {
   assert.equal(activity.type, type);
   assert.equal(activity.subtype, subtype);
   assert.equal(activity.amount, amount);
-  assert.equal(activity.fromId, fromId);
-  assert.equal(activity.toId, toId);
+  switch (type) {
+    case "new":
+      assert.equal(activity.fromRecordId, fromId);
+      assert.equal(activity.toUserId, toId);
+      assert.equal(activity.fromUserId, null);
+      assert.equal(activity.toGoodsId, null);
+      break;
+    case "transfer":
+      assert.equal(activity.fromUserId, fromId);
+      assert.equal(activity.toUserId, toId);
+      assert.equal(activity.fromRecordId, null);
+      assert.equal(activity.toGoodsId, null);
+      break;
+    case "consume":
+      assert.equal(activity.fromUserId, fromId);
+      assert.equal(activity.toGoodsId, toId);
+      assert.equal(activity.fromRecordId, null);
+      assert.equal(activity.toUserId, null);
+      break;
+    default:
+      throw `Unknown record type: ${type}`;
+  }
 }
 
 async function checkUserPoints(userId, before_point, amount) {
@@ -28,7 +48,7 @@ async function checkUserPoints(userId, before_point, amount) {
 
 test("pointsFromRecord", async function () {
   let amount = 5;
-  const userId = 1;
+  const userId = "1";
 
   const fake_record = await collections.record.findOne({
     recordType: "income",
@@ -51,7 +71,7 @@ test("pointsFromRecord", async function () {
 
 test("pointsFromEvent", async function () {
   let amount = 5;
-  const userId = 1;
+  const userId = "1";
 
   let user = await collections.user.findOne({ _id: userId });
   const before_point = user.rewardPoints;
@@ -67,8 +87,8 @@ test("pointsFromEvent", async function () {
 
 test("transferPoints", async function () {
   let amount = 5;
-  const fromUserId = 1;
-  const toUserId = 2;
+  const fromUserId = "1";
+  const toUserId = "2";
 
   let fromUser = await collections.user.findOne({ _id: fromUserId });
   const from_before_point = fromUser.rewardPoints;
@@ -87,8 +107,8 @@ test("transferPoints", async function () {
 });
 
 test("consumePoints", async function () {
-  const userId = 1;
-  const goodsId = 2;
+  const userId = "1";
+  const goodsId = "2";
 
   let user = await collections.user.findOne({ _id: userId });
   const before_point = user.rewardPoints;
@@ -100,6 +120,6 @@ test("consumePoints", async function () {
   await checkUserPoints(userId, before_point, -goods.point);
 
   // check activity
-  await checkActivity("transfer", "", goods.point, userId, goodsId);
+  await checkActivity("consume", "", goods.point, userId, goodsId);
 });
 module.exports = test;

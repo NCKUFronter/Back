@@ -22,7 +22,7 @@ const RecordSchema = Joi.object({
 }).not({});
 
 class RecordModel {
-  /** @type {number} */
+  /** @type {string} */
   _id;
 
   /** @type {string} */

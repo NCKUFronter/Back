@@ -122,7 +122,7 @@ async function consumePoints(subtype, user, goods) {
     );
 
     const activity = new PointActivityModel(
-      "transfer",
+      "consume",
       subtype,
       goods.point,
       user._id,

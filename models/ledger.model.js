@@ -9,7 +9,7 @@ const LedgerSchema = Joi.object({
 }).not({});
 
 class LedgerModel {
-  /** @type {number} */
+  /** @type {string} */
   _id;
 
   /** @type {string} */

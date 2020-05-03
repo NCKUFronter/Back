@@ -25,7 +25,7 @@ router.get("/:id", function (req, res) {
   
   const getData = {
     // recordId: parseInt(id),
-    _id: parseInt(req.params.id, 10),
+    _id: req.params.id,
   };
   
   record_coll.findOne(getData, function (err, result) {
@@ -64,7 +64,7 @@ router.post("/", validatePipe("body", RecordSchema), async function (req, res) {
 
 // PUT to update certain row info
 router.put("/:id", validatePipe("body", RecordSchema), function (req, res) {
-  const putFilter = { _id: parseInt(req.params.id, 10) };
+  const putFilter = { _id: req.params.id };
   const putData = {
     $set: { ...req.body, reviseDate: new Date().toISOString() },
   };
@@ -85,7 +85,7 @@ router.patch(
   "/:id",
   validatePipe("body", RecordSchema, { context: { partial: true } }),
   function (req, res) {
-    const patchFilter = { _id: parseInt(req.params.id, 10) };
+    const patchFilter = { _id: req.params.id };
     const patchData = { $set: req.body };
     record_coll.findOneAndUpdate(
       patchFilter,
@@ -101,7 +101,7 @@ router.patch(
 
 // DELETE certain row
 router.delete("/:id", function (req, res) {
-  var deleteFilter = { _id: parseInt(req.params.id, 10) };
+  var deleteFilter = { _id: req.params.id };
   record_coll.deleteOne(deleteFilter, (err, result) => {
     console.log(req.params.id, deleteFilter, result.result.n);
     res
