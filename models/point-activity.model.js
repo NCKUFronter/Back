@@ -3,8 +3,11 @@ const Joi = require("@hapi/joi");
 const { JoiNumberString } = require("./utils");
 
 const TransferPointsSchema = Joi.object({
-  ledgerId: JoiNumberString.required(),
-  email: Joi.string().email().required(),
+  toUserId: Joi.string().email().required(),
+});
+
+const ConsumePointsSchema = Joi.object({
+  goodsId: JoiNumberString,
 });
 
 class PointActivityModel {
@@ -24,8 +27,8 @@ class PointActivityModel {
    * @param {'new' | 'transfer' | 'consume'} type
    * @param {string} subtype
    * @param {number} amount
-   * @param {number} fromId
-   * @param {number} toId
+   * @param {string} fromId
+   * @param {string} toId
    * @param {string=} detail
    */
   constructor(type, subtype, amount, fromId, toId, detail) {
@@ -37,21 +40,21 @@ class PointActivityModel {
 
     switch (type) {
       case "new":
-        /** @type {number} */
+        /** @type {string} */
         this.fromRecordId = fromId;
-        /** @type {number} */
+        /** @type {string} */
         this.toUserId = toId;
         break;
       case "transfer":
-        /** @type {number} */
+        /** @type {string} */
         this.fromUserId = fromId;
-        /** @type {number} */
+        /** @type {string} */
         this.toUserId = toId;
         break;
       case "consume":
-        /** @type {number} */
+        /** @type {string} */
         this.fromUserId = fromId;
-        /** @type {number} */
+        /** @type {string} */
         this.toGoodsId = toId;
         break;
       default:
@@ -63,4 +66,5 @@ class PointActivityModel {
 module.exports = {
   PointActivityModel,
   TransferPointsSchema,
+  ConsumePointsSchema,
 };
