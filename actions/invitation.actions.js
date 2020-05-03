@@ -44,11 +44,14 @@ async function invite(ledger, fromUser, toUser) {
  */
 async function answerInvitation(invitation, answer) {
   // 假設參數都是對的，不做任何正確性檢查
-  invitation.type = Number(answer);
+  if (!(invitation instanceof InvitationModel))
+    invitation = InvitationModel.fromObject(invitation);
+
+  invitation.answer(answer);
   try {
     await collections.invitation.updateOne(
       { _id: invitation._id },
-      { $set: { type: invitation.type } }
+      { $set: invitation }
     );
   } catch (err) {
     console.log(err);

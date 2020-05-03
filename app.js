@@ -6,6 +6,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const https = require("https");
+const http = require("http");
 const cors = require("cors");
 const { AppPassport } = require("./middleware/app-passport");
 const session = require("express-session");
@@ -60,9 +61,15 @@ async function startup() {
   console.log("has cert: " + Boolean(KeyCert));
 
   const port = process.env.PORT || 3000;
-  const server = KeyCert ? https.createServer(KeyCert, app) : app;
-  server.listen(port, function () {
+  const server = KeyCert
+    ? https.createServer(KeyCert, app)
+    : http.createServer(app);
+
+  await server.listen(port, function () {
     console.log(`App listening on port ${port}!`);
   });
+
+  return { server, app };
 }
-startup();
+const promise = startup();
+module.exports = promise; // for test

@@ -22,6 +22,8 @@ class InvitationModel {
   ledgerId;
   /** @type {number} */
   type = 2;
+  /** @type {Date} */
+  createTime = new Date();
 
   /**
    * @param {string} ledgerId
@@ -32,6 +34,20 @@ class InvitationModel {
     this.ledgerId = ledgerId;
     this.fromUserId = fromUserId;
     this.toUserId = toUserId;
+  }
+
+  /**
+   * @param {boolean} answer
+   */
+  answer(answer) {
+    this.type = Number(answer);
+    /** @type {Date} */
+    this.answerTime = new Date();
+  }
+
+  static fromObject(obj) {
+    const model = new InvitationModel(null, null, null);
+    return Object.assign(model, obj);
   }
 }
 

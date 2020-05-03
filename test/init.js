@@ -240,24 +240,12 @@ async function initDBData(db) {
   ]);
 }
 
-// for mongo-mock
-function connectDBFn(collections, client) {
-  return () => {
-    console.log("DB connect success");
-    const db = client.db();
-    collections.record = db.collection("record");
-    collections.category = db.collection("category");
-    collections.user = db.collection("user");
-    collections.ledger = db.collection("ledger");
-    collections.goods = db.collection("goods");
-    collections.counter = db.collection("counter");
-    collections.pointActivity = db.collection("point-activity");
-  };
-}
+const findLast = async (coll) =>
+  (await coll.find({}).limit(1).sort({ $natural: -1 }).toArray())[0];
 
 module.exports = {
   initDB,
   initDBData,
-  connectDBFn,
   resetDB,
+  findLast,
 };
