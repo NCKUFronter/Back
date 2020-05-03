@@ -4,7 +4,9 @@ const { AppPassport } = require("../middleware/app-passport");
 
 router.get(
   "/auth/google",
-  AppPassport.authenticate("google", { scope: ["profile"] })
+  AppPassport.authenticate("google", { scope: [
+    'profile', 'email'
+] })
 );
 
 router.get(

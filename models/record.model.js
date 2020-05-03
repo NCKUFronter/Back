@@ -8,18 +8,17 @@ const RecordSchema = Joi.object({
   money: JoiRequireWhen(Joi.number().min(0)),
 
   // 或許放在url內比較好 '/ledger/:ledgerId/record'
-  ledgerId: JoiRequireWhen(Joi.number().min(0)),
+  ledgerId: JoiRequireWhen(Joi.string().regex(/[0-9]/).min(0)),
 
-  categoryId: JoiRequireWhen(Joi.number().min(0)),
-
-  // 應該辨識使用者身份自動填入
-  userId: JoiRequireWhen(Joi.number().min(0)),
+  categoryId: JoiRequireWhen(Joi.string().regex(/[0-9]/).min(0)),
 
   date: JoiRequireWhen(Joi.date()),
 
   hashtags: Joi.array().items(Joi.string()),
 
   detail: Joi.string().allow(""),
+
+  from: Joi.string().allow(null)
 }).not({});
 
 class RecordModel {

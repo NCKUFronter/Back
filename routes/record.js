@@ -3,47 +3,31 @@ const { collections, fetchNextId } = require("../models/mongo");
 const { RecordSchema } = require("../models/record.model");
 const validatePipe = require("../middleware/validate-pipe");
 const router = require("express").Router();
-const { AppPassport } = require('../middleware/app-passport')
-// 假設已經 connectDB
+
 const record_coll = collections.record;
 
 // GET from database
-router.get("/", function (req, res) {
-    console.log(req.sessionID);
-    record_coll.find(req.query).toArray(function (err, result) {
-      if (err) throw err;
-      res.status(200).send(result);
-    });
-    /*
-    if (req.query.recordType) {
-      const getData = {
-        recordType: req.query.recordType,
-      };
-
-    record_coll.find(getData).toArray(function (err, result) {
-      if (err) throw err;
-      res.status(200).send(result);
-    });
-    } else {
-    record_coll
-      .find()
-      .sort({ recordId: 1 })
-      .toArray(function (err, result) {
-        if (err) throw err;
-        res.status(200).send(result);
-      });
-    }
-      */
+router.get("/",
+  function (req, res) {
+    record_coll.aggregate([
+      { $lookup: { from: 'category', localField: "categoryId", foreignField: "_id", as: "categoryData" } }
+      ]).toArray((err, result) => {
+        if (result) {
+        }
+        console.log(result);
+      })
+    console.log(req.user);
   }
 );
 
 // GET certain data from database
 router.get("/:id", function (req, res) {
+  
   const getData = {
     // recordId: parseInt(id),
     _id: parseInt(req.params.id, 10),
   };
-
+  
   record_coll.findOne(getData, function (err, result) {
     if (err) throw err;
     res.status(200).send(result);
@@ -52,57 +36,30 @@ router.get("/:id", function (req, res) {
 
 // Post the info
 router.post("/", validatePipe("body", RecordSchema), async function (req, res) {
-  // res.send({ _id: 0, ...req.body });
-  const postData = {
-    _id: await fetchNextId(record_coll.collectionName),
-    ...req.body,
-  };
-
-  record_coll.insertOne(postData, function (err, result) {
-    if (err) throw err;
-    console.log("1 document inserted.");
-    res.status(201).send(result.ops[0]);
-  });
-  /*
-  record_coll.countDocuments(function (err, count) {
-    record_coll
-      .find({})
-      .sort({ recordId: 1 })
-      .toArray(function (err, result) {
-        var id = 0;
-        if (count != 0) {
-          id = result[count - 1].recordId;
-        }
-        const postData = {
-          recordId: id + 1,
-          recordType: req.body.recordType,
-          money: req.body.money,
-          ledger: req.body.ledger,
-          date: req.body.date,
-          reviseDate: req.body.reviseDate,
-          hashtag: req.body.hashtag,
-          userId: req.body.userId,
-          payback: req.body.payback,
-          from: req.body.from,
-          categoryId: req.body.categoryId,
-          detail: req.body.detail,
-        };
-        record_coll.insertOne(postData, function (err, res) {
-          if (err) throw err;
-          console.log("1 document inserted.");
-        });
-        res
-          .status(201)
-          .send(
-            "Add Category: " +
-              postData["category"] +
-              ", money: " +
-              postData["money"] +
-              " into db Successfully!"
-          );
-      });
-  });
-  */
+  if (req.isAuthenticated) {
+    const postData = {
+      _id: await fetchNextId(record_coll.collectionName),
+      userId: req.user[0]._id,
+      ...req.body,
+    }
+    record_coll.insertOne(postData, function (err, result) {
+      if (err) throw err;
+      console.log("1 document inserted.");
+      res.status(201).send(result.ops[0]);
+    });
+  }
+  else {
+    const postData = {
+      _id: await fetchNextId(record_coll.collectionName),
+      userId: null,
+      ...req.body
+    }
+    record_coll.insertOne(postData, function (err, result) {
+      if (err) throw err;
+      console.log("1 document inserted.");
+      res.status(201).send(result.ops[0]);
+    });
+  }
 });
 
 // PUT to update certain row info
@@ -111,23 +68,6 @@ router.put("/:id", validatePipe("body", RecordSchema), function (req, res) {
   const putData = {
     $set: { ...req.body, reviseDate: new Date().toISOString() },
   };
-  /*
-  const putData = {
-    $set: {
-      recordType: req.body.recordType,
-      money: req.body.money,
-      ledger: req.body.ledger,
-      date: req.body.date,
-      reviseDate: req.body.reviseDate,
-      hashtag: req.body.hashtag,
-      userId: req.body.userId,
-      payback: req.body.payback,
-      from: req.body.from,
-      categoryId: req.body.categoryId,
-      detail: req.body.detail,
-    },
-  };
-  */
   record_coll.findOneAndUpdate(
     putFilter,
     putData,

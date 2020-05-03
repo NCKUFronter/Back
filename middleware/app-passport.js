@@ -13,12 +13,14 @@ AppPassport.use(
       callbackURL: "/login/auth/google/callback",
     },
     async function (accessToken, refreshToken, profile, done) {
+      console.log(accessToken, profile);
       const user_coll = collections.user;
       user_coll.findOneAndUpdate(
         { _id: profile.id },
         {
           $set: {
             _id: profile.id,
+            email: profile.emails[0].value,
             name: profile.displayName,
             photo: profile.photos[0].value,
           },
@@ -37,7 +39,7 @@ AppPassport.use(
   new LocalStrategy(
     function (username, password, done) {
       const user_coll = collections.user;
-      user_coll.findOne({ name: username }, function (err, user) {
+      user_coll.findOne({ email: username }, function (err, user) {
         console.log({ now: "local strategy", user });
         if (err) {
           return done(err);

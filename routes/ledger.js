@@ -3,8 +3,6 @@ const { fetchNextId, collections } = require("../models/mongo");
 const { LedgerSchema } = require("../models/ledger.model");
 const validatePipe = require("../middleware/validate-pipe");
 const router = require("express").Router();
-const ObjectId = require("mongodb").ObjectId
-const DBref = require("mongodb").DBRef
 
 // 假設已經 connectDB
 const ledger_coll = collections.ledger;
@@ -14,7 +12,7 @@ router.get(
   validatePipe("query", LedgerSchema, { context: { partial: true } }),
   async function (req, res) {
     ledger_coll.aggregate([
-      { $lookup: { from: 'user', localField: "pass", foreignField: "password", as: "UserData" } }
+      { $lookup: { from: 'record', localField: "_id", foreignField: "ledgerId", as: "recordData" } }
     ]).toArray((err, result) => {
       console.log(result);
     })
@@ -40,17 +38,32 @@ router.get("/:id", function (req, res) {
 
 // Post the info
 router.post("/", validatePipe("body", LedgerSchema), async function (req, res) {
-  const postData = {
-    _id: await fetchNextId(ledger_coll.collectionName),
-    ...req.body
-  };
-
-  ledger_coll.insertOne(postData, function (err, result) {
-    if (err) throw err;
-    console.log("1 ledger info inserted.");
-    res.status(201).send(result.ops[0]);
-  });
-
+  if (req.isAuthenticated) {
+    const postData = {
+      _id: await fetchNextId(ledger_coll.collectionName),
+      admin: req.user[0]._id,
+      userId: [req.user[0]._id],
+      ...req.body,
+    }
+    ledger_coll.insertOne(postData, function (err, result) {
+      if (err) throw err;
+      console.log("1 document inserted.");
+      res.status(201).send(result.ops[0]);
+    });
+  }
+  else {
+    const postData = {
+      _id: await fetchNextId(ledger_coll.collectionName),
+      admin: null,
+      userId: [null],
+      ...req.body
+    }
+    ledger_coll.insertOne(postData, function (err, result) {
+      if (err) throw err;
+      console.log("1 document inserted.");
+      res.status(201).send(result.ops[0]);
+    });
+  }
   /*
   ledger_coll.countDocuments(function (err, count) {
     ledger_coll
@@ -77,25 +90,15 @@ router.post("/", validatePipe("body", LedgerSchema), async function (req, res) {
       */
 });
 
-
-// const objectid = new ObjectID("5ea94a17ca96d5395fe83cdf")
-// const dbref = new DBref("user", objectid)
-// PUT to update certain row info
 router.put(
   "/:id",
   validatePipe("body", LedgerSchema, { context: { partial: true } }),
   function (req, res) {
-    console.log(new ObjectId("5ea94a17ca96d5395fe83cdf"))
     const putFilter = { _id: parseInt(req.params.id, 10) };
     const putData = {
-      // $set: {test: 1,
-      //   ...req.body,}
-      $set: {pass: "123"}
-      /*{}
-        userIds: req.body.userIds,
-        ledgerName: req.body.ledgerName,
-        admin: req.body.admin,
-      },*/
+      $set: {
+        ...req.body
+      }
     };
     
     ledger_coll.findOneAndUpdate(
@@ -104,12 +107,10 @@ router.put(
       { returnOriginal: false },
       function (err, result) {
         if (err) throw err;
-        
         console.log("1 document updated");
         res.status(200).send(result.value);
       }
     );
-    
   }
 );
 
@@ -122,7 +123,6 @@ router.patch(
     const patchData = {
       $set: req.body,
     };
-
     ledger_coll.findOneAndUpdate(
       patchFilter,
       patchData,

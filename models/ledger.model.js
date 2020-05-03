@@ -3,21 +3,23 @@ const Joi = require("@hapi/joi");
 const { JoiRequireWhen } = require("./utils");
 
 const LedgerSchema = Joi.object({
-  name: JoiRequireWhen(Joi.string())
-});
+  userIds: JoiRequireWhen(Joi.array().items(Joi.string().regex(/[0-9]/).allow(null))),
+  ledgerName: JoiRequireWhen(Joi.string().regex(/[a-zA-Z0-9]/)),
+  admin: JoiRequireWhen(Joi.string().regex(/[0-9]/).allow(null))
+}).not({});
 
 class LedgerModel {
   /** @type {number} */
   _id;
 
   /** @type {string} */
-  name;
+  ledgerName;
 
   /** @type {string} */
   admin;
 
   /** @type {string[]} */
-  user;
+  userIds;
 }
 
 module.exports = {

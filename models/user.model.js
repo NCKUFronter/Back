@@ -3,11 +3,11 @@ const Joi = require("@hapi/joi");
 const { JoiRequireWhen } = require("./utils");
 
 const UserSchema = Joi.object({
-  name: JoiRequireWhen(Joi.string()),
+  name: Joi.string().regex(/[a-zA-Z0-9]/).allow(null),
 
-  password: JoiRequireWhen(Joi.string()),
+  password: Joi.string().regex(/[a-zA-Z0-9]/).allow(null),
 
-  email: JoiRequireWhen(Joi.string()),
+  email: Joi.string().allow(null),
 });
 
 class UserModel {
@@ -29,8 +29,11 @@ class UserModel {
   /** @type {number} */
   payback;
 
-  /** @type { {[key: number]: string[]} } */
-  hashtags;
+  /** @type {number} */
+  point;
+
+  /** @type { {[key: number]: [string, string[]]} } */
+  categoryTags;
 }
 
 module.exports = {
