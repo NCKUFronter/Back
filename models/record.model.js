@@ -50,7 +50,7 @@ class RecordModel {
   detail;
 
   /** @type {number} */
-  payback;
+  rewardPoints;
 
   /** @type {number} */
   reviseDate;

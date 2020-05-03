@@ -11,8 +11,7 @@ const { AppPassport } = require("./middleware/app-passport");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
-
-const { connectDB } = require("./models/mongo");
+const { connectDB, collections, client } = require("./models/mongo");
 
 async function startup() {
   await connectDB();
@@ -22,6 +21,7 @@ async function startup() {
 
   // Plugins
   app.use(
+    // @ts-ignore
     cors({
       credentials: true,
       origin: (_origin, cb) => cb(null, true), // 給前端用

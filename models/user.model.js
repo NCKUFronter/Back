@@ -27,7 +27,7 @@ class UserModel {
   cardIds;
 
   /** @type {number} */
-  payback;
+  rewardPoints;
 
   /** @type {number} */
   point;
