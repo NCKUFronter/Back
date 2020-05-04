@@ -29,7 +29,7 @@ async function startup() {
     })
   );
 
-  // app.use(express.static(__dirname));
+  app.use(express.static(__dirname));
   app.use(cookieParser());
   app.get("/", function (req, res) {
     console.log(req.cookies)

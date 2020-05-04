@@ -37,15 +37,15 @@ AppPassport.use(
 
 AppPassport.use(
   new LocalStrategy(
-    function (username, password, done) {
+    function (email, password, done) {
       const user_coll = collections.user;
-      user_coll.findOne({ email: username }, function (err, user) {
+      user_coll.findOne({ email: email }, function (err, user) {
         console.log({ now: "local strategy", user });
         if (err) {
           return done(err);
         }
         if (!user) {
-          return done(null, false, { message: "Incorrect username." });
+          return done(null, false, { message: "Incorrect email." });
         }
         if (user.password != password) {
           return done(null, false, { message: "Incorrect password." });

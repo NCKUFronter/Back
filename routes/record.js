@@ -2,6 +2,7 @@
 const { collections, fetchNextId } = require("../models/mongo");
 const { RecordSchema } = require("../models/record.model");
 const validatePipe = require("../middleware/validate-pipe");
+const loginCheck = require("../middleware/login-check");
 const router = require("express").Router();
 
 const record_coll = collections.record;
@@ -9,6 +10,7 @@ const record_coll = collections.record;
 // GET from database
 router.get("/",
   function (req, res) {
+    console.log(req.cookies['connect.sid']);
     record_coll.aggregate([
       { $lookup: { from: 'category', localField: "categoryId", foreignField: "_id", as: "categoryData" } }
       ]).toArray((err, result) => {
@@ -35,30 +37,17 @@ router.get("/:id", function (req, res) {
 
 // Post the info
 router.post("/", validatePipe("body", RecordSchema), async function (req, res) {
-  if (req.isAuthenticated()) {
-    const postData = {
-      _id: await fetchNextId(record_coll.collectionName),
-      userId: req.user[0]._id,
-      ...req.body,
-    }
-    record_coll.insertOne(postData, function (err, result) {
-      if (err) throw err;
-      console.log("1 document inserted.");
-      res.status(201).send(result.ops[0]);
-    });
+  const userId = loginCheck();
+  const postData = {
+    _id: await fetchNextId(record_coll.collectionName),
+    userId: userId,
+    ...req.body,
   }
-  else {
-    const postData = {
-      _id: await fetchNextId(record_coll.collectionName),
-      userId: req.cookies['connect.sid'],
-      ...req.body
-    }
-    record_coll.insertOne(postData, function (err, result) {
-      if (err) throw err;
-      console.log("1 document inserted.");
-      res.status(201).send(result.ops[0]);
-    });
-  }
+  record_coll.insertOne(postData, function (err, result) {
+    if (err) throw err;
+    console.log("1 document inserted.");
+    res.status(201).send(result.ops[0]);
+  });
 });
 
 // PUT to update certain row info

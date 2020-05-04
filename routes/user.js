@@ -2,6 +2,7 @@
 const { fetchNextId, collections } = require("../models/mongo");
 const { UserSchema } = require("../models/user.model");
 const validatePipe = require("../middleware/validate-pipe");
+const loginCheck = require("../middleware/login-check")
 const router = require("express").Router();
 
 const user_coll = collections.user;
@@ -44,39 +45,22 @@ router.get(
 // });
 
 // PUT to update certain row info
-router.put("/", validatePipe("body", UserSchema), function (req, res) {
-  if (req.isAuthenticated) {
-    const putFilter = { _id: req.user[0]._id };
-    const putData = {
-      ...req.body,
-    }
-    user_coll.findOneAndUpdate(
-      putFilter,
-      putData,
-      { returnOriginal: false },
-      function (err, result) {
-        if (err) throw err;
-        console.log("1 document updated");
-        res.status(200).send(result.value);
-      }
-    );
+router.put("/", validatePipe("body", UserSchema), loginCheck(user_coll), 
+ function (req, res) {
+  const putFilter = { _id: req.user[0]._id };
+  const putData = {
+    $set: {...req.body}
   }
-  else {
-    const putFilter = { _id: req.params.id };
-    const putData = {
-      ...req.body
+  user_coll.findOneAndUpdate(
+    putFilter,
+    putData,
+    { returnOriginal: false },
+    function (err, result) {
+      if (err) throw err;
+      console.log("1 document updated");
+      res.status(200).send(result.value);
     }
-    user_coll.findOneAndUpdate(
-      putFilter,
-      putData,
-      { returnOriginal: false },
-      function (err, result) {
-        if (err) throw err;
-        console.log("1 document updated");
-        res.status(200).send(result.value);
-      }
-    );
-  }
+  );
 });
 
 // router.patch(
@@ -101,7 +85,7 @@ router.put("/", validatePipe("body", UserSchema), function (req, res) {
 // );
 
 router.delete("/", function (req, res) {
-  if (req.isAuthenticated) {
+  if (req.isAuthenticated()) {
     const deleteFilter = { _id: req.user[0]._id };
     user_coll.deleteOne(deleteFilter, (err, result) => {
       console.log(

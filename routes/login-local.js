@@ -17,7 +17,7 @@ router.get("/", function (req, res, next) {
     if (!user) return res.redirect("/");
     req.logIn(user, function (err) {
       if (err) return next(err);
-      return res.redirect("/user/" + user.username);
+      return res.redirect("/user/" + user.email);
     });
   })(req, res, next);
 });
