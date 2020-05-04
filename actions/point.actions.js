@@ -6,6 +6,7 @@ const {
   simpleInsertOne,
   workInTransaction,
 } = require("../models/mongo");
+const assert = require("assert");
 const { UserModel, RecordModel, PointActivityModel } = require("../models");
 
 async function pointsFromEvent(subtype, amount, user) {
@@ -74,6 +75,8 @@ async function innerGivenPoints(subtype, amount, record, user) {
  * @return { Promise<boolean> } 是否成功
  */
 async function transferPoints(subtype, amount, fromUser, toUser) {
+  assert.equal(fromUser.rewardPoints >= amount, true);
+
   return workInTransaction(async (session) => {
     // update user
     const from_user_prom = collections.user.updateOne(
@@ -113,6 +116,8 @@ async function transferPoints(subtype, amount, fromUser, toUser) {
  * @return { Promise<boolean> } 是否成功
  */
 async function consumePoints(subtype, user, goods) {
+  assert.equal(user.rewardPoints >= goods.point, true);
+
   return workInTransaction(async (session) => {
     // update user
     const user_prom = collections.user.updateOne(
@@ -122,7 +127,7 @@ async function consumePoints(subtype, user, goods) {
     );
 
     const activity = new PointActivityModel(
-      "transfer",
+      "consume",
       subtype,
       goods.point,
       user._id,

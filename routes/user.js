@@ -62,7 +62,7 @@ router.put("/", validatePipe("body", UserSchema), function (req, res) {
     );
   }
   else {
-    const putFilter = { _id: parseInt(req.params.id) };
+    const putFilter = { _id: req.params.id };
     const putData = {
       ...req.body
     }
@@ -102,7 +102,7 @@ router.put("/", validatePipe("body", UserSchema), function (req, res) {
 
 router.delete("/", function (req, res) {
   if (req.isAuthenticated) {
-    const deleteFilter = { _id: parseInt(req.user[0]._id) };
+    const deleteFilter = { _id: req.user[0]._id };
     user_coll.deleteOne(deleteFilter, (err, result) => {
       console.log(
         "Delete row: " +

@@ -51,6 +51,7 @@ async function connectDB() {
  * 小心這個會直接修改到資料庫數值
  * @param {string} coll_name
  * @param {ClientSession=} session
+ * @return {Promise<string>}
  */
 async function fetchNextId(coll_name, session) {
   const coll_document = await collections.counter.findOneAndUpdate(
@@ -58,12 +59,16 @@ async function fetchNextId(coll_name, session) {
     { $inc: { nowId: 1 } },
     { session, returnOriginal: false }
   );
-  return coll_document.value.nowId;
+  return String(coll_document.value.nowId);
 }
 
+/**
+ * @param {string} coll_name
+ * @return {Promise<string>}
+ */
 async function fetchNowId(coll_name) {
   const coll_document = await collections.counter.findOne({ _id: coll_name });
-  return coll_document.value.nowId;
+  return String(coll_document.value.nowId);
 }
 
 /**

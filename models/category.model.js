@@ -7,7 +7,7 @@ const CategorySchema = Joi.object({
 });
 
 class CategoryModel {
-  /** @type {number} */
+  /** @type {string} */
   _id;
 
   /** @type {string} */

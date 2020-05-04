@@ -11,7 +11,7 @@ const UserSchema = Joi.object({
 });
 
 class UserModel {
-  /** @type {number} */
+  /** @type {string} */
   _id;
 
   /** @type {string} */

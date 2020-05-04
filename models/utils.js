@@ -13,4 +13,5 @@ function JoiRequireWhen(schema) {
 
 module.exports = {
   JoiRequireWhen,
+  JoiNumberString: Joi.string().regex(/^[0-9]+/),
 };
