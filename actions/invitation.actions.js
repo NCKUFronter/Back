@@ -52,7 +52,8 @@ async function answerInvitation(invitation, answer) {
 
     const invit_prom = collections.invitation.updateOne(
       { _id: invitation._id },
-      { $set: invitation }
+      { $set: invitation },
+      { session }
     );
     await Promise.all([ledger_prom, invit_prom]);
   });

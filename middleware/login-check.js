@@ -1,9 +1,11 @@
+// @ts-check
 const { collections } = require("../models/mongo");
 
 function loginCheck(coll) {
   return (req, res, next) => {
     if (req.isAuthenticated()) {
-      req.userId = req.user._id || req.user[0]._id;
+      if (Array.isArray(req.user)) req.user = req.user[0];
+      req.userId = req.user._id;
       next();
     } else if (coll == collections.record) {
       req.userId = req.cookies["connect.sid"];
