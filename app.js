@@ -28,12 +28,14 @@ async function startup() {
     })
   );
 
-  app.use(express.static(__dirname));
+  // app.use(express.static(__dirname));
+  app.use(cookieParser());
   app.get("/", function (req, res) {
+    console.log(req.cookies)
     res.send("Main page loading properly!");
   });
   // Log in
-  app.use(cookieParser());
+  
   app.use(session({ secret: "cats", resave: false, saveUninitialized: false }));
   app.use(AppPassport.initialize());
   app.use(AppPassport.session());

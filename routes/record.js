@@ -14,9 +14,8 @@ router.get("/",
       ]).toArray((err, result) => {
         if (result) {
         }
-        console.log(result);
+        res.status(200).send(result);
       })
-    console.log(req.user);
   }
 );
 
@@ -36,7 +35,7 @@ router.get("/:id", function (req, res) {
 
 // Post the info
 router.post("/", validatePipe("body", RecordSchema), async function (req, res) {
-  if (req.isAuthenticated) {
+  if (req.isAuthenticated()) {
     const postData = {
       _id: await fetchNextId(record_coll.collectionName),
       userId: req.user[0]._id,
@@ -51,7 +50,7 @@ router.post("/", validatePipe("body", RecordSchema), async function (req, res) {
   else {
     const postData = {
       _id: await fetchNextId(record_coll.collectionName),
-      userId: null,
+      userId: req.cookies['connect.sid'],
       ...req.body
     }
     record_coll.insertOne(postData, function (err, result) {
