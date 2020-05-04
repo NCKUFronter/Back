@@ -16,14 +16,10 @@ const { InvitationModel, LedgerModel, UserModel } = require("../models");
  */
 async function invite(ledger, fromUser, toUser) {
   // 假設參數都是對的，不做任何正確性檢查
-  assert.equal(
-    ledger.adminId == fromUser._id || ledger.userIds.includes(fromUser._id),
-    true
+  assert(
+    ledger.adminId == fromUser._id || ledger.userIds.includes(fromUser._id)
   );
-  assert.equal(
-    ledger.adminId != toUser._id || !ledger.userIds.includes(toUser._id),
-    true
-  );
+  assert(ledger.adminId != toUser._id || !ledger.userIds.includes(toUser._id));
 
   const invitation = new InvitationModel(ledger._id, fromUser._id, toUser._id);
   return workInTransaction(async (session) => {
