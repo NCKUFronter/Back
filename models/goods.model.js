@@ -2,13 +2,13 @@
 const Joi = require("@hapi/joi");
 const { JoiRequireWhen } = require("./utils");
 
-const GoodSchema = Joi.object({
+const GoodsSchema = Joi.object({
   name: JoiRequireWhen(Joi.string().regex(/[a-zA-Z]/)),
   
   point: JoiRequireWhen(Joi.number().min(0)),
 }).not({});
 
-class GoodModel {
+class GoodsModel {
   /** @type {string} */
   _id;
 
@@ -20,6 +20,6 @@ class GoodModel {
 }
 
 module.exports = {
-  GoodSchema,
-  GoodModel,
+  GoodsSchema,
+  GoodsModel,
 };

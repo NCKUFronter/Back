@@ -12,12 +12,13 @@ async function run() {
     await require("./point.test").run();
     await require("./invitation.test").run();
     await require("./user.test").run();
-    // await require("./login.test").run(app);
+    await require("./relation.test").run();
+    await require("./login.test").run(app);
+    await require("./category.test").run(app);
   } catch (err) {
     console.log(err);
-  } finally {
-    await server.close();
-    await client.close();
   }
+  await server.close();
+  await client.close();
 }
 run();

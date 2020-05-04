@@ -1,14 +1,18 @@
 // @ts-check
 // 只測試local
 const test = require("baretest")("point-test");
+const supertest = require("supertest");
 const assert = require("assert");
 const { collections } = require("../models/mongo");
 
+/** @type {import('express').Application} */
+let app = null;
 /** @type {import('supertest').SuperTest} */
 let agent = null;
 
 const testUrls = {
   localLogin: "/login-local",
+  localLogout: "/login/logout",
 };
 
 test("local login", async () => {
@@ -16,14 +20,21 @@ test("local login", async () => {
     .post(testUrls.localLogin)
     .send({ email: "father@gmail.com", password: "0000" })
     .set("Accept", "application/json")
-    // .redirects(1)
-    .expect(200)
+    .redirects(1)
+    .expect(200);
+  /*
     .then(({ body }) => {
       // body 應該要是使用者
-      assert.equal(body._id, "1");
-      assert.equal(body.email, "father@gmail.com");
+      // assert.equal(body._id, "1");
+      // assert.equal(body.email, "father@gmail.com");
     });
-  await agent.get("/record").expect(200).end();
+    */
+  await agent.get("/record").expect(200);
+});
+
+test("local logout", async () => {
+  await agent.post(testUrls.localLogout).redirects(1).expect(200);
+  // await agent.put("/user/1").send({}).expect(401);
 });
 
 /**
@@ -38,9 +49,10 @@ async function simpleLogin(agent) {
 }
 
 module.exports = {
-  /** @param {import('supertest').SuperTest} supertest_agent */
-  run: async (supertest_agent) => {
-    agent = supertest_agent;
+  /** @param {import('express').Application} express_app */
+  run(express_app) {
+    app = express_app;
+    agent = supertest.agent(app);
     return test.run();
   },
   simpleLogin,

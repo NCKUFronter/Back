@@ -68,7 +68,7 @@ async function fetchNextId(coll_name, session) {
  */
 async function fetchNowId(coll_name) {
   const coll_document = await collections.counter.findOne({ _id: coll_name });
-  return String(coll_document.value.nowId);
+  return String(coll_document.nowId);
 }
 
 /**

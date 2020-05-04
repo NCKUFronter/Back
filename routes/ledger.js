@@ -3,7 +3,7 @@ const { fetchNextId, collections } = require("../models/mongo");
 const { LedgerSchema } = require("../models/ledger.model");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
-const collRelation = require("../middleware/coll-relation");
+const collRelation = require("../actions/coll-relation");
 const router = require("express").Router();
 
 // 假設已經 connectDB

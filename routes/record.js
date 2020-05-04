@@ -3,7 +3,7 @@ const { collections, fetchNextId } = require("../models/mongo");
 const { RecordSchema } = require("../models/record.model");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
-const collRelation = require("../middleware/coll-relation")
+const collRelation = require("../actions/coll-relation")
 const router = require("express").Router();
 
 const record_coll = collections.record;

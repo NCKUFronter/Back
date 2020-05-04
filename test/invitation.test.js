@@ -39,8 +39,8 @@ test("accept invitation", async () => {
   assert.equal(invitation.type, 1);
 
   const ledger = await collections.ledger.findOne({ _id: invitation.ledgerId });
-  assert.equal(new Set(ledger.userIds).size, ledger.userIds.length);
-  assert.equal(ledger.userIds.includes("3"), true)
+  assert.equal(ledger.userIds.length, new Set(ledger.userIds).size);
+  assert(ledger.userIds.includes("3"));
 });
 
 test("reject invitation", async () => {
@@ -56,7 +56,7 @@ test("reject invitation", async () => {
 
   const ledger = await collections.ledger.findOne({ _id: invitation.ledgerId });
   assert.equal(new Set(ledger.userIds).size, ledger.userIds.length);
-  assert.equal(ledger.userIds.includes("3"), false)
+  assert.ok(!ledger.userIds.includes("3"));
 });
 
 module.exports = test;

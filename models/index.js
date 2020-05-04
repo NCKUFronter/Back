@@ -5,5 +5,5 @@ module.exports = {
   ...require("./record.model"),
   ...require("./point-activity.model"),
   ...require("./invitation.model"),
-  ...require("./good.model"),
+  ...require("./goods.model"),
 };
