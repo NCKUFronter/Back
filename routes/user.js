@@ -31,76 +31,82 @@ router.get(
 //   });
 // });
 
-// router.post("/", validatePipe("body", UserSchema), async function (req, res) {
-//   const postData = {
-//     _id: await fetchNextId(user_coll.collectionName),
-//     ...req.body,
-//   };
+router.post("/",
+  validatePipe("body", UserSchema),
+  loginCheck(user_coll),
+  async function (req, res) {
+  const postData = {
+    _id: await fetchNextId(user_coll.collectionName),
+    // @ts-ignore
+    userId: req.userId,
+    ...req.body,
+  };
 
-//   user_coll.insertOne(postData, function (err, result) {
-//     if (err) throw err;
-//     console.log("1 user info inserted.");
-//     res.status(201).send(result.ops[0]);
-//   });
-// });
-
-// PUT to update certain row info
-router.put("/", validatePipe("body", UserSchema), loginCheck(user_coll), 
- function (req, res) {
-  const putFilter = { _id: req.user[0]._id };
-  const putData = {
-    $set: {...req.body}
-  }
-  user_coll.findOneAndUpdate(
-    putFilter,
-    putData,
-    { returnOriginal: false },
-    function (err, result) {
-      if (err) throw err;
-      console.log("1 document updated");
-      res.status(200).send(result.value);
-    }
-  );
+  user_coll.insertOne(postData, function (err, result) {
+    if (err) throw err;
+    console.log("1 user info inserted.");
+    res.status(201).send(result.ops[0]);
+  });
 });
 
-// router.patch(
-//   "/:id",
-//   validatePipe("body", UserSchema, { context: { partial: true } }),
-//   function (req, res) {
-//     const patchFilter = { _id: parseInt(req.params.id, 10) };
-//     const patchData = {
-//       $set: req.body,
-//     };
-//     user_coll.findOneAndUpdate(
-//       patchFilter,
-//       patchData,
-//       { returnOriginal: false },
-//       function (err, result) {
-//         if (err) throw err;
-//         console.log("1 document updated");
-//         res.status(200).send(result.value);
-//       }
-//     );
+// router.put("/", validatePipe("body", UserSchema), loginCheck(user_coll),
+//  function (req, res) {
+//   // @ts-ignore
+//   const putFilter = { _id: req.userId };
+//   const putData = {
+//     $set: {...req.body}
 //   }
-// );
+//   user_coll.findOneAndUpdate(
+//     putFilter,
+//     putData,
+//     { returnOriginal: false },
+//     function (err, result) {
+//       if (err) throw err;
+//       console.log("1 document updated");
+//       res.status(200).send(result.value);
+//     }
+//   );
+// });
 
-router.delete("/", function (req, res) {
-  if (req.isAuthenticated()) {
-    const deleteFilter = { _id: req.user[0]._id };
-    user_coll.deleteOne(deleteFilter, (err, result) => {
-      console.log(
-        "Delete row: " +
-          req.params.id +
-          " with filter: " +
-          deleteFilter +
-          ". Deleted: " +
-          result.result.n
-      );
-      res
-        .status(200)
-        .send("Delete row: " + req.params.id + " from db Successfully!");
-    });
+router.patch(
+  "/",
+  validatePipe("body", UserSchema, { context: { partial: true } }),
+  loginCheck(user_coll),
+  function (req, res) {
+    // @ts-ignore
+    const patchFilter = { _id: req.userId };
+    const patchData = {
+      $set: req.body,
+    };
+    user_coll.findOneAndUpdate(
+      patchFilter,
+      patchData,
+      { returnOriginal: false },
+      function (err, result) {
+        if (err) throw err;
+        console.log("1 document updated");
+        res.status(200).send(result.value);
+      }
+    );
   }
+);
+
+router.delete("/", loginCheck(user_coll), function (req, res) {
+  // @ts-ignore
+  const deleteFilter = { _id: req.userId };
+  user_coll.deleteOne(deleteFilter, (err, result) => {
+    console.log(
+      "Delete row: " +
+        req.params.id +
+        " with filter: " +
+        deleteFilter +
+        ". Deleted: " +
+        result.result.n
+    );
+    res
+      .status(200)
+      .send("Delete from db Successfully!");
+  });
 });
 
 module.exports = router;

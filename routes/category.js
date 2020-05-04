@@ -11,7 +11,6 @@ const category_coll = collections.category;
 router.get(
   "/",
   function (req, res) {
-    console.log({ session: req.session, user: req.user });
     category_coll
       .find(req.query)
       // .sort({ categoryId: 1 })

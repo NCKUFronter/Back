@@ -3,6 +3,7 @@ const { collections, fetchNextId } = require("../models/mongo");
 const { RecordSchema } = require("../models/record.model");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
+const collRelation = require("../middleware/coll-relation")
 const router = require("express").Router();
 
 const record_coll = collections.record;
@@ -10,27 +11,16 @@ const record_coll = collections.record;
 // GET from database
 router.get("/", loginCheck(record_coll),
   function (req, res) {
-    // @ts-ignore
-    console.log(req.userId);
-    console.log(req.cookies['connect.sid']);
-    record_coll.aggregate([
-      { $lookup: { from: 'category', localField: "categoryId", foreignField: "_id", as: "categoryData" } }
-      ]).toArray((err, result) => {
-        if (result) {
-        }
-        res.status(200).send(result);
-      })
+    collRelation(record_coll, 'category', 'categoryId', '_id', 'categoryData');
   }
 );
 
 // GET certain data from database
 router.get("/:id", function (req, res) {
-  
   const getData = {
     // recordId: parseInt(id),
     _id: req.params.id,
   };
-  
   record_coll.findOne(getData, function (err, result) {
     if (err) throw err;
     res.status(200).send(result);
@@ -53,29 +43,32 @@ router.post("/", validatePipe("body", RecordSchema), loginCheck(record_coll), as
 });
 
 // PUT to update certain row info
-router.put("/:id", validatePipe("body", RecordSchema), function (req, res) {
-  const putFilter = { _id: req.params.id };
-  const putData = {
-    $set: { ...req.body, reviseDate: new Date().toISOString() },
-  };
-  record_coll.findOneAndUpdate(
-    putFilter,
-    putData,
-    { returnOriginal: false },
-    function (err, result) {
-      if (err) throw err;
-      console.log("1 document updated");
-      res.status(200).send(result.value);
-    }
-  );
-});
+// router.put("/", validatePipe("body", RecordSchema), loginCheck(record_coll), function (req, res) {
+//   // @ts-ignore
+//   const putFilter = { _id: req.userId };
+//   const putData = {
+//     $set: { ...req.body, reviseDate: new Date().toISOString() },
+//   };
+//   record_coll.findOneAndUpdate(
+//     putFilter,
+//     putData,
+//     { returnOriginal: false },
+//     function (err, result) {
+//       if (err) throw err;
+//       console.log("1 document updated");
+//       res.status(200).send(result.value);
+//     }
+//   );
+// });
 
 // PATCH to update certain row info
 router.patch(
   "/:id",
   validatePipe("body", RecordSchema, { context: { partial: true } }),
+  loginCheck(record_coll),
   function (req, res) {
-    const patchFilter = { _id: req.params.id };
+  // @ts-ignore
+    const patchFilter = { _id: req.params.id, userId: req.userId };
     const patchData = { $set: req.body };
     record_coll.findOneAndUpdate(
       patchFilter,
