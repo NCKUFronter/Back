@@ -4,6 +4,7 @@ const { JoiNumberString } = require("./utils");
 
 const TransferPointsSchema = Joi.object({
   toUserId: Joi.string().email().required(),
+  amout: Joi.number(),
 });
 
 const ConsumePointsSchema = Joi.object({

@@ -21,7 +21,7 @@ function validatePipe(position, schema, options) {
         result[item.path[0]] = item.message;
         return result;
       }, {});
-      res.status(400).send({ [position + "_schema_error"]: error_msg });
+      res.status(400).json({ [position + "_schema_error"]: error_msg });
     } else {
       req[position + "_origin"] = req.body;
       req[position] = value;

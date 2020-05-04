@@ -4,9 +4,7 @@ const { AppPassport } = require("../middleware/app-passport");
 
 router.get(
   "/auth/google",
-  AppPassport.authenticate("google", { scope: [
-    'profile', 'email'
-] })
+  AppPassport.authenticate("google", { scope: ["profile", "email"] })
 );
 
 router.get(
@@ -16,11 +14,10 @@ router.get(
     res.send("Log In Success!");
   }
 );
-router.get(
-  "/logout",
-  function(req,res){
-    req.logout();
-    res.status(200);
+
+router.post("/logout", function (req, res) {
+  req.logout();
+  res.status(200).json("Logout Success!");
 });
 
 module.exports = router;
