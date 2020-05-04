@@ -16,5 +16,11 @@ router.get(
     res.send("Log In Success!");
   }
 );
+router.get(
+  "/logout",
+  function(req,res){
+    req.logout();
+    res.status(200);
+});
 
 module.exports = router;

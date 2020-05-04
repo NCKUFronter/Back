@@ -38,7 +38,7 @@ router.get("/:id", function (req, res) {
 
 // Post the info
 router.post("/", validatePipe("body", LedgerSchema), async function (req, res) {
-  if (req.isAuthenticated) {
+  if (req.isAuthenticated()) {
     const postData = {
       _id: await fetchNextId(ledger_coll.collectionName),
       admin: req.user[0]._id,
