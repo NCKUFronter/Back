@@ -1,13 +1,32 @@
 const router = require("express").Router();
 const {collections} = require("../models/mongo");
 const loginCheck = require("../middleware/login-check")
+const pointAction = require("../actions/point.actions")
 
+router.get("/transfer",loginCheck(collections.pointActivity),async function(req,res){
 
+    const from = await collections.user.findOne({_id: '3'})
+    const to = await collections.user.findOne({email: 'father@gmail.com'})
 
-router.get("/transfer",loginCheck(collections.pointActivity),function(req,res){
-    console.log(req.userId)
+    pointAction.transferPoints('',100,from,to);
+    
+    console.log("transfer success")
     res.status(200);
+
 });
 
+router.get("/consume",loginCheck(collections.pointActivity),async function(req,res){
+
+    const user = await collections.user.findOne({_id: '1'})
+    const good = await collections.goods.findOne({_id: '2'})
+
+    console.log(user,good);
+
+    pointAction.consumePoints('',user,good)
+
+    console.log("consume success")
+    res.status(200);
+
+})
 
 module.exports = router;
