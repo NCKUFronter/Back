@@ -4,7 +4,6 @@ const { LedgerSchema } = require("../models/ledger.model");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
 const collRelation = require("../middleware/coll-relation");
-const { invite } = require("../actions/invitation.actions");
 const router = require("express").Router();
 
 // 假設已經 connectDB
