@@ -36,24 +36,26 @@ AppPassport.use(
 );
 
 AppPassport.use(
-  new LocalStrategy(
-    function (email, password, done) {
-      const user_coll = collections.user;
-      user_coll.findOne({ email: email }, function (err, user) {
-        console.log({ now: "local strategy", user });
-        if (err) {
-          return done(err);
-        }
-        if (!user) {
-          return done(null, false, { message: "Incorrect email." });
-        }
-        if (user.password != password) {
-          return done(null, false, { message: "Incorrect password." });
-        }
-        return done(null, user);
-      });
-    }
-  )
+  new LocalStrategy({ usernameField: "email" }, function (
+    email,
+    password,
+    done
+  ) {
+    const user_coll = collections.user;
+    user_coll.findOne({ email: email }, function (err, user) {
+      console.log({ now: "local strategy", user });
+      if (err) {
+        return done(err);
+      }
+      if (!user) {
+        return done(null, false, { message: "Incorrect email." });
+      }
+      if (user.password != password) {
+        return done(null, false, { message: "Incorrect password." });
+      }
+      return done(null, user);
+    });
+  })
 );
 
 AppPassport.serializeUser(function (user, done) {
