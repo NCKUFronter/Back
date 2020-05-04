@@ -8,8 +8,10 @@ const router = require("express").Router();
 const record_coll = collections.record;
 
 // GET from database
-router.get("/",
+router.get("/", loginCheck(record_coll),
   function (req, res) {
+    // @ts-ignore
+    console.log(req.userId);
     console.log(req.cookies['connect.sid']);
     record_coll.aggregate([
       { $lookup: { from: 'category', localField: "categoryId", foreignField: "_id", as: "categoryData" } }
@@ -36,11 +38,11 @@ router.get("/:id", function (req, res) {
 });
 
 // Post the info
-router.post("/", validatePipe("body", RecordSchema), async function (req, res) {
-  const userId = loginCheck();
+router.post("/", validatePipe("body", RecordSchema), loginCheck(record_coll), async function (req, res) {
   const postData = {
     _id: await fetchNextId(record_coll.collectionName),
-    userId: userId,
+    // @ts-ignore
+    userId: req.userId,
     ...req.body,
   }
   record_coll.insertOne(postData, function (err, result) {
