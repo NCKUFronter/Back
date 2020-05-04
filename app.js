@@ -52,6 +52,7 @@ async function startup() {
   app.use("/ledger", require("./routes/ledger")); // /account to record user info
   app.use("/login", require("./routes/login"));
   app.use("/login-local", require("./routes/login-local"));
+  app.use("/point", require("./routes/point"));
 
   // Run the server
   let KeyCert = null;

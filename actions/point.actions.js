@@ -75,7 +75,7 @@ async function innerGivenPoints(subtype, amount, record, user) {
  * @return { Promise<boolean> } 是否成功
  */
 async function transferPoints(subtype, amount, fromUser, toUser) {
-  assert.equal(fromUser.rewardPoints >= amount, true);
+  assert(fromUser.rewardPoints >= amount);
 
   return workInTransaction(async (session) => {
     // update user
@@ -116,7 +116,7 @@ async function transferPoints(subtype, amount, fromUser, toUser) {
  * @return { Promise<boolean> } 是否成功
  */
 async function consumePoints(subtype, user, goods) {
-  assert.equal(user.rewardPoints >= goods.point, true);
+  assert(user.rewardPoints >= goods.point);
 
   return workInTransaction(async (session) => {
     // update user
