@@ -15,6 +15,7 @@ AppPassport.use(
     async function (accessToken, refreshToken, profile, done) {
       console.log(accessToken, profile);
       const user_coll = collections.user;
+      const date = new Date()
       user_coll.findOneAndUpdate(
         { _id: profile.id },
         {
@@ -23,11 +24,12 @@ AppPassport.use(
             email: profile.emails[0].value,
             name: profile.displayName,
             photo: profile.photos[0].value,
+            logInDate: date,
           },
         },
         { upsert: true, returnOriginal: false },
         function (err, user) {
-          console.log({ now: "Google Strategy", user });
+          console.log({ now: "Google Strategy", user, date });
           return done(err, user.value);
         }
       );

@@ -16,12 +16,11 @@ router.get("/transfer",loginCheck(collections.pointActivity),async function(req,
 });
 
 router.get("/consume",loginCheck(collections.pointActivity),async function(req,res){
-
     const user = await collections.user.findOne({_id: '1'})
     const good = await collections.goods.findOne({_id: '2'})
 
     console.log(user,good);
-
+    
     pointAction.consumePoints('',user,good);
 
     console.log("consume success");
@@ -29,12 +28,16 @@ router.get("/consume",loginCheck(collections.pointActivity),async function(req,r
 
 })
 
-router.get("/fromRecord", async function(req, res) {
-    const record = await collections.record.findOne({ _id: '1' });
-    const user = await collections.user.findOne({_id: '1'});
-    const amount = Math.round(record.money/100);
+router.get("/event", loginCheck(collections.pointActivity), async function (req, res) {
+    
+    const user = await collections.user.findOne({ _id: '1' });
+    //const ;
 
-    pointAction.pointsFromRecord('', amount, record, user);
-    res.status(200);
+    pointAction.pointsFromEvent('每日', 100, user)
+    res.status(200)
+
 })
+
+
+
 module.exports = router;
