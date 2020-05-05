@@ -47,6 +47,7 @@ function relationPipeline(coll_name, oneToManyFields, manyToManyFields) {
   const pipeline = [];
 
   const one_map = oneToManyFields && oneToManyMap[coll_name];
+  console.log(one_map)
   if (one_map) {
     if(!Array.isArray(oneToManyFields)) oneToManyFields = [oneToManyFields];
     for (const field of oneToManyFields) {

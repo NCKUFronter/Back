@@ -17,6 +17,7 @@ router.get(
   "/",
   // validatePipe("query", LedgerSchema, { context: { partial: true } }),
   async function (req, res) {
+    console.log(req.query);
     const oneToManyFields = req.query._expand;
     const manyToManyFields = req.query._embed;
     const ledgers = await findWithRelation(

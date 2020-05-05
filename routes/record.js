@@ -14,10 +14,13 @@ const record_coll = collections.record;
 // GET from database
 router.get("/", loginCheck(record_coll), async function (req, res) {
   // collRelation(record_coll, 'category', 'categoryId', '_id', 'categoryData');
+  console.log(req.query);
   const oneToManyFields = req.query._expand;
   const manyToManyFields = req.query._embed;
+  
   const ledgers = await findWithRelation(
     record_coll,
+    // @ts-ignore
     oneToManyFields,
     manyToManyFields
   );
@@ -31,6 +34,7 @@ router.get("/:id", async function (req, res) {
   const ledger = await findOneWithRelation(
     record_coll,
     req.params.id,
+    // @ts-ignore
     oneToManyFields,
     manyToManyFields
   );
