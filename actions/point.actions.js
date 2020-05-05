@@ -16,13 +16,14 @@ async function pointsFromEvent(subtype, amount, user) {
 /**
  * 給予點數並將User, Record保存到資料庫
  * @param { string } subtype
- * @param {number} amount
+ * @param { number } amount
  * @param { RecordModel } record 尚未保存的record
  * @param { UserModel } user
  * @return { Promise<boolean> } 是否成功
  */
 async function pointsFromRecord(subtype, amount, record, user) {
   record.rewardPoints = amount;
+  console.log(record)
   return innerGivenPoints(subtype, amount, record, user);
 }
 
@@ -40,6 +41,7 @@ async function innerGivenPoints(subtype, amount, record, user) {
       // insert record
       recordId = (await simpleInsertOne(collections.record, record, session))
         .insertedId;
+      console.log(recordId);
     }
 
     const activity = new PointActivityModel(

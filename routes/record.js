@@ -7,6 +7,7 @@ const {
   findWithRelation,
   findOneWithRelation,
 } = require("../actions/coll-relation");
+const pointAction = require("../actions/point.actions")
 const router = require("express").Router();
 
 const record_coll = collections.record;
@@ -53,11 +54,12 @@ router.post(
       userId: req.userId,
       ...req.body,
     };
-    record_coll.insertOne(postData, function (err, result) {
-      if (err) throw err;
-      console.log("1 document inserted.");
-      res.status(201).send(result.ops[0]);
-    });
+    const user = await collections.user.findOne({ _id: req.userId });
+    const amount = Math.round(req.body.money/100);
+
+    pointAction.pointsFromRecord('', amount, postData, user);
+    console.log("1 document inserted.");
+    res.status(201);
   }
 );
 
