@@ -1,4 +1,5 @@
 // @ts-check
+/// <reference types="./types" />
 
 require("dotenv").config();
 const express = require("express");
@@ -21,7 +22,7 @@ async function startup() {
 
   // Plugins
   app.use(
-    // @ts-ignore
+    // @ts-ignore: 型別定義不符合express，但可以work
     cors({
       credentials: true,
       origin: (_origin, cb) => cb(null, true), // 給前端用
@@ -29,6 +30,7 @@ async function startup() {
   );
 
   app.use(express.static(__dirname));
+  // @ts-ignore
   app.use(cookieParser());
   app.get("/", function (req, res) {
     console.log(req.cookies);
@@ -36,9 +38,11 @@ async function startup() {
   });
   // Log in
 
+  // @ts-ignore: 型別定義不符合express，但可以work
   app.use(session({ secret: "cats", resave: false, saveUninitialized: false }));
   app.use(AppPassport.initialize());
   app.use(AppPassport.session());
+  // @ts-ignore: 型別定義不符合express，但可以work
   app.use(flash());
 
   app.use(bodyParser.urlencoded({ extended: false }));

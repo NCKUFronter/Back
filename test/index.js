@@ -12,7 +12,7 @@ async function run() {
     await require("./point.test").run();
     await require("./invitation.test").run();
     await require("./user.test").run();
-    await require("./relation.test").run();
+    await require("./other.test").run();
     await require("./login.test").run(app);
     await require("./category.test").run(app);
   } catch (err) {

@@ -46,7 +46,7 @@ class InvitationModel {
   }
 
   static fromObject(obj) {
-    const model = new InvitationModel(null, null, null);
+    const model = Object.create(InvitationModel.prototype);
     return Object.assign(model, obj);
   }
 }

@@ -4,6 +4,7 @@ const { LedgerModel, UserModel } = require("../models");
 
 /**
  * @param {(req) => string} ledgerIdFn 取得ledger id
+ * @return {import('express').Handler}
  */
 function getLedgerAuthGuard(ledgerIdFn) {
   /**

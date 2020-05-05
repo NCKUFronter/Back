@@ -3,7 +3,11 @@ const { fetchNextId, collections } = require("../models/mongo");
 const { LedgerSchema } = require("../models/ledger.model");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
-const collRelation = require("../actions/coll-relation");
+const { getLedgerAuthGuard } = require("../middleware/auth-guard");
+const {
+  findWithRelation,
+  findOneWithRelation,
+} = require("../actions/coll-relation");
 const router = require("express").Router();
 
 // 假設已經 connectDB
@@ -11,36 +15,55 @@ const ledger_coll = collections.ledger;
 // GET from database
 router.get(
   "/",
-  validatePipe("query", LedgerSchema, { context: { partial: true } }),
-  function (req, res) {
-    collRelation(ledger_coll, 'recrod', '_id', 'ledgerId', 'recordData');
+  // validatePipe("query", LedgerSchema, { context: { partial: true } }),
+  async function (req, res) {
+    const oneToManyFields = req.query._expand;
+    const manyToManyFields = req.query._embed;
+    const ledgers = await findWithRelation(
+      ledger_coll,
+      oneToManyFields,
+      manyToManyFields
+    );
+    res.status(200).json(ledgers);
   }
 );
 
 // GET certain data from database
-router.get("/:id", loginCheck(ledger_coll), function (req, res) {
-  const getData = { _id: req.params.id };
-  ledger_coll.find(getData).toArray(function (err, result) {
-    if (err) throw err;
-    res.status(200).send(result);
-  });
-});
+router.get(
+  "/:id",
+  loginCheck(ledger_coll),
+  getLedgerAuthGuard((req) => req.params.id),
+  async function (req, res) {
+    const oneToManyFields = req.query._expand;
+    const manyToManyFields = req.query._embed;
+    const ledger = await findOneWithRelation(
+      ledger_coll,
+      req.params.id,
+      oneToManyFields,
+      manyToManyFields
+    );
+    res.status(200).json(ledger);
+  }
+);
 
-router.post("/", validatePipe("body", LedgerSchema), loginCheck(ledger_coll), async function (req, res) {
+router.post(
+  "/",
+  validatePipe("body", LedgerSchema),
+  loginCheck(ledger_coll),
+  async function (req, res) {
     const postData = {
       _id: await fetchNextId(ledger_coll.collectionName),
-      // @ts-ignore
-      admin: req.userId,
-      // @ts-ignore
+      adminId: req.userId,
       userId: [req.userId],
       ...req.body,
-    }
+    };
     ledger_coll.insertOne(postData, function (err, result) {
       if (err) throw err;
       console.log("1 document inserted.");
       res.status(201).send(result.ops[0]);
     });
-});
+  }
+);
 
 // router.put(
 //   "/:id",

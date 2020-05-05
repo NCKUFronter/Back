@@ -1,4 +1,5 @@
 // @ts-check
+const log = console.log;
 const test = require("baretest")("category-test");
 const assert = require("assert");
 const supertest = require("supertest");
@@ -17,8 +18,9 @@ const testUrls = {
   getAll: "/category",
   getOne: (id) => "/category/" + id,
   patch: (id) => "/category/" + id,
-  delete: "/category",
+  delete: (id) => "/category/" + id,
 };
+let id = "5";
 
 test.before(async () => {
   await simpleLogin(agent);
@@ -26,22 +28,22 @@ test.before(async () => {
 
 test("insert category", async () => {
   const category_dto = { name: "myCategory" };
-  await supertest(app)
+  await agent
     .post(testUrls.insert)
     .send(category_dto)
     .expect(201)
     .then((res) => {
       /** @type {CategoryModel} */
       const { _id, ...categoryInfo } = res.body;
+      id = _id;
       assert.deepStrictEqual(categoryInfo, category_dto);
     });
 });
 
 test("patch category", async () => {
-  const id = "5";
   const category_dto = { name: "yourCategory" };
 
-  await supertest(app)
+  await agent
     .patch(testUrls.patch(id))
     .send(category_dto)
     .expect(200)
@@ -52,14 +54,33 @@ test("patch category", async () => {
 });
 
 test("get all category", async () => {
-  await supertest(app).get(testUrls.get).expect(200);
+  await agent
+    .get(testUrls.getAll)
+    .expect(200)
+    .then((res) => {
+      const categories = res.body;
+      assert(Array.isArray(categories));
+      for (const category of categories) {
+        assert.equal(Object.keys(category).length, 2);
+        assert(typeof category.name == "string");
+        assert(typeof category._id == "string");
+      }
+    });
+});
+
+test("delete category", async () => {
+  await agent.delete(testUrls.delete(id)).expect(200);
+  const category = await collections.category.findOne({ _id: id });
+  assert(category == null);
 });
 
 module.exports = {
   /** @param {import('express').Application} express_app */
-  run(express_app) {
+  async run(express_app) {
+    console.log = () => {};
     app = express_app;
     agent = supertest.agent(app);
-    return test.run();
+    await test.run();
+    console.log = log; // 恢復log
   },
 };

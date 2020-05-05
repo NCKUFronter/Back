@@ -32,14 +32,15 @@ const oneToManyMap = {
 
 const manyToManyMap = {
   ledger: {
-    users: { coll: "user", localField: "userIds" },
+    users: { coll: "user", localField: "userIds", foreignField: "_id" },
+    records: { coll: "record", localField: "_id", foreignField: "ledgerId" },
   },
 };
 
 /**
  * @param {string} coll_name
- * @param {string[]} oneToManyFields
- * @param {string[]} manyToManyFields
+ * @param {string[] | string} oneToManyFields
+ * @param {string[] | string} manyToManyFields
  * @return any[]
  */
 function relationPipeline(coll_name, oneToManyFields, manyToManyFields) {
@@ -47,6 +48,7 @@ function relationPipeline(coll_name, oneToManyFields, manyToManyFields) {
 
   const one_map = oneToManyFields && oneToManyMap[coll_name];
   if (one_map) {
+    if(!Array.isArray(oneToManyFields)) oneToManyFields = [oneToManyFields];
     for (const field of oneToManyFields) {
       const relation_coll = one_map[field];
       if (!relation_coll) continue;
@@ -66,6 +68,7 @@ function relationPipeline(coll_name, oneToManyFields, manyToManyFields) {
 
   const many_map = manyToManyFields && manyToManyMap[coll_name];
   if (many_map) {
+    if(!Array.isArray(manyToManyFields)) manyToManyFields = [manyToManyFields];
     for (const field of manyToManyFields) {
       const relation = many_map[field];
       if (!relation) continue;
@@ -86,8 +89,8 @@ function relationPipeline(coll_name, oneToManyFields, manyToManyFields) {
 /**
  * @param {import('mongodb').Collection} coll
  * @param {string} id
- * @param {string[]} [oneToManyFields]
- * @param {string[]} [manyToManyFields]
+ * @param {string[] | string} [oneToManyFields]
+ * @param {string[] | string} [manyToManyFields]
  * @return Promise<any[]>
  */
 async function findOneWithRelation(
@@ -113,8 +116,8 @@ async function findOneWithRelation(
 /**
  * 對不是array的field進行relation
  * @param {import('mongodb').Collection} coll
- * @param {string[]} [oneToManyFields]
- * @param {string[]} [manyToManyFields]
+ * @param {string[] | string} [oneToManyFields]
+ * @param {string[] | string} [manyToManyFields]
  * @return Promise<any[]>
  */
 function findWithRelation(coll, oneToManyFields, manyToManyFields) {

@@ -1,6 +1,7 @@
 // @ts-check
 // 只測試local
-const test = require("baretest")("point-test");
+const log = console.log;
+const test = require("baretest")("login-test");
 const supertest = require("supertest");
 const assert = require("assert");
 const { collections } = require("../models/mongo");
@@ -50,10 +51,15 @@ async function simpleLogin(agent) {
 
 module.exports = {
   /** @param {import('express').Application} express_app */
-  run(express_app) {
+  async run(express_app) {
+    // 關閉 log
+    console.log = () => {};
+
     app = express_app;
     agent = supertest.agent(app);
-    return test.run();
+    await test.run();
+
+    console.log = log; // 恢復log
   },
   simpleLogin,
 };

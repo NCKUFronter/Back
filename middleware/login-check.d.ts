@@ -1,12 +1,14 @@
 import { Collection } from "mongodb";
-import { RequestHandler, Request } from "express";
+import {Handler} from 'express';
 
-declare module "express" {
-  interface Request {
-    userId: string;
+declare global {
+  module Express {
+    interface Request {
+      userId?: string;
+    }
   }
 }
 
-function loginCheck(coll: Collection): RequestHandler;
+function loginCheck(coll: Collection): Handler;
 
 export = loginCheck;

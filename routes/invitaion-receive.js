@@ -3,7 +3,8 @@ const validatePipe = require("../middleware/validate-pipe");
 const InvitationSchema = require("../models/invitation.model");
 const { answerInvitation } = require("../actions/invitation.actions");
 
-router.post("/",
+router.post(
+  "/",
   validatePipe("body", InvitationSchema),
   loginCheck(collections.invitation),
   function (req, res) {
