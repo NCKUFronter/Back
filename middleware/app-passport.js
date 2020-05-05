@@ -10,7 +10,7 @@ AppPassport.use(
     {
       clientID: keys.googleClientID,
       clientSecret: keys.googleClientSecret,
-      callbackURL: "/login/auth/google/callback",
+      callbackURL: "/api/login/auth/google/callback",
     },
     async function (accessToken, refreshToken, profile, done) {
       console.log(accessToken, profile);
@@ -24,8 +24,13 @@ AppPassport.use(
             email: profile.emails[0].value,
             name: profile.displayName,
             photo: profile.photos[0].value,
+            lastDate: null,
+            conDays: 0,
             logInDate: date,
           },
+          // $setOnInsert: {
+            
+          // }
         },
         { upsert: true, returnOriginal: false },
         function (err, user) {

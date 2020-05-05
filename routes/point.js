@@ -2,6 +2,7 @@ const router = require("express").Router();
 const { collections } = require("../models/mongo");
 const loginCheck = require("../middleware/login-check")
 const pointAction = require("../actions/point.actions")
+const countDays = require("../actions/dateCount")
 
 router.get("/transfer", loginCheck(collections.pointActivity), async function (req, res) {
 
@@ -31,9 +32,35 @@ router.get("/consume", loginCheck(collections.pointActivity), async function (re
 router.get("/event", loginCheck(collections.pointActivity), async function (req, res) {
     
     const user = await collections.user.findOne({ _id: '1' });
-    //const ;
+    //console.log(user,user.logInDate, user.lastLogIn, user.conDays)
+    const nowDate = user.logInDate
+    const lastDate = user.lastLogIn
+    //const nowday = user.logInDate.getTime();
+    console.log(user.conDays)
+    const date = new Date()
+    var diffTime = nowDate.getTime() - lastDate.getTime()
+    var diffDate = diffTime / (1000 * 3600 * 24)
+    var diff = (date.getTime() - nowDate.getTime()) / (1000 * 3600 * 24)
+    console.log(diff)
+    if (diff < 1)
+        console.log("kkkkkkkkkkk")
+    else {
+        if (diffDate < 2) {
+            console.log("conDays ++")
+            user.conDays = user.conDays + 1;
+        }
+        else {
+            console.log("n conDays")
+            user.conDays = 1;
+        }
+    }
 
-    pointAction.pointsFromEvent('每日', 100, user)
+    console.log(user.conDays)
+    //const ;
+    //countDays(user.logInDate, user.lastDate, user.conDays)
+
+    //pointAction.pointsFromEvent('每日', 100, user)
+    console.log("Info: API point/event success")
     res.status(200)
 
 })
