@@ -22,6 +22,7 @@ router.get(
     const manyToManyFields = req.query._embed;
     const ledgers = await findWithRelation(
       ledger_coll,
+      // @ts-ignore
       oneToManyFields,
       manyToManyFields
     );
@@ -40,6 +41,7 @@ router.get(
     const ledger = await findOneWithRelation(
       ledger_coll,
       req.params.id,
+      // @ts-ignore
       oneToManyFields,
       manyToManyFields
     );
