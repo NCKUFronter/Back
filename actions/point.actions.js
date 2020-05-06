@@ -23,7 +23,7 @@ async function pointsFromEvent(subtype, amount, user) {
  */
 async function pointsFromRecord(subtype, amount, record, user) {
   record.rewardPoints = amount;
-  console.log(record)
+  console.log(record);
   return innerGivenPoints(subtype, amount, record, user);
 }
 
@@ -44,6 +44,7 @@ async function innerGivenPoints(subtype, amount, record, user) {
       console.log(recordId);
     }
 
+    // save activity
     const activity = new PointActivityModel(
       "new",
       subtype,
@@ -52,16 +53,34 @@ async function innerGivenPoints(subtype, amount, record, user) {
       user._id
     );
 
-    const activity_prom = simpleInsertOne(
-      collections.pointActivity,
-      activity,
-      session
-    );
+    let activity_prom = null;
+    if (amount) {
+      activity_prom = simpleInsertOne(
+        collections.pointActivity,
+        activity,
+        session
+      );
+    }
+
+    // add hashtags to user
+    let userUpdate = { $inc: { rewardPoints: amount } };
+    if (record.hashtags) {
+      const categoryTags = user.categoryTags ? user.categoryTags : {};
+      if (!categoryTags[record.categoryId])
+        categoryTags[record.categoryId] = [];
+      let now_tags = new Set([
+        ...record.hashtags,
+        ...categoryTags[record.categoryId],
+      ]);
+      categoryTags[record.categoryId] = Array.from(now_tags);
+
+      userUpdate.$set = { categoryTags };
+    }
 
     // update user
     const user_prom = collections.user.updateOne(
       { _id: user._id },
-      { $inc: { rewardPoints: amount } },
+      userUpdate,
       { session }
     );
     await Promise.all([user_prom, activity_prom]);

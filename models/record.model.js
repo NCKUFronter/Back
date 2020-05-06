@@ -1,26 +1,49 @@
 // @ts-check
 const Joi = require("@hapi/joi");
 const { collections } = require("../models/mongo");
-const { JoiRequireWhen, existInDB, AsyncJoi } = require("./utils");
+const {
+  JoiRequireWhen,
+  JoiNumberString,
+  existInDB,
+  AsyncJoi,
+} = require("./utils");
 
-const RecordSchema = Joi.object({
-  recordType: JoiRequireWhen(Joi.string().valid("income", "expense")),
+/**
+ * @typedef RecordDto
+ * @property {enum} recordType - - eg:income,expense
+ * @property {string} recordType.required
+ * @property {number} money.required
+ * @property {string} ledgerId.required - - eg:1
+ * @property {string} categoryId.required - - eg:1
+ * @property {string} date.required - - eg:2020-05-06T15:21:32.202Z
+ * @property {string} detail
+ * @property {string[]} hashtags
+ */
+const RecordSchema = AsyncJoi.object(
+  {
+    recordType: JoiRequireWhen(Joi.string().valid("income", "expense")),
 
-  money: JoiRequireWhen(Joi.number().min(0)),
+    money: JoiRequireWhen(Joi.number().min(0)),
 
-  // 或許放在url內比較好 '/ledger/:ledgerId/record'
-  ledgerId: JoiRequireWhen(Joi.string().regex(/[0-9]/).min(0)),
+    // 或許放在url內比較好 '/ledger/:ledgerId/record'
+    ledgerId: AsyncJoi.schema(JoiRequireWhen(JoiNumberString)).addRule(
+      existInDB(() => collections.ledger, "_id")
+    ),
 
-  categoryId: JoiRequireWhen(Joi.string().regex(/[0-9]/).min(0)),
+    categoryId: AsyncJoi.schema(JoiRequireWhen(JoiNumberString)).addRule(
+      existInDB(() => collections.category, "_id")
+    ),
 
-  date: JoiRequireWhen(Joi.date()),
+    date: JoiRequireWhen(Joi.date()),
 
-  hashtags: Joi.array().items(Joi.string()),
+    hashtags: Joi.array().items(Joi.string()),
 
-  detail: Joi.string().allow(""),
+    detail: Joi.string().allow(""),
 
-  from: Joi.string().allow(null),
-}).not({});
+    from: Joi.string().allow(null),
+  },
+  Joi.not()
+);
 
 /**
  * "swagger model"

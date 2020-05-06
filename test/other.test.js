@@ -1,4 +1,5 @@
 // @ts-check
+const log = console.log
 const test = require("baretest")("other-test");
 const assert = require("assert");
 const { collections } = require("../models/mongo");
@@ -41,4 +42,10 @@ test("notification", async () => {
   notification.send(event);
 });
 
-module.exports = test;
+module.exports = {
+  async run() {
+    console.log = () => {}
+    await test.run()
+    console.log = log;
+  }
+};

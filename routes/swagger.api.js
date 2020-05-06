@@ -64,13 +64,19 @@
  */
 
 /**
+ * @typedef InsertRecordResponse
+ * @property {string} message
+ * @property {number} rewardPoints
+ */
+/**
  * @route POST /record
  * @group record
  * @summary 新增的record
- * @param {RecordDto.model} name.body.required
- * @returns {Record.model} 201 - inserted model
+ * @param {RecordDto.model} dto.body.required
+ * @returns {InsertRecordResponse.model} 201 - inserted model
  * @returns {string} 400 - 所填資料有誤
  * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
  * @security Basic
  */
 
@@ -79,7 +85,7 @@
  * @group record
  * @summary 部分修改指定 id 的record
  * @param {string} id.path.required
- * @param {RecordDto.model} name.body.required
+ * @param {RecordDto.model} dto.body.required
  * @returns {Record.model} 200 - updated model
  * @returns {string} 400 - 所填資料有誤
  * @returns {any} 401 - 未登入

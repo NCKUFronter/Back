@@ -1,25 +1,29 @@
 // @ts-check
 const Joi = require("@hapi/joi");
-const { JoiNumberString } = require("./utils");
+const { collections } = require("../models/mongo");
+const { JoiNumberString, AsyncJoi, existInDB } = require("./utils");
 
 /**
  * @typedef TransferPointsDto
  * @property {string} email.required
  * @property {number} amount.required - amount of points
  */
-const TransferPointsSchema = Joi.object({
-  email: Joi.string().email().required(),
-  amout: Joi.number(),
+const TransferPointsSchema = AsyncJoi.object({
+  email: AsyncJoi.schema(Joi.string().email().required()).addRule(
+    existInDB(() => collections.user, "email")
+  ),
+  amout: Joi.number().required(),
 });
-
 
 /**
  * @typedef ConsumePointsDto
  * @property {string} email.required
  * @property {number} amount.required - amount of points
  */
-const ConsumePointsSchema = Joi.object({
-  goodsId: JoiNumberString,
+const ConsumePointsSchema = AsyncJoi.object({
+  goodsId: AsyncJoi.schema(JoiNumberString).addRule(
+    existInDB(() => collections.goods, "_id")
+  ),
 });
 
 /**

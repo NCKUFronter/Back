@@ -1,11 +1,12 @@
 // @ts-check
 const Joi = require("@hapi/joi");
+const { AsyncJoiSchema } = require("../models/utils");
 /**
  * 依照 Joi Schema驗證並轉換body或params或query
  * 會取代原本的值，原本的會放到 req.body_origin, req.params_origin req.query_origin
  *
  * @param {'body' | 'params' | 'query'} position
- * @param {import('@hapi/joi').Schema} schema
+ * @param {import('@hapi/joi').Schema | AsyncJoiSchema} schema
  * @param {import('@hapi/joi').ValidationOptions=} options
  */
 function validatePipe(position, schema, options) {

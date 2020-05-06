@@ -26,7 +26,7 @@ const UserSchema = Joi.object({
  * @property {string} money.required
  * @property {string} lastLogin.required - real type: Date
  * @property {string[]} cardIds
- * @property {string[]} categoryTags.required
+ * @property {object} categoryTags.required
  */
 class UserModel {
   /** @type {string} */

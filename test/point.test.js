@@ -1,4 +1,5 @@
 // @ts-check
+const log = console.log;
 const test = require("baretest")("point-test");
 const assert = require("assert");
 const {
@@ -122,4 +123,10 @@ test("consumePoints", async function () {
   // check activity
   await checkActivity("consume", "", goods.point, userId, goodsId);
 });
-module.exports = test;
+module.exports = {
+  async run() {
+    console.log = () => {};
+    await test.run();
+    console.log = log;
+  },
+};

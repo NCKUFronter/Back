@@ -37,4 +37,16 @@ test("user pointActivity", async () => {
   }
 });
 
+test("e2e-user invitations", async () => {
+  assert(false, "not implement")
+});
+
+test("e2e-user ledgers", async () => {
+  assert(false, "not implement")
+});
+
+test("e2e-user pointActivity", async () => {
+  assert(false, "not implement")
+});
+
 module.exports = test;
