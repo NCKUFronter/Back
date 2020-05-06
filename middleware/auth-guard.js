@@ -4,7 +4,6 @@ const { LedgerModel, UserModel } = require("../models");
 
 /**
  * @param {(req) => string} ledgerIdFn 取得ledger id
- * @return {import('express').Handler}
  */
 function getLedgerAuthGuard(ledgerIdFn) {
   /**
@@ -18,7 +17,7 @@ function getLedgerAuthGuard(ledgerIdFn) {
 
     /** @type {LedgerModel} */
     const ledger = await collections.ledger.findOne({ _id: ledgerId });
-    if (ledger) return res.status(404).json("Ledger Not Found");
+    if (!ledger) return res.status(404).json("Ledger Not Found");
     else if (
       ledger.adminId == req.user._id ||
       (ledger.userIds && ledger.userIds.indexOf(req.user._id) > -1)

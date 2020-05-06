@@ -8,6 +8,13 @@ const GoodsSchema = Joi.object({
   point: JoiRequireWhen(Joi.number().min(0)),
 }).not({});
 
+/**
+ * "swagger model"
+ * @typedef Goods
+ * @property {string} _id
+ * @property {string} name
+ * @property {number} point
+ */
 class GoodsModel {
   /** @type {string} */
   _id;

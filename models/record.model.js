@@ -1,6 +1,7 @@
 // @ts-check
 const Joi = require("@hapi/joi");
-const { JoiRequireWhen } = require("./utils");
+const { collections } = require("../models/mongo");
+const { JoiRequireWhen, existInDB, AsyncJoi } = require("./utils");
 
 const RecordSchema = Joi.object({
   recordType: JoiRequireWhen(Joi.string().valid("income", "expense")),
@@ -18,9 +19,25 @@ const RecordSchema = Joi.object({
 
   detail: Joi.string().allow(""),
 
-  from: Joi.string().allow(null)
+  from: Joi.string().allow(null),
 }).not({});
 
+/**
+ * "swagger model"
+ * @typedef Record
+ * @property {string} _id.required
+ * @property {string} recordType.required
+ * @property {string} money.required
+ * @property {string} ledgerId.required
+ * @property {string} categoryId.required
+ * @property {string} userId.required
+ * @property {string[]} hashtags
+ * @property {string} detail
+ * @property {number} rewardPoints.required
+ * @property {string} from
+ * @property {string} date.required - real type: Date
+ * @property {string} reviseDate.required - real type: Date
+ */
 class RecordModel {
   /** @type {string} */
   _id;

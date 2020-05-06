@@ -3,12 +3,17 @@ const router = require("express").Router();
 const { AppPassport } = require("../middleware/app-passport");
 
 router.post(
-  "/",
+  "/login",
   AppPassport.authenticate("local", {
-    successRedirect: "/user",
-    failureRedirect: "/login-local",
     session: true,
-  })
+  }),
+  (req, res) => {
+    if (req.isAuthenticated()) {
+      res.status(200).json("Login Successful!");
+    } else {
+      res.status(401).json("登入失敗! 帳號或密碼錯誤。");
+    }
+  }
 );
 
 router.get("/", function (req, res, next) {
@@ -22,9 +27,9 @@ router.get("/", function (req, res, next) {
   })(req, res, next);
 });
 
-router.get("/logout", function (req, res) {
+router.post("/logout", function (req, res) {
   req.logout();
-  res.status(200);
+  res.status(200).json("Logout Success!");
 });
 
 module.exports = router;

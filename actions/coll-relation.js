@@ -10,7 +10,6 @@
 const oneToManyMap = {
   ledger: {
     admin: "user",
-    category: "category",
   },
   invitation: {
     fromUser: "user",

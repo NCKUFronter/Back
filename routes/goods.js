@@ -7,17 +7,19 @@ const router = require("express").Router();
 const goods_coll = collections.goods;
 
 // GET from database
-router.get("/", loginCheck(goods_coll), async function (req, res) {
+router.get("/", async function (req, res) {
   goods_coll.find().toArray((err, result) => {
     if (err) throw err;
     res.status(200).json(result);
-  })
+  });
 });
 
 // GET certain data from database
 router.get("/:id", async function (req, res) {
-  goods_coll.find({ _id: req.params.id}).toArray((err, result) => {
-      if (err) throw err;
-      res.status(200).json(result);
-  })
+  goods_coll.findOne({ _id: req.params.id }, (err, result) => {
+    if (err) throw err;
+    res.status(200).json(result);
+  });
 });
+
+module.exports = router;
