@@ -13,6 +13,7 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const { connectDB, collections, client } = require("./models/mongo");
+const path = require('path');
 
 async function startup() {
   await connectDB();
@@ -29,7 +30,8 @@ async function startup() {
     })
   );
 
-  app.use(express.static(__dirname));
+  app.use(require("./middleware/front-end-hook"));
+  app.use(express.static(__dirname+ "/Front/dist"))
   // @ts-ignore
   app.use(cookieParser());
   app.get("/", function (req, res) {
@@ -49,13 +51,13 @@ async function startup() {
   app.use(bodyParser.json());
 
   // Router
-  app.use("/record", require("./routes/record"));
-  app.use("/user", require("./routes/user")); // /account to record user info
-  app.use("/category", require("./routes/category"));
-  app.use("/ledger", require("./routes/ledger")); // /account to record user info
-  app.use("/login", require("./routes/login"));
-  app.use("/login-local", require("./routes/login-local"));
-  app.use("/point", require("./routes/point"));
+  app.use("/api/record", require("./routes/record"));
+  app.use("/api/user", require("./routes/user")); // /account to record user info
+  app.use("/api/category", require("./routes/category"));
+  app.use("/api/ledger", require("./routes/ledger")); // /account to record user info
+  app.use("/api/login", require("./routes/login"));
+  app.use("/api/login-local", require("./routes/login-local"));
+  app.use("/api/point", require("./routes/point"));
 
   // Run the server
   let KeyCert = null;

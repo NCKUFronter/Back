@@ -15,7 +15,6 @@ const record_coll = collections.record;
 // GET from database
 router.get("/", loginCheck(record_coll), async function (req, res) {
   // collRelation(record_coll, 'category', 'categoryId', '_id', 'categoryData');
-  console.log(req.query);
   const oneToManyFields = req.query._expand;
   const manyToManyFields = req.query._embed;
   

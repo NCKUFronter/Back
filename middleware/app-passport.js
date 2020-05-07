@@ -10,7 +10,7 @@ AppPassport.use(
     {
       clientID: keys.googleClientID,
       clientSecret: keys.googleClientSecret,
-      callbackURL: "/login/auth/google/callback",
+      callbackURL: "/api/login/auth/google/callback",
     },
     async function (accessToken, refreshToken, profile, done) {
       console.log(accessToken, profile);
