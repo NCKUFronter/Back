@@ -7,7 +7,7 @@ const { getLedgerAuthGuard } = require("../middleware/auth-guard");
 const {
   findWithRelation,
   findOneWithRelation,
-  getCategoryTags
+  getCategoryTags,
 } = require("../actions");
 const pointAction = require("../actions/point.actions");
 const router = require("express").Router();
@@ -18,11 +18,13 @@ const record_coll = collections.record;
 router.get("/", loginCheck(record_coll), async function (req, res) {
   // collRelation(record_coll, 'category', 'categoryId', '_id', 'categoryData');
   console.log(req.query);
-  const oneToManyFields = req.query._expand;
-  const manyToManyFields = req.query._embed;
+  const { _one, _many, ...match } = req.query;
+  const oneToManyFields = req.query._one;
+  const manyToManyFields = req.query._many;
 
   const records = await findWithRelation(
     record_coll,
+    match,
     // @ts-ignore
     oneToManyFields,
     manyToManyFields

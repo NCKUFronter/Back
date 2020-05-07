@@ -69,7 +69,7 @@
  * -- ✔️ 可以運作 
  * -- 🚫 前端不應該使用
  * @parm {string} ledger
- * @param {enum[]} _expand.query - one to one fields - eg: category,user,ledger
+ * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
  * @returns {Array<Record>} 200
  */
 
@@ -79,7 +79,7 @@
  * @summary 查詢所有record
  * -- ✔️ 可以運作
  * @param {string} id.path.required
- * @param {enum[]} _expand.query - one to one fields - eg: category,user,ledger
+ * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
  * @returns {Record.model} 200
  */
 
@@ -253,9 +253,9 @@
  * @summary 查詢所有 ledger 
  * -- ✔️ 可以運作
  * -- 🚫 前端不應該使用
- * @parm {string} ledger
- * @param {enum[]} _expand.query - one to one fields - eg: admin
- * @param {enum[]} _embed.query - many-to-many relationship fields - eg: users,records
+ * @parm {string} ledgerId.query
+ * @param {enum[]} _one.query - one to one fields - eg: admin
+ * @param {enum[]} _many.query - many-to-many relationship fields - eg: users,records
  * @returns {Array<Ledger>} 200
  */
 
@@ -265,7 +265,7 @@
  * @summary 查詢指定 id 的 ledger
  * -- ✔️ 可以運作
  * @param {string} id.path.required
- * @param {enum[]} _expand.query - one to one fields - eg: category,user,ledger
+ * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
  * @returns {Ledger.model} 200 - success
  * @returns {any} 401 - 未登入
  * @returns {any} 403 - 沒有權限訪問
@@ -317,7 +317,7 @@
  * @summary 查詢所有pointActivity 
  * -- 🔨 尚未弄好
  * -- 🚫前端不應該使用
- * @param {enum[]} _expand.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
+ * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
  * @returns {Array<PointActivity>} 200
  */
 
@@ -326,7 +326,7 @@
  * @group point
  * @summary 查詢指定 id 的pointActivity
  * -- 🔨 尚未弄好
- * @param {enum[]} _expand.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
+ * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
  * @returns {PointActivity.model} 200
  */
 
