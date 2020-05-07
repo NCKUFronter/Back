@@ -21,14 +21,14 @@ async function doInviteTest(ledgerId, fromUserId, toUserId) {
   assert.equal(invitation.type, 2);
 }
 
-test("invite", async () => {
+test("unit > invite", async () => {
   const ledgerId = "1";
   const fromUserId = "2";
   const toUserId = "3";
   await doInviteTest(ledgerId, fromUserId, toUserId);
 });
 
-test("accept invitation", async () => {
+test("unit > accept invitation", async () => {
   await doInviteTest("2", "2", "3");
 
   /** @type {InvitationModel} */
@@ -43,7 +43,7 @@ test("accept invitation", async () => {
   assert(ledger.userIds.includes("3"));
 });
 
-test("reject invitation", async () => {
+test("unit > reject invitation", async () => {
   await doInviteTest("1", "1", "3");
 
   /** @type {InvitationModel} */

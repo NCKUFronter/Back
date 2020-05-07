@@ -26,7 +26,7 @@ test.before(async () => {
   await simpleLogin(agent);
 });
 
-test("e2e-insert category", async () => {
+test("e2e > insert category", async () => {
   const category_dto = { name: "myCategory" };
   await agent
     .post(testUrls.insert)
@@ -40,7 +40,7 @@ test("e2e-insert category", async () => {
     });
 });
 
-test("e2e-patch category", async () => {
+test("e2e > patch category", async () => {
   const category_dto = { name: "yourCategory" };
 
   await agent
@@ -53,7 +53,7 @@ test("e2e-patch category", async () => {
     });
 });
 
-test("e2e-get all category", async () => {
+test("e2e > get all category", async () => {
   await agent
     .get(testUrls.getAll)
     .expect(200)
@@ -68,7 +68,18 @@ test("e2e-get all category", async () => {
     });
 });
 
-test("e2e-delete category", async () => {
+test("e2e > get one category", async () => {
+  await agent
+    .get(testUrls.getOne(id))
+    .expect(200)
+    .then((res) => {
+      const category = res.body;
+      assert(!Array.isArray(category));
+      assert.equal(category._id, id);
+    });
+});
+
+test("e2e > delete category", async () => {
   await agent.delete(testUrls.delete(id)).expect(200);
   const category = await collections.category.findOne({ _id: id });
   assert(category == null);

@@ -57,7 +57,7 @@ router.post(
     const postData = {
       _id: await fetchNextId(ledger_coll.collectionName),
       adminId: req.userId,
-      userId: [req.userId],
+      userIds: [req.userId],
       ...req.body,
     };
     ledger_coll.insertOne(postData, function (err, result) {
@@ -95,6 +95,7 @@ router.patch(
   "/:id",
   validatePipe("body", LedgerSchema, { context: { partial: true } }),
   loginCheck(ledger_coll),
+  getLedgerAuthGuard((req) => req.params.id),
   function (req, res) {
     // @ts-ignore
     const patchFilter = { _id: req.params.id, adminId: req.userId };
@@ -114,22 +115,27 @@ router.patch(
   }
 );
 
-router.delete("/:id", loginCheck(ledger_coll), function (req, res) {
-  // @ts-ignore
-  const deleteFilter = { _id: req.params.id, adminId: req.userId };
-  ledger_coll.deleteOne(deleteFilter, (err, result) => {
-    console.log(
-      "Delete row: " +
-        req.params.id +
-        " with filter: " +
-        deleteFilter +
-        ". Deleted: " +
-        result.result.n
-    );
-    res
-      .status(200)
-      .send("Delete row: " + req.params.id + " from db Successfully!");
-  });
-});
+router.delete(
+  "/:id",
+  loginCheck(ledger_coll),
+  getLedgerAuthGuard((req) => req.params.id),
+  function (req, res) {
+    // @ts-ignore
+    const deleteFilter = { _id: req.params.id, adminId: req.userId };
+    ledger_coll.deleteOne(deleteFilter, (err, result) => {
+      console.log(
+        "Delete row: " +
+          req.params.id +
+          " with filter: " +
+          deleteFilter +
+          ". Deleted: " +
+          result.result.n
+      );
+      res
+        .status(200)
+        .send("Delete row: " + req.params.id + " from db Successfully!");
+    });
+  }
+);
 
 module.exports = router;

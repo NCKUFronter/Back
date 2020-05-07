@@ -80,7 +80,7 @@ class RecordModel {
   /** @type {number} */
   userId;
 
-  /** @type {string} */
+  /** @type {string | Date} */
   date;
 
   /** @type {string[]} */
@@ -92,7 +92,7 @@ class RecordModel {
   /** @type {number} */
   rewardPoints;
 
-  /** @type {number} */
+  /** @type {string | Date} */
   reviseDate;
 
   /** @type {string | null} */

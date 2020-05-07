@@ -16,7 +16,7 @@ const testUrls = {
   localLogout: "/api/user/logout",
 };
 
-test("e2e-local login", async () => {
+test("e2e > local login", async () => {
   await agent.get("/api/ledger/2").expect(401);
   await agent
     .post(testUrls.localLogin)
@@ -25,7 +25,7 @@ test("e2e-local login", async () => {
   await agent.get("/api/ledger/2").expect(200);
 });
 
-test("e2e-local logout", async () => {
+test("e2e > local logout", async () => {
   await agent.post(testUrls.localLogout).expect(200);
   await agent.get("/api/ledger/1").expect(401);
 });

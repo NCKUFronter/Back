@@ -15,8 +15,10 @@ async function run() {
     await require("./user.test").run();
     await require("./other.test").run();
     await require("./login.test").run(app);
-    await require("./record.test").run(app);
     await require("./category.test").run(app);
+    await require("./ledger.test").run(app);
+    await require("./goods.test").run(app);
+    await require("./record.test").run(app);
   } catch (err) {
     console.log(err);
   }

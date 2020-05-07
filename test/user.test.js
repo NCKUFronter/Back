@@ -9,14 +9,14 @@ const {
 const { collections } = require("../models/mongo");
 const { InvitationModel, PointActivityModel } = require("../models");
 
-test("user ledgers", async () => {
+test("unit > user ledgers", async () => {
   const userId = "3";
   const ledgers = await userLedgers(userId);
   assert.equal(ledgers.length, 1);
   assert.equal(ledgers[0]._id, "2");
 });
 
-test("user invitations", async () => {
+test("unit > user invitations", async () => {
   const userId = "3";
   /** @type {InvitationModel[]} */
   const invitations = await userInvitations(userId);
@@ -27,7 +27,7 @@ test("user invitations", async () => {
   }
 });
 
-test("user pointActivity", async () => {
+test("unit > user pointActivity", async () => {
   const userId = "1";
   /** @type {PointActivityModel[]} */
   const pointActivities = await userPointActivities(userId);
@@ -37,15 +37,15 @@ test("user pointActivity", async () => {
   }
 });
 
-test("e2e-user invitations", async () => {
+test("e2e > user invitations", async () => {
   assert(false, "not implement")
 });
 
-test("e2e-user ledgers", async () => {
+test("e2e > user ledgers", async () => {
   assert(false, "not implement")
 });
 
-test("e2e-user pointActivity", async () => {
+test("e2e > user pointActivity", async () => {
   assert(false, "not implement")
 });
 
