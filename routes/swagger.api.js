@@ -189,6 +189,33 @@
  * @returns {string} 200
  */
 
+/**
+ * @route GET /user/ledgers
+ * @group user
+ * @summary 取得使用者所有帳簿
+ * -- ✔️ 可以運作
+ * @returns {Array<Ledger>} 200
+ * @security Basic
+ */
+
+/**
+ * @route GET /user/pointActivities
+ * @group user
+ * @summary 取得使用者所有點數紀錄
+ * -- ✔️ 可以運作
+ * @returns {Array<PointActivity>} 200
+ * @security Basic
+ */
+
+/**
+ * @route GET /user/invitations
+ * @group user
+ * @summary 取得使用者待回覆的邀請
+ * -- ✔️ 可以運作
+ * @returns {Array<Invitation>} 200
+ * @security Basic
+ */
+
 // ---------  Invitation ---------
 /**
  * ❔ ledger內，誰能寄邀請?

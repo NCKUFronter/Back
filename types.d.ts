@@ -1,5 +1,6 @@
 import "fastrx";
 import "express";
+import { UserModel } from "./models/user.model";
 
 declare module "fastrx" {
   namespace Rx {
@@ -14,10 +15,12 @@ declare module "fastrx" {
 }
 
 declare global {
-  namespace CategoryDto { }
+  namespace CategoryDto {}
 
   module Express {
     interface Request {
+      user?: UserModel;
+
       body_origin?: any;
       params_origin?: any;
       query_origin?: any;

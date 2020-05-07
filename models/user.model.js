@@ -22,7 +22,6 @@ const UserSchema = Joi.object({
  * @property {string} _id.required
  * @property {string} name.required
  * @property {string} email.required
- * @property {string} password
  * @property {string} photo
  * @property {string} money.required
  * @property {string} lastLogin.required - real type: Date
