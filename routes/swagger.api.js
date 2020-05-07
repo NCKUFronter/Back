@@ -194,6 +194,8 @@
  * @group user
  * @summary 取得使用者所有帳簿
  * -- ✔️ 可以運作
+ * @param {enum[]} _one.query - one to one fields - eg: admin
+ * @param {enum[]} _many.query - many-to-many relationship fields - eg: users,records
  * @returns {Array<Ledger>} 200
  * @security Basic
  */
@@ -203,6 +205,7 @@
  * @group user
  * @summary 取得使用者所有點數紀錄
  * -- ✔️ 可以運作
+ * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
  * @returns {Array<PointActivity>} 200
  * @security Basic
  */
@@ -212,6 +215,7 @@
  * @group user
  * @summary 取得使用者待回覆的邀請
  * -- ✔️ 可以運作
+ * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser
  * @returns {Array<Invitation>} 200
  * @security Basic
  */
@@ -307,6 +311,28 @@
  * @returns {string} 200 - success
  * @returns {any} 401 - 未登入
  * @returns {any} 403 - 沒有權限訪問
+ * @security Basic
+ */
+
+/**
+ * @route GET /ledger/{id}/records
+ * @group ledger
+ * @summary 查詢帳本所有record 
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
+ * @returns {Array<Record>} 200
+ * @security Basic
+ */
+
+/**
+ * @route GET /ledger/{id}/invitations
+ * @group ledger
+ * @summary 查詢帳本所有邀請紀錄 
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser
+ * @returns {Array<Invitation>} 200
  * @security Basic
  */
 

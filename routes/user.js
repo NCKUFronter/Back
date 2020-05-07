@@ -3,6 +3,7 @@ const { fetchNextId, collections } = require("../models/mongo");
 const { UserSchema } = require("../models/user.model");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
+const { findWithRelation } = require("../actions");
 const {
   userLedgers,
   userInvitations,
@@ -121,17 +122,41 @@ router.get("/profile", loginCheck(user_coll), function (req, res) {
 });
 
 router.get("/ledgers", loginCheck(user_coll), async function (req, res) {
-  const ledgers = await userLedgers(req.userId);
+  // const ledgers = await userLedgers(req.userId);
+  const { _one, _many } = req.query;
+  const ledgers = await findWithRelation(
+    collections.ledger,
+    { userIds: req.userId },
+    _one,
+    _many
+  );
   res.status(200).json(ledgers);
 });
 
 router.get("/invitations", loginCheck(user_coll), async function (req, res) {
-  const invitations = await userInvitations(req.userId);
+  // const invitations = await userInvitations(req.userId);
+  const { _one, _many } = req.query;
+  const invitations = await findWithRelation(
+    collections.invitation,
+    { toUserId: req.userId, type: 2 },
+    _one,
+    _many
+  );
   res.status(200).json(invitations);
 });
 
-router.get("/pointActivities", loginCheck(user_coll), async function (req, res) {
-  const activities = await userPointActivities(req.userId);
+router.get("/pointActivities", loginCheck(user_coll), async function (
+  req,
+  res
+) {
+  // const activities = await userPointActivities(req.userId);
+  const { _one, _many } = req.query;
+  const activities = await findWithRelation(
+    collections.pointActivity,
+    { $or: [{ fromUserId: req.userId }, { toUserId: req.userId }] },
+    _one,
+    _many
+  );
   res.status(200).json(activities);
 });
 

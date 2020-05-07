@@ -21,7 +21,7 @@ const oneToManyMap = {
     ledger: "ledger",
     user: "user",
   },
-  pointActivity: {
+  "point-activity": {
     fromUser: "user",
     toUser: "user",
     fromRecord: "record",

@@ -18,7 +18,7 @@ router.get(
   // validatePipe("query", LedgerSchema, { context: { partial: true } }),
   async function (req, res) {
     console.log(req.query);
-    const {_one, _many, ...match} = req.query
+    const { _one, _many, ...match } = req.query;
     const oneToManyFields = req.query._one;
     const manyToManyFields = req.query._many;
     const ledgers = await findWithRelation(
@@ -137,6 +137,38 @@ router.delete(
         .status(200)
         .send("Delete row: " + req.params.id + " from db Successfully!");
     });
+  }
+);
+
+router.get(
+  "/:id/records",
+  loginCheck(ledger_coll),
+  getLedgerAuthGuard((req) => req.params.id),
+  async function (req, res) {
+    const { _one, _many } = req.query;
+    const records = await findWithRelation(
+      collections.record,
+      { ledgerId: req.params.id },
+      _one,
+      _many
+    );
+    res.status(200).json(records);
+  }
+);
+
+router.get(
+  "/:id/invitations",
+  loginCheck(ledger_coll),
+  getLedgerAuthGuard((req) => req.params.id),
+  async function (req, res) {
+    const { _one, _many } = req.query;
+    const invitations = await findWithRelation(
+      collections.invitation,
+      { ledgerId: req.params.id },
+      _one,
+      _many
+    );
+    res.status(200).json(invitations);
   }
 );
 

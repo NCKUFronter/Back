@@ -28,11 +28,12 @@ const AnswerInvitationSchema = Joi.object({
 /**
  * "swagger model"
  * @typedef Invitation
- * @property {string} fromUserId
- * @property {string} toUserId
- * @property {string} ledgerId
- * @property {number} type - - eg:0,1,2
- * @property {string} createIime - real type: Date
+ * @property {string} _id.required
+ * @property {string} fromUserId.required
+ * @property {string} toUserId.required
+ * @property {string} ledgerId.required
+ * @property {number} type.required - - eg:0,1,2
+ * @property {string} createIime.required - real type: Date
  */
 class InvitationModel {
   /** @type {string} */
