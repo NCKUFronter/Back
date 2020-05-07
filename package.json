@@ -23,11 +23,13 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "express-sse": "^0.5.3",
+    "express-swagger-generator": "https://github.com/p0o9i8u7y6t5r4e3w2q1/express-swagger-generator",
     "fastrx": "^1.0.10",
     "mongodb": "^3.5.7",
     "passport": "^0.4.1",
     "passport-google-oauth": "^2.0.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
     "@types/baretest": "^2.0.0",

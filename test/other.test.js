@@ -1,4 +1,5 @@
 // @ts-check
+const log = console.log
 const test = require("baretest")("other-test");
 const assert = require("assert");
 const { collections } = require("../models/mongo");
@@ -8,8 +9,8 @@ const {
 } = require("../actions/coll-relation");
 const { notification } = require("../actions/notification.service");
 
-test("invitation-fine many records", async () => {
-  const records = await findWithRelation(collections.record, [
+test("invitation > find many records", async () => {
+  const records = await findWithRelation(collections.record, null, [
     "category",
     "ledger",
   ]);
@@ -20,7 +21,7 @@ test("invitation-fine many records", async () => {
   }
 });
 
-test("invitation-find one ledger", async () => {
+test("invitation > find one ledger", async () => {
   const ledgerId = "1";
   const ledger = await findOneWithRelation(
     collections.ledger,
@@ -41,4 +42,10 @@ test("notification", async () => {
   notification.send(event);
 });
 
-module.exports = test;
+module.exports = {
+  async run() {
+    console.log = () => {}
+    await test.run()
+    console.log = log;
+  }
+};

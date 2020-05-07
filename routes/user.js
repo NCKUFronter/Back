@@ -2,7 +2,13 @@
 const { fetchNextId, collections } = require("../models/mongo");
 const { UserSchema } = require("../models/user.model");
 const validatePipe = require("../middleware/validate-pipe");
-const loginCheck = require("../middleware/login-check")
+const loginCheck = require("../middleware/login-check");
+const { findWithRelation } = require("../actions");
+const {
+  userLedgers,
+  userInvitations,
+  userPointActivities,
+} = require("../actions/user.actions");
 const router = require("express").Router();
 
 const user_coll = collections.user;
@@ -31,23 +37,25 @@ router.get(
 //   });
 // });
 
-router.post("/",
+router.post(
+  "/",
   validatePipe("body", UserSchema),
   loginCheck(user_coll),
   async function (req, res) {
-  const postData = {
-    _id: await fetchNextId(user_coll.collectionName),
-    // @ts-ignore
-    userId: req.userId,
-    ...req.body,
-  };
+    const postData = {
+      _id: await fetchNextId(user_coll.collectionName),
+      // @ts-ignore
+      userId: req.userId,
+      ...req.body,
+    };
 
-  user_coll.insertOne(postData, function (err, result) {
-    if (err) throw err;
-    console.log("1 user info inserted.");
-    res.status(201).send(result.ops[0]);
-  });
-});
+    user_coll.insertOne(postData, function (err, result) {
+      if (err) throw err;
+      console.log("1 user info inserted.");
+      res.status(201).send(result.ops[0]);
+    });
+  }
+);
 
 // router.put("/", validatePipe("body", UserSchema), loginCheck(user_coll),
 //  function (req, res) {
@@ -103,10 +111,53 @@ router.delete("/", loginCheck(user_coll), function (req, res) {
         ". Deleted: " +
         result.result.n
     );
-    res
-      .status(200)
-      .send("Delete from db Successfully!");
+    res.status(200).send("Delete from db Successfully!");
   });
+});
+
+router.get("/profile", loginCheck(user_coll), function (req, res) {
+  // @ts-ignore
+  const { password, ...user_rest } = req.user;
+  res.status(200).json(user_rest);
+});
+
+router.get("/ledgers", loginCheck(user_coll), async function (req, res) {
+  // const ledgers = await userLedgers(req.userId);
+  const { _one, _many } = req.query;
+  const ledgers = await findWithRelation(
+    collections.ledger,
+    { userIds: req.userId },
+    _one,
+    _many
+  );
+  res.status(200).json(ledgers);
+});
+
+router.get("/invitations", loginCheck(user_coll), async function (req, res) {
+  // const invitations = await userInvitations(req.userId);
+  const { _one, _many } = req.query;
+  const invitations = await findWithRelation(
+    collections.invitation,
+    { toUserId: req.userId, type: 2 },
+    _one,
+    _many
+  );
+  res.status(200).json(invitations);
+});
+
+router.get("/pointActivities", loginCheck(user_coll), async function (
+  req,
+  res
+) {
+  // const activities = await userPointActivities(req.userId);
+  const { _one, _many } = req.query;
+  const activities = await findWithRelation(
+    collections.pointActivity,
+    { $or: [{ fromUserId: req.userId }, { toUserId: req.userId }] },
+    _one,
+    _many
+  );
+  res.status(200).json(activities);
 });
 
 module.exports = router;

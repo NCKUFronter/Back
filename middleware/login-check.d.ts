@@ -9,6 +9,6 @@ declare global {
   }
 }
 
-function loginCheck(coll: Collection): Handler;
+declare function loginCheck(coll: Collection): Handler;
 
 export = loginCheck;

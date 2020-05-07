@@ -1,0 +1,381 @@
+/* symbol
+ * -- ✔️ 可以運作
+ * -- 🚫 前端不應該使用
+ * -- 🔨 尚未弄好
+ * -- ⚠️ 可能有bug
+ * -- ❔ 有待討論的問題
+ * ⚠️ bug說明
+ * ❔ 疑問?
+ */
+
+// ---------  Category ---------
+/**
+ * @route GET /category
+ * @group category
+ * @summary 取德所有category 
+ * -- ✔️ 可以運作
+ * @returns {Array.<Category>} 200
+ */
+
+/**
+ * @route GET /category/{id}
+ * @group category
+ * @summary 取德指定 id 的category
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @returns {Category.model} 200
+ */
+
+/**
+ * ❔ 類別若新增在個人上，則單筆record要顯示自定意類別會很麻煩
+ * @route POST /category
+ * @summary 新增category
+ * -- ✔️ 可以運作
+ * -- ❔ 有待討論的問題
+ * @group category
+ * @param {CategoryDto.model} dto.body.required
+ * @returns {Category.model} 201 - inserted model
+ * @returns {string} 400 - 所填資料有誤
+ * @returns {any} 404 - 找不到
+ */
+
+/**
+ * @route PATCH /category/{id}
+ * @group category
+ * @summary 部分修改指定 id 的category
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @param {CategoryDto.model} name.body.required
+ * @returns {Category.model} 200 - updated model
+ * @returns {string} 400 - 所填資料有誤
+ * @returns {any} 404 - 找不到
+ */
+
+/**
+ * @route DELETE /category/{id}
+ * @group category
+ * @summary 刪除指定 id 的category
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @param {CategoryDto.model} name.body.required
+ * @returns {string} 200 - success
+ */
+
+// ---------  Record ---------
+/**
+ * @route GET /record
+ * @group record
+ * @summary 查詢所有record 
+ * -- ✔️ 可以運作 
+ * -- 🚫 前端不應該使用
+ * @parm {string} ledger
+ * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
+ * @returns {Array<Record>} 200
+ */
+
+/**
+ * @route GET /record/{id}
+ * @group record
+ * @summary 查詢所有record
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
+ * @returns {Record.model} 200
+ */
+
+/**
+ * @typedef InsertRecordResponse
+ * @property {string} message
+ * @property {number} rewardPoints
+ */
+/**
+ * ❔ 未登入使用者的點數?
+ * @route POST /record
+ * @group record
+ * @summary 新增的record
+ * -- ✔️ 可以運作
+ * -- ❔ 有待討論的問題
+ * @param {RecordDto.model} dto.body.required
+ * @returns {InsertRecordResponse.model} 201 - inserted model
+ * @returns {string} 400 - 所填資料有誤
+ * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
+ * @security Basic
+ */
+
+/**
+ * ⚠️ 未處理category,tag更新後，使用者的categoryTags
+ * ❔ Record修改後的點數?
+ * @route PATCH /record/{id}
+ * @group record
+ * @summary 部分修改指定 id 的record
+ * -- ⚠️ 可能有bug
+ * -- ❔ 有待討論的問題
+ * @param {string} id.path.required
+ * @param {RecordDto.model} dto.body.required
+ * @returns {Record.model} 200 - updated model
+ * @returns {string} 400 - 所填資料有誤
+ * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
+ * @returns {any} 404 - 找不到
+ * @security Basic
+ */
+
+/**
+ * ❔ ledger內，誰能刪除record?
+ * @route DELETE /record/{id}
+ * @group record
+ * @summary 刪除指定 id 的預設record
+ * -- ✔️ 可以運作
+ * -- ❔ 有待討論的問題
+ * @param {string} id.path.required
+ * @returns {string} 200 - success
+ * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
+ * @security Basic
+ */
+
+// ---------  Goods ---------
+/**
+ * @route GET /goods
+ * @group goods
+ * @summary 查詢所有goods
+ * -- ✔️ 可以運作
+ * @returns {Array<Goods>} 200
+ */
+
+/**
+ * @route GET /goods/{id}
+ * @group goods
+ * @summary 查詢所有goods
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @returns {Goods.model} 200
+ */
+
+// ---------  User ---------
+/**
+ * @route GET /user -- 🚫前端不應該使用
+ * @group user
+ * @summary 查詢所有 user
+ * -- ✔️ 可以運作
+ * @returns {Array<User>} 200
+ */
+
+/**
+ * @route GET /user/{id}
+ * @group user
+ * @summary 查詢其中一個 user
+ * -- 🔨 尚未弄好
+ * @param {string} id.path.required
+ * @returns {User.model} 200
+ */
+
+/**
+ * @route POST /user/login
+ * @group user
+ * @summary 登入
+ * -- ✔️ 可以運作
+ * @param {LoginDto.model} dto.body.required
+ * @returns {string} 200
+ * @returns {string} 401 - 登入失敗，帳號或密碼錯誤
+ */
+
+/**
+ * @route POST /user/logout
+ * @group user
+ * @summary 登出
+ * -- ✔️ 可以運作
+ * @returns {string} 200
+ */
+
+/**
+ * @route GET /user/ledgers
+ * @group user
+ * @summary 取得使用者所有帳簿
+ * -- ✔️ 可以運作
+ * @param {enum[]} _one.query - one to one fields - eg: admin
+ * @param {enum[]} _many.query - many-to-many relationship fields - eg: users,records
+ * @returns {Array<Ledger>} 200
+ * @security Basic
+ */
+
+/**
+ * @route GET /user/pointActivities
+ * @group user
+ * @summary 取得使用者所有點數紀錄
+ * -- ✔️ 可以運作
+ * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
+ * @returns {Array<PointActivity>} 200
+ * @security Basic
+ */
+
+/**
+ * @route GET /user/invitations
+ * @group user
+ * @summary 取得使用者待回覆的邀請
+ * -- ✔️ 可以運作
+ * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser
+ * @returns {Array<Invitation>} 200
+ * @security Basic
+ */
+
+// ---------  Invitation ---------
+/**
+ * ❔ ledger內，誰能寄邀請?
+ * @route GET /invitation/invite
+ * @group invitation
+ * @summary 發送ledger的邀請
+ * -- 🔨 尚未弄好
+ * -- ❔ 有待討論的問題
+ * @param {InviteDto.model} dto.body.required
+ * @returns {string} 200
+ * @returns {string} 400 - 所填資料有誤
+ * @returns {any} 401 - 未登入
+ * @security Basic
+ */
+
+/**
+ * @route GET /invitation/{id}/answer
+ * @group invitation
+ * @summary 回應邀請 
+ * -- 🔨 尚未弄好
+ * @param {string} id.path.required
+ * @param {AnswerDto.model} dto.body.required
+ * @returns {string} 200
+ * @returns {string} 400 - 所填資料有誤
+ * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
+ * @returns {any} 404 - 找不到
+ * @security Basic
+ */
+
+// ---------  Ledger ---------
+/**
+ * @route GET /ledger
+ * @group ledger
+ * @summary 查詢所有 ledger 
+ * -- ✔️ 可以運作
+ * -- 🚫 前端不應該使用
+ * @parm {string} ledgerId.query
+ * @param {enum[]} _one.query - one to one fields - eg: admin
+ * @param {enum[]} _many.query - many-to-many relationship fields - eg: users,records
+ * @returns {Array<Ledger>} 200
+ */
+
+/**
+ * @route GET /ledger/{id}
+ * @group ledger
+ * @summary 查詢指定 id 的 ledger
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
+ * @returns {Ledger.model} 200 - success
+ * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
+ * @returns {any} 404 - 找不到
+ * @security Basic
+ */
+
+/**
+ * @route POST /ledger
+ * @group ledger
+ * @summary 新增 ledger
+ * -- ✔️ 可以運作
+ * @param {LedgerDto.model} name.body.required
+ * @returns {Ledger.model} 201 - inserted model
+ * @returns {any} 400 - 所填資料有誤
+ * @returns {any} 401 - 未登入
+ * @security Basic
+ */
+
+/**
+ * @route PATCH /ledger/{id}
+ * @group ledger
+ * @summary 部分修改指定 id 的 ledger
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @param {LedgerDto.model} dto.body.required
+ * @returns {Ledger.model} 200 - updated model
+ * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
+ * @security Basic
+ */
+
+/**
+ * @route DELETE /ledger/{id}
+ * @group ledger
+ * @summary 刪除指定 id 的 ledger
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @returns {string} 200 - success
+ * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
+ * @security Basic
+ */
+
+/**
+ * @route GET /ledger/{id}/records
+ * @group ledger
+ * @summary 查詢帳本所有record 
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
+ * @returns {Array<Record>} 200
+ * @security Basic
+ */
+
+/**
+ * @route GET /ledger/{id}/invitations
+ * @group ledger
+ * @summary 查詢帳本所有邀請紀錄 
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser
+ * @returns {Array<Invitation>} 200
+ * @security Basic
+ */
+
+// ---------  Points ---------
+/**
+ * @route GET /point/activites
+ * @group point
+ * @summary 查詢所有pointActivity 
+ * -- 🔨 尚未弄好
+ * -- 🚫前端不應該使用
+ * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
+ * @returns {Array<PointActivity>} 200
+ */
+
+/**
+ * @route GET /point/activites/{id}
+ * @group point
+ * @summary 查詢指定 id 的pointActivity
+ * -- 🔨 尚未弄好
+ * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
+ * @returns {PointActivity.model} 200
+ */
+
+/**
+ * @route POST /point/transfer
+ * @group point
+ * @summary 轉移點數
+ * -- 🔨 尚未弄好
+ * @param {TransferPointsDto.model} dto.body.required
+ * @returns {string} 200 - success
+ * @returns {string} 400 - 所填資料有誤
+ * @returns {string} 401 - 未登入
+ * @security Basic
+ */
+
+/**
+ * @route POST /points/consume/{goodsId}
+ * @group point
+ * @summary 消費點數
+ * -- 🔨 尚未弄好
+ * @param {string} goodsId.path.required
+ * @returns {string} 200 - success
+ * @returns {string} 400 - 所填資料有誤
+ * @returns {string} 401 - 未登入
+ * @security Basic
+ */

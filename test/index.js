@@ -1,5 +1,6 @@
 // @ts-check
 process.env.DB_URI = "mongodb://localhost/test";
+process.env.PORT = "5000";
 const { connectDB, client } = require("../models/mongo");
 const { resetDB, initDB } = require("./init");
 
@@ -11,10 +12,13 @@ async function run() {
     // 不能改順序
     await require("./point.test").run();
     await require("./invitation.test").run();
-    await require("./user.test").run();
     await require("./other.test").run();
     await require("./login.test").run(app);
+    await require("./user.test").run(app);
     await require("./category.test").run(app);
+    await require("./ledger.test").run(app);
+    await require("./goods.test").run(app);
+    await require("./record.test").run(app);
   } catch (err) {
     console.log(err);
   }

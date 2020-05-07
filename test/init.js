@@ -66,6 +66,7 @@ async function initDBData(db) {
       _id: "3",
       name: "小孩",
       email: "child@gmail.com",
+      password: "0000",
       photo: "",
       rewardPoints: 100,
     },
@@ -241,7 +242,7 @@ async function initDBData(db) {
 }
 
 const findLast = async (coll) =>
-  (await coll.find({}).limit(1).sort({ $natural: -1 }).toArray())[0];
+  (await coll.find().limit(1).sort({ $natural: -1 }).toArray())[0];
 
 module.exports = {
   initDB,

@@ -11,7 +11,7 @@ function loginCheck(coll) {
       req.userId = req.cookies["connect.sid"];
       next();
     } else {
-      res.status(404).send("User not logged in!");
+      res.status(401).send("User not logged in!");
     }
   };
 }

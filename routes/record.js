@@ -1,13 +1,15 @@
 // @ts-check
-const { collections, fetchNextId } = require("../models/mongo");
+const { collections, workInTransaction } = require("../models/mongo");
 const { RecordSchema } = require("../models/record.model");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
+const { getLedgerAuthGuard } = require("../middleware/auth-guard");
 const {
   findWithRelation,
   findOneWithRelation,
-} = require("../actions/coll-relation");
-const pointAction = require("../actions/point.actions")
+  getCategoryTags,
+} = require("../actions");
+const pointAction = require("../actions/point.actions");
 const router = require("express").Router();
 
 const record_coll = collections.record;
@@ -15,30 +17,40 @@ const record_coll = collections.record;
 // GET from database
 router.get("/", loginCheck(record_coll), async function (req, res) {
   // collRelation(record_coll, 'category', 'categoryId', '_id', 'categoryData');
+<<<<<<< HEAD
   const oneToManyFields = req.query._expand;
   const manyToManyFields = req.query._embed;
   
   const ledgers = await findWithRelation(
+=======
+  console.log(req.query);
+  const { _one, _many, ...match } = req.query;
+  const oneToManyFields = req.query._one;
+  const manyToManyFields = req.query._many;
+
+  const records = await findWithRelation(
+>>>>>>> 64c39ce9d1bdae90e9a9abb2d27165fe29056a35
     record_coll,
+    match,
     // @ts-ignore
     oneToManyFields,
     manyToManyFields
   );
-  res.status(200).json(ledgers);
+  res.status(200).json(records);
 });
 
 // GET certain data from database
 router.get("/:id", async function (req, res) {
   const oneToManyFields = req.query._expand;
   const manyToManyFields = req.query._embed;
-  const ledger = await findOneWithRelation(
+  const record = await findOneWithRelation(
     record_coll,
     req.params.id,
     // @ts-ignore
     oneToManyFields,
     manyToManyFields
   );
-  res.status(200).json(ledger);
+  res.status(200).json(record);
 });
 
 // Post the info
@@ -46,19 +58,20 @@ router.post(
   "/",
   validatePipe("body", RecordSchema),
   loginCheck(record_coll),
+  getLedgerAuthGuard((req) => req.body.ledgerId),
   async function (req, res) {
     const postData = {
-      _id: await fetchNextId(record_coll.collectionName),
+      // _id: await fetchNextId(record_coll.collectionName), // not need
       // @ts-ignore
-      userId: req.userId,
       ...req.body,
+      userId: req.userId,
     };
     const user = await collections.user.findOne({ _id: req.userId });
-    const amount = Math.round(req.body.money/100);
+    const amount = Math.round(req.body.money / 100);
 
-    pointAction.pointsFromRecord('', amount, postData, user);
+    await pointAction.pointsFromRecord("", amount, postData, user);
     console.log("1 document inserted.");
-    res.status(201);
+    res.status(201).json({ message: "Insert Success", rewardPoints: amount });
   }
 );
 

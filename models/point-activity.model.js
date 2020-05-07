@@ -1,16 +1,42 @@
 // @ts-check
 const Joi = require("@hapi/joi");
-const { JoiNumberString } = require("./utils");
+const { collections } = require("../models/mongo");
+const { JoiNumberString, AsyncJoi, existInDB } = require("./utils");
 
-const TransferPointsSchema = Joi.object({
-  toUserId: Joi.string().email().required(),
-  amout: Joi.number(),
+/**
+ * @typedef TransferPointsDto
+ * @property {string} email.required
+ * @property {number} amount.required - amount of points
+ */
+const TransferPointsSchema = AsyncJoi.object({
+  email: AsyncJoi.schema(Joi.string().email().required()).addRule(
+    existInDB(() => collections.user, "email")
+  ),
+  amout: Joi.number().required(),
 });
 
-const ConsumePointsSchema = Joi.object({
-  goodsId: JoiNumberString,
+/**
+ * @typedef ConsumePointsDto
+ * @property {string} email.required
+ * @property {number} amount.required - amount of points
+ */
+const ConsumePointsSchema = AsyncJoi.object({
+  goodsId: AsyncJoi.schema(JoiNumberString).addRule(
+    existInDB(() => collections.goods, "_id")
+  ),
 });
 
+/**
+ * @typedef PointActivity
+ * @property {string} _id.required
+ * @property {enum} type.required - - eg:new,transfer,consume
+ * @property {string} subtype.required
+ * @property {string} time.required - real type: Date
+ * @property {string} fromRecordId - for type = 'new'
+ * @property {string} toUserId - for type = 'transfer' or 'new'
+ * @property {string} fromUserId - for type = 'consume' or 'transfer'
+ * @property {string} toGoodsId - for type = 'consume'
+ */
 class PointActivityModel {
   /** @type {string} */
   _id;

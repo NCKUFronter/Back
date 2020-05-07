@@ -1,4 +1,5 @@
 // @ts-check
+const log = console.log;
 const test = require("baretest")("point-test");
 const assert = require("assert");
 const {
@@ -46,7 +47,7 @@ async function checkUserPoints(userId, before_point, amount) {
   assert.equal(user.rewardPoints, before_point + amount);
 }
 
-test("pointsFromRecord", async function () {
+test("unit > pointsFromRecord", async function () {
   let amount = 5;
   const userId = "1";
 
@@ -69,7 +70,7 @@ test("pointsFromRecord", async function () {
   await checkActivity("new", "every_record", amount, record._id, userId);
 });
 
-test("pointsFromEvent", async function () {
+test("unit > pointsFromEvent", async function () {
   let amount = 5;
   const userId = "1";
 
@@ -106,7 +107,7 @@ test("transferPoints", async function () {
   await checkActivity("transfer", "", amount, fromUserId, toUserId);
 });
 
-test("consumePoints", async function () {
+test("unit > consumePoints", async function () {
   const userId = "1";
   const goodsId = "2";
 
@@ -122,4 +123,10 @@ test("consumePoints", async function () {
   // check activity
   await checkActivity("consume", "", goods.point, userId, goodsId);
 });
-module.exports = test;
+module.exports = {
+  async run() {
+    console.log = () => {};
+    await test.run();
+    console.log = log;
+  },
+};

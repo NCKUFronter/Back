@@ -14,19 +14,19 @@ let app = null;
 let agent = null;
 
 const testUrls = {
-  insert: "/category",
-  getAll: "/category",
-  getOne: (id) => "/category/" + id,
-  patch: (id) => "/category/" + id,
-  delete: (id) => "/category/" + id,
+  insert: "/api/category",
+  getAll: "/api/category",
+  getOne: (id) => "/api/category/" + id,
+  patch: (id) => "/api/category/" + id,
+  delete: (id) => "/api/category/" + id,
 };
-let id = "5";
+let id = null;
 
 test.before(async () => {
   await simpleLogin(agent);
 });
 
-test("insert category", async () => {
+test("e2e > insert category", async () => {
   const category_dto = { name: "myCategory" };
   await agent
     .post(testUrls.insert)
@@ -40,7 +40,7 @@ test("insert category", async () => {
     });
 });
 
-test("patch category", async () => {
+test("e2e > patch category", async () => {
   const category_dto = { name: "yourCategory" };
 
   await agent
@@ -53,7 +53,7 @@ test("patch category", async () => {
     });
 });
 
-test("get all category", async () => {
+test("e2e > get all category", async () => {
   await agent
     .get(testUrls.getAll)
     .expect(200)
@@ -68,7 +68,18 @@ test("get all category", async () => {
     });
 });
 
-test("delete category", async () => {
+test("e2e > get one category", async () => {
+  await agent
+    .get(testUrls.getOne(id))
+    .expect(200)
+    .then((res) => {
+      const category = res.body;
+      assert(!Array.isArray(category));
+      assert.equal(category._id, id);
+    });
+});
+
+test("e2e > delete category", async () => {
   await agent.delete(testUrls.delete(id)).expect(200);
   const category = await collections.category.findOne({ _id: id });
   assert(category == null);

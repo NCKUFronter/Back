@@ -2,6 +2,12 @@
 const Joi = require("@hapi/joi");
 const { JoiRequireWhen } = require("./utils");
 
+/**
+ * @typedef LoginDto
+ * @property {string} email
+ * @property {string} password
+ */
+
 const UserSchema = Joi.object({
   name: Joi.string().regex(/[a-zA-Z0-9]/).allow(null),
 
@@ -10,6 +16,18 @@ const UserSchema = Joi.object({
   email: Joi.string().allow(null),
 });
 
+/**
+ * "swagger model"
+ * @typedef User
+ * @property {string} _id.required
+ * @property {string} name.required
+ * @property {string} email.required
+ * @property {string} photo
+ * @property {string} money.required
+ * @property {string} lastLogin.required - real type: Date
+ * @property {string[]} cardIds
+ * @property {object} categoryTags.required
+ */
 class UserModel {
   /** @type {string} */
   _id;
@@ -29,10 +47,7 @@ class UserModel {
   /** @type {number} */
   rewardPoints;
 
-  /** @type {number} */
-  point;
-
-  /** @type { {[key: number]: [string, string[]]} } */
+  /** @type { {[key: string]: string | string[]} } */
   categoryTags;
 }
 

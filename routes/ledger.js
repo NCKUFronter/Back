@@ -18,10 +18,12 @@ router.get(
   // validatePipe("query", LedgerSchema, { context: { partial: true } }),
   async function (req, res) {
     console.log(req.query);
-    const oneToManyFields = req.query._expand;
-    const manyToManyFields = req.query._embed;
+    const { _one, _many, ...match } = req.query;
+    const oneToManyFields = req.query._one;
+    const manyToManyFields = req.query._many;
     const ledgers = await findWithRelation(
       ledger_coll,
+      match,
       // @ts-ignore
       oneToManyFields,
       manyToManyFields
@@ -57,7 +59,7 @@ router.post(
     const postData = {
       _id: await fetchNextId(ledger_coll.collectionName),
       adminId: req.userId,
-      userId: [req.userId],
+      userIds: [req.userId],
       ...req.body,
     };
     ledger_coll.insertOne(postData, function (err, result) {
@@ -95,6 +97,7 @@ router.patch(
   "/:id",
   validatePipe("body", LedgerSchema, { context: { partial: true } }),
   loginCheck(ledger_coll),
+  getLedgerAuthGuard((req) => req.params.id),
   function (req, res) {
     // @ts-ignore
     const patchFilter = { _id: req.params.id, adminId: req.userId };
@@ -114,22 +117,59 @@ router.patch(
   }
 );
 
-router.delete("/:id", loginCheck(ledger_coll), function (req, res) {
-  // @ts-ignore
-  const deleteFilter = { _id: req.params.id, adminId: req.userId };
-  ledger_coll.deleteOne(deleteFilter, (err, result) => {
-    console.log(
-      "Delete row: " +
-        req.params.id +
-        " with filter: " +
-        deleteFilter +
-        ". Deleted: " +
-        result.result.n
+router.delete(
+  "/:id",
+  loginCheck(ledger_coll),
+  getLedgerAuthGuard((req) => req.params.id),
+  function (req, res) {
+    // @ts-ignore
+    const deleteFilter = { _id: req.params.id, adminId: req.userId };
+    ledger_coll.deleteOne(deleteFilter, (err, result) => {
+      console.log(
+        "Delete row: " +
+          req.params.id +
+          " with filter: " +
+          deleteFilter +
+          ". Deleted: " +
+          result.result.n
+      );
+      res
+        .status(200)
+        .send("Delete row: " + req.params.id + " from db Successfully!");
+    });
+  }
+);
+
+router.get(
+  "/:id/records",
+  loginCheck(ledger_coll),
+  getLedgerAuthGuard((req) => req.params.id),
+  async function (req, res) {
+    const { _one, _many } = req.query;
+    const records = await findWithRelation(
+      collections.record,
+      { ledgerId: req.params.id },
+      _one,
+      _many
     );
-    res
-      .status(200)
-      .send("Delete row: " + req.params.id + " from db Successfully!");
-  });
-});
+    res.status(200).json(records);
+  }
+);
+
+router.get(
+  "/:id/invitations",
+  loginCheck(ledger_coll),
+  getLedgerAuthGuard((req) => req.params.id),
+  async function (req, res) {
+    const { _one, _many } = req.query;
+    const invitations = await findWithRelation(
+      collections.invitation,
+      { ledgerId: req.params.id },
+      _one,
+      _many
+    );
+    res.status(200).json(invitations);
+  }
+);
 
 module.exports = router;

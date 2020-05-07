@@ -10,7 +10,6 @@
 const oneToManyMap = {
   ledger: {
     admin: "user",
-    category: "category",
   },
   invitation: {
     fromUser: "user",
@@ -22,7 +21,7 @@ const oneToManyMap = {
     ledger: "ledger",
     user: "user",
   },
-  pointActivity: {
+  "point-activity": {
     fromUser: "user",
     toUser: "user",
     fromRecord: "record",
@@ -47,9 +46,9 @@ function relationPipeline(coll_name, oneToManyFields, manyToManyFields) {
   const pipeline = [];
 
   const one_map = oneToManyFields && oneToManyMap[coll_name];
-  console.log(one_map)
+  console.log(one_map);
   if (one_map) {
-    if(!Array.isArray(oneToManyFields)) oneToManyFields = [oneToManyFields];
+    if (!Array.isArray(oneToManyFields)) oneToManyFields = [oneToManyFields];
     for (const field of oneToManyFields) {
       const relation_coll = one_map[field];
       if (!relation_coll) continue;
@@ -69,7 +68,7 @@ function relationPipeline(coll_name, oneToManyFields, manyToManyFields) {
 
   const many_map = manyToManyFields && manyToManyMap[coll_name];
   if (many_map) {
-    if(!Array.isArray(manyToManyFields)) manyToManyFields = [manyToManyFields];
+    if (!Array.isArray(manyToManyFields)) manyToManyFields = [manyToManyFields];
     for (const field of manyToManyFields) {
       const relation = many_map[field];
       if (!relation) continue;
@@ -100,33 +99,35 @@ async function findOneWithRelation(
   oneToManyFields,
   manyToManyFields
 ) {
-  return (
-    await coll
-      .aggregate([
-        { $match: { _id: id } },
-        ...relationPipeline(
-          coll.collectionName,
-          oneToManyFields,
-          manyToManyFields
-        ),
-      ])
-      .toArray()
-  )[0];
+  /** @type {any} */
+  const pipeline = relationPipeline(
+    coll.collectionName,
+    oneToManyFields,
+    manyToManyFields
+  );
+  pipeline.unshift({ $match: { _id: id } });
+  return (await coll.aggregate(pipeline).toArray())[0];
 }
 
 /**
  * 對不是array的field進行relation
  * @param {import('mongodb').Collection} coll
+ * @param {object} match
  * @param {string[] | string} [oneToManyFields]
  * @param {string[] | string} [manyToManyFields]
  * @return Promise<any[]>
  */
-function findWithRelation(coll, oneToManyFields, manyToManyFields) {
-  return coll
-    .aggregate(
-      relationPipeline(coll.collectionName, oneToManyFields, manyToManyFields)
-    )
-    .toArray();
+function findWithRelation(coll, match, oneToManyFields, manyToManyFields) {
+  /** @type {any} */
+  const pipeline = relationPipeline(
+    coll.collectionName,
+    oneToManyFields,
+    manyToManyFields
+  );
+  if (match) {
+    pipeline.unshift({ $match: match });
+  }
+  return coll.aggregate(pipeline).toArray();
 }
 
 module.exports = {

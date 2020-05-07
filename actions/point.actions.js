@@ -8,6 +8,7 @@ const {
 } = require("../models/mongo");
 const assert = require("assert");
 const { UserModel, RecordModel, PointActivityModel } = require("../models");
+const { getCategoryTags } = require("./user.actions");
 
 async function pointsFromEvent(subtype, amount, user) {
   return innerGivenPoints(subtype, amount, null, user);
@@ -23,7 +24,8 @@ async function pointsFromEvent(subtype, amount, user) {
  */
 async function pointsFromRecord(subtype, amount, record, user) {
   record.rewardPoints = amount;
-  console.log(record)
+  record.reviseDate = new Date();
+  console.log(record);
   return innerGivenPoints(subtype, amount, record, user);
 }
 
@@ -37,13 +39,27 @@ async function pointsFromRecord(subtype, amount, record, user) {
 async function innerGivenPoints(subtype, amount, record, user) {
   return workInTransaction(async (/** @type {ClientSession} */ session) => {
     let recordId = null;
+    let userUpdate = { $inc: { rewardPoints: amount } };
     if (record) {
-      // insert record
+      // insert record to get recordId
       recordId = (await simpleInsertOne(collections.record, record, session))
         .insertedId;
       console.log(recordId);
+
+      // add hashtags to user
+      if (record.hashtags) {
+        userUpdate.$set = { categoryTags: getCategoryTags(record, user) };
+      }
     }
 
+    // update user
+    const user_prom = collections.user.updateOne(
+      { _id: user._id },
+      userUpdate,
+      { session }
+    );
+
+    // create activity
     const activity = new PointActivityModel(
       "new",
       subtype,
@@ -52,18 +68,16 @@ async function innerGivenPoints(subtype, amount, record, user) {
       user._id
     );
 
-    const activity_prom = simpleInsertOne(
-      collections.pointActivity,
-      activity,
-      session
-    );
+    // save activity
+    let activity_prom = null;
+    if (amount) {
+      activity_prom = simpleInsertOne(
+        collections.pointActivity,
+        activity,
+        session
+      );
+    }
 
-    // update user
-    const user_prom = collections.user.updateOne(
-      { _id: user._id },
-      { $inc: { rewardPoints: amount } },
-      { session }
-    );
     await Promise.all([user_prom, activity_prom]);
   });
 }

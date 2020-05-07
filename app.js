@@ -1,5 +1,4 @@
 // @ts-check
-/// <reference types="./types" />
 
 require("dotenv").config();
 const express = require("express");
@@ -13,13 +12,19 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const { connectDB, collections, client } = require("./models/mongo");
+<<<<<<< HEAD
 const path = require('path');
+=======
+const swaggerGenerator = require("express-swagger-generator");
+const swaggerUi = require("swagger-ui-express");
+>>>>>>> 64c39ce9d1bdae90e9a9abb2d27165fe29056a35
 
 async function startup() {
   await connectDB();
 
   // App init
   const app = express();
+  app.set("json spaces", 2);
 
   // Plugins
   app.use(
@@ -56,8 +61,34 @@ async function startup() {
   app.use("/api/category", require("./routes/category"));
   app.use("/api/ledger", require("./routes/ledger")); // /account to record user info
   app.use("/api/login", require("./routes/login"));
+<<<<<<< HEAD
   app.use("/api/login-local", require("./routes/login-local"));
   app.use("/api/point", require("./routes/point"));
+=======
+  app.use("/api/user", require("./routes/login-local"));
+  app.use("/api/point", require("./routes/point"));
+  app.use("/api/goods", require("./routes/goods"));
+
+  // swagger setting
+  // @ts-ignore
+  const definition = {
+    info: {
+      title: "Fronter",
+      description: "Backend Api Document",
+      version: "0.0.1",
+    },
+    basePath: "/api",
+    securityDefinitions: [],
+  };
+
+  const specs = swaggerGenerator({
+    swaggerDefinition: definition,
+    basedir: __dirname,
+    files: ["./models/*.model.js", "./routes/swagger.api.js"],
+  });
+  // @ts-ignore
+  app.use("/api/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+>>>>>>> 64c39ce9d1bdae90e9a9abb2d27165fe29056a35
 
   // Run the server
   let KeyCert = null;

@@ -24,8 +24,13 @@ AppPassport.use(
             email: profile.emails[0].value,
             name: profile.displayName,
             photo: profile.photos[0].value,
+            lastDate: null,
+            conDays: 0,
             logInDate: date,
           },
+          // $setOnInsert: {
+            
+          // }
         },
         { upsert: true, returnOriginal: false },
         function (err, user) {
