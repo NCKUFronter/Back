@@ -14,6 +14,7 @@
  * @group category
  * @summary 取德所有category 
  * -- ✔️ 可以運作
+ * -- ✨
  * @returns {Array.<Category>} 200
  */
 
@@ -220,14 +221,23 @@
  * @security Basic
  */
 
+/**
+ * @route GET /user/profile
+ * @group user
+ * @summary 取得使用者資料
+ * -- ✔️ 可以運作
+ * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser
+ * @returns {Array<Invitation>} 200
+ * @returns {string} 401 未登入
+ * @security Basic
+ */
+
 // ---------  Invitation ---------
 /**
- * ❔ ledger內，誰能寄邀請?
  * @route GET /invitation/invite
  * @group invitation
  * @summary 發送ledger的邀請
- * -- 🔨 尚未弄好
- * -- ❔ 有待討論的問題
+ * -- ✔️ 可以運作
  * @param {InviteDto.model} dto.body.required
  * @returns {string} 200
  * @returns {string} 400 - 所填資料有誤
@@ -239,7 +249,7 @@
  * @route GET /invitation/{id}/answer
  * @group invitation
  * @summary 回應邀請 
- * -- 🔨 尚未弄好
+ * -- ✔️ 可以運作
  * @param {string} id.path.required
  * @param {AnswerDto.model} dto.body.required
  * @returns {string} 200
@@ -342,7 +352,7 @@
  * @group point
  * @summary 查詢所有pointActivity 
  * -- 🔨 尚未弄好
- * -- 🚫前端不應該使用
+ * -- 🚫 前端不應該使用
  * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
  * @returns {Array<PointActivity>} 200
  */

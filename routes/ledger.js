@@ -38,8 +38,8 @@ router.get(
   loginCheck(ledger_coll),
   getLedgerAuthGuard((req) => req.params.id),
   async function (req, res) {
-    const oneToManyFields = req.query._expand;
-    const manyToManyFields = req.query._embed;
+    const oneToManyFields = req.query._one;
+    const manyToManyFields = req.query._many;
     const ledger = await findOneWithRelation(
       ledger_coll,
       req.params.id,

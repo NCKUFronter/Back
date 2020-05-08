@@ -60,6 +60,7 @@ async function startup() {
   app.use("/api/user", require("./routes/login-local"));
   app.use("/api/point", require("./routes/point"));
   app.use("/api/goods", require("./routes/goods"));
+  app.use("/api/invitation", require("./routes/invitaion"));
 
   // swagger setting
   // @ts-ignore

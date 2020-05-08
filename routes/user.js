@@ -160,4 +160,36 @@ router.get("/pointActivities", loginCheck(user_coll), async function (
   res.status(200).json(activities);
 });
 
+router.get("/relativeUsers", loginCheck(user_coll), async function (req, res) {
+  // reference:
+  // https://stackoverflow.com/questions/42291965/setunion-to-merge-array-from-multiple-documents-mongodb
+  const results = await collections.user
+    .aggregate([
+      { $match: { userIds: req.userId } },
+      {
+        $lookup: {
+          from: "user",
+          foreignField: "_id",
+          localField: "userIds",
+          as: "users",
+        },
+      },
+      { $group: { _id: 0, user: { $push: "$users" } } },
+      {
+        $project: {
+          users: {
+            $reduce: {
+              input: "$user",
+              initialValue: [],
+              in: { $setUnion: ["$$value", "$$this"] },
+            },
+          },
+        },
+      },
+    ])
+    .toArray();
+
+  res.status(200).json(results[0].users);
+});
+
 module.exports = router;

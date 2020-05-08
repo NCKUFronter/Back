@@ -1,7 +1,7 @@
 /** @typedef { { property: string; schema: AsyncJoiSchema; } } PropAsyncJoiScema */
 /** @typedef { { self?: string[], prop?: {[key: string]: ValidateErrorType} } } ValidateErrorType */
 /** @typedef { { error?: ValidateErrorType, value?: any, hasError?: boolean } } ValidateResult */
-/** @typedef { import('@hapi/joi').ValidationOptions & {origin: any} } JoiValidationOptions */
+/** @typedef { import('@hapi/joi').ValidationOptions } JoiValidationOptions */
 /** @typedef { import('@hapi/joi').Schema } JoiSchema */
 // @ts-check
 const Joi = require("@hapi/joi");
@@ -108,7 +108,7 @@ function runRule(data, options, rule) {
   if (data == null) return { value: data };
   let args = rule.args;
   if (typeof rule.args == "function") args = args();
-  return rule.validate(data, args, options);
+  return rule.validate(data, { ...args, ...options.context }, options);
 }
 
 const joiAnySchema = Joi.any();
@@ -193,8 +193,9 @@ class AsyncJoiSchema {
    * @return { Promise<ValidateResult> }
    */
   async validate(data, options) {
-    if (!options) options = { origin: data };
-    else options.origin = data;
+    if (!options) options = {};
+    if (!options.context) options.context = {};
+    options.context.origin = data;
 
     /** @type { ValidateResult } */
     let result = await this._validate_prop(data, options);
@@ -227,15 +228,16 @@ class AsyncJoiSchema {
     }
 
     if (result.hasError) return removeEmptyError(result);
-    async_results = await awaitPromises(this._prop_async_schemas, (item) =>
-      item.schema._validate_self(
+    async_results = await awaitPromises(this._prop_async_schemas, (item) => {
+      options.context.property = item.property;
+      return item.schema._validate_self(
         {
           value: result.value[item.property],
           error: result.error.prop[item.property],
         },
         options
-      )
-    );
+      );
+    });
     return mergePropPromisesResult(async_results, result);
   }
 
@@ -252,6 +254,7 @@ class AsyncJoiSchema {
     let value = oldResult.value;
     for (const rule of this._self_rules) {
       const result = await runRule(value, options, rule);
+      // @ts-ignore
       if (result.error) errors.push(result.error);
       value = result.value;
     }

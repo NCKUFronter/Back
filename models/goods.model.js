@@ -14,6 +14,7 @@ const GoodsSchema = Joi.object({
  * @property {string} _id
  * @property {string} name
  * @property {number} point
+ * @property {string} intro
  */
 class GoodsModel {
   /** @type {string} */

@@ -89,6 +89,16 @@ test("e2e > user pointActivity", async () => {
     });
 });
 
+test("e2e > user pointActivity", async () => {
+  await agent
+    .get("/api/user/profile")
+    .expect(200)
+    .then((res) => {
+      const profile = res.body;
+      assert.equal(profile._id, "1");
+    });
+});
+
 module.exports = {
   /** @param {import('express').Application} express_app */
   async run(express_app) {

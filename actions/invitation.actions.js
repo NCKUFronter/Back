@@ -19,7 +19,7 @@ async function invite(ledger, fromUser, toUser) {
   assert(
     ledger.adminId == fromUser._id || ledger.userIds.includes(fromUser._id)
   );
-  assert(ledger.adminId != toUser._id || !ledger.userIds.includes(toUser._id));
+  assert(ledger.adminId != toUser._id && !ledger.userIds.includes(toUser._id));
 
   const invitation = new InvitationModel(ledger._id, fromUser._id, toUser._id);
   return workInTransaction(async (session) => {

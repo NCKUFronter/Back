@@ -13,8 +13,10 @@ function validatePipe(position, schema, options) {
   return async (req, res, next) => {
     if (!options) options = { abortEarly: false };
     else options.abortEarly = false;
-    if (!options.context) options.context = { req };
-    else options.context.req = req;
+
+    if (!options.context) options.context = {};
+    options.context.req = req;
+    options.context.position = position;
 
     const { error, value } = await schema.validate(req[position], options);
     if (error) {

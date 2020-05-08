@@ -40,6 +40,18 @@ async function simpleLogin(agent, email = "father@gmail.com") {
     .send({ email, password: "0000" })
 }
 
+async function get_child_agent(app) {
+  const agent = supertest.agent(app)
+  await simpleLogin(agent, "child@gmail.com")
+  return agent;
+}
+
+async function get_mother_agent(app) {
+  const agent = supertest.agent(app)
+  await simpleLogin(agent, "mother@gmail.com")
+  return agent;
+}
+
 module.exports = {
   /** @param {import('express').Application} express_app */
   async run(express_app) {
@@ -53,4 +65,6 @@ module.exports = {
     console.log = log; // 恢復log
   },
   simpleLogin,
+  get_child_agent,
+  get_mother_agent,
 };

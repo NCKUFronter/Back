@@ -34,8 +34,8 @@ router.get("/", loginCheck(record_coll), async function (req, res) {
 
 // GET certain data from database
 router.get("/:id", async function (req, res) {
-  const oneToManyFields = req.query._expand;
-  const manyToManyFields = req.query._embed;
+  const oneToManyFields = req.query._one;
+  const manyToManyFields = req.query._many;
   const record = await findOneWithRelation(
     record_coll,
     req.params.id,

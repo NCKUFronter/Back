@@ -12,6 +12,11 @@ function JoiRequireWhen(schema) {
   });
 }
 
+function setConvertEntity(req, position, field, entity) {
+  if (!req["convert_from_" + position]) req["convert_from_" + position] = {};
+  req["convert_from_" + position][field] = entity;
+}
+
 /**
  * @param {() => import('mongodb').Collection} collFn
  * @param {string} fieldInColl
@@ -24,12 +29,12 @@ function existInDB(collFn, fieldInColl) {
       return { coll: collFn(), fieldInColl };
     },
     validate: async (value, args, options) => {
-      const req = options.context.req;
+      const req = options.req;
       const coll = args.coll;
 
       const entity = await coll.findOne({ [args.fieldInColl]: value });
       if (entity) {
-        req.convert_from_body = entity;
+        setConvertEntity(args.req, args.position, args.property, entity);
         return { value };
       }
       return {
@@ -45,4 +50,5 @@ module.exports = {
   JoiNumberString: Joi.string().regex(/^[0-9]+/),
   existInDB,
   AsyncJoi,
+  setConvertEntity,
 };
