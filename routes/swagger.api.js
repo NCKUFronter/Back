@@ -34,6 +34,8 @@
  * @param {CategoryDto.model} dto.body.required
  * @returns {Category.model} 201 - inserted model
  * @returns {string} 400 - 所填資料有誤
+ * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
  * @returns {any} 404 - 找不到
  * @security Basic
  */
@@ -47,6 +49,8 @@
  * @param {CategoryDto.model} name.body.required
  * @returns {Category.model} 200 - updated model
  * @returns {string} 400 - 所填資料有誤
+ * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
  * @returns {any} 404 - 找不到
  * @security Basic
  */
@@ -59,6 +63,8 @@
  * @param {string} id.path.required
  * @param {CategoryDto.model} name.body.required
  * @returns {string} 200 - success
+ * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
  * @security Basic
  */
 

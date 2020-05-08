@@ -54,7 +54,7 @@ router.post(
   "/",
   validatePipe("body", RecordSchema),
   loginCheck(record_coll),
-  getLedgerAuthGuard((req) => req.body.ledgerId),
+  getLedgerAuthGuard((req) => req.convert_from_body.ledgerId),
   async function (req, res) {
     const postData = {
       // _id: await fetchNextId(record_coll.collectionName), // not need

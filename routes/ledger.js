@@ -124,7 +124,7 @@ router.delete(
   checkParamsIdExists(collections.ledger),
   function (req, res) {
     if (req.userId !== req.convert_from_params.id.adminId)
-      return res.status(403).json("No auth to delete");
+      return res.status(403).json("No access");
 
     // @ts-ignore
     const deleteFilter = { _id: req.params.id, adminId: req.userId };

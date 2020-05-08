@@ -23,7 +23,7 @@ function getLedgerAuthGuard(ledgerIdFn) {
       (ledger.userIds && ledger.userIds.includes(req.userId))
     ) {
       next();
-    } else return res.status(403).json("No auth to access this ledger");
+    } else return res.status(403).json("No access");
   }
 
   return ledgerAuthGuard;

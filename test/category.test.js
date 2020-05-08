@@ -3,7 +3,7 @@ const log = console.log;
 const test = require("baretest")("category-test");
 const assert = require("assert");
 const supertest = require("supertest");
-const { simpleLogin } = require("./login.test");
+const { simpleLogin, get_child_agent } = require("./login.test");
 const { collections } = require("../models/mongo");
 const { CategoryModel } = require("../models");
 const {} = require("./init");
@@ -34,23 +34,32 @@ test("e2e > insert category", async () => {
     .expect(201)
     .then((res) => {
       /** @type {CategoryModel} */
-      const { _id, ...categoryInfo } = res.body;
-      id = _id;
-      assert.deepStrictEqual(categoryInfo, category_dto);
+      const category = res.body;
+      id = category._id;
+      assert.equal(category.name, category_dto.name);
+      assert.equal(category.userId, "1");
     });
 });
 
 test("e2e > patch category", async () => {
-  const category_dto = { name: "yourCategory" };
+  const category_dto = { name: "yourCategory", hashtags: ["xxx1", "xxx2"] };
 
-  await agent
-    .patch(testUrls.patch(id))
-    .send(category_dto)
-    .expect(200)
-    .then((res) => {
-      const { _id, ...categoryInfo } = res.body;
-      assert.deepStrictEqual(categoryInfo, category_dto);
-    });
+  await agent.patch(testUrls.patch(id)).send(category_dto).expect(200);
+
+  const category = await collections.category.findOne({ _id: id });
+  assert.equal(category.name, "yourCategory");
+
+  const user = await collections.user.findOne({ _id: "1" });
+  assert.notEqual(user.categoryTags, null);
+  assert.notEqual(user.categoryTags[id], null);
+});
+
+test("e2e > category > no access", async () => {
+  const category_dto = { name: "yourCategory" };
+  const child_agent = await get_child_agent(app);
+
+  await child_agent.patch(testUrls.patch(id)).send(category_dto).expect(403);
+  await child_agent.delete(testUrls.patch(id)).expect(403);
 });
 
 test("e2e > get all category", async () => {
@@ -61,7 +70,6 @@ test("e2e > get all category", async () => {
       const categories = res.body;
       assert(Array.isArray(categories));
       for (const category of categories) {
-        assert.equal(Object.keys(category).length, 2);
         assert(typeof category.name == "string");
         assert(typeof category._id == "string");
       }
@@ -82,7 +90,7 @@ test("e2e > get one category", async () => {
 test("e2e > delete category", async () => {
   await agent.delete(testUrls.delete(id)).expect(200);
   const category = await collections.category.findOne({ _id: id });
-  assert(category == null);
+  assert.equal(category, null);
 });
 
 module.exports = {

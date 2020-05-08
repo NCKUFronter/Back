@@ -45,7 +45,7 @@ router.put(
     const invitation = req.convert_from_params.id;
 
     if (invitation.toUserId != req.userId)
-      return res.status(403).json("No auth to answer Invitation");
+      return res.status(403).json("No access");
 
     await answerInvitation(req.convert_from_params.id, req.body.answer);
     res.status(200).json("Answer Success");
