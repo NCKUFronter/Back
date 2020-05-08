@@ -170,15 +170,6 @@
  */
 
 /**
- * @route GET /user/{id}
- * @group user
- * @summary 查詢其中一個 user
- * -- 🔨 尚未弄好
- * @param {string} id.path.required
- * @returns {User.model} 200
- */
-
-/**
  * @route POST /user/login
  * @group user
  * @summary 登入
@@ -228,11 +219,20 @@
  */
 
 /**
+ * @route GET /user/categories
+ * @group user
+ * @summary 取得使用者待回覆的邀請
+ * -- ✔️ 可以運作
+ * @returns {Array<Category>} 200
+ * @security Basic
+ */
+
+/**
  * @route GET /user/profile
  * @group user
  * @summary 取得使用者資料
  * -- ✔️ 可以運作
- * @returns {User} 200
+ * @returns {User.model} 200
  * @returns {string} 401 未登入
  * @security Basic
  */
@@ -353,20 +353,21 @@
 
 // ---------  Points ---------
 /**
- * @route GET /point/activites
+ * @route GET /point/activities
  * @group point
  * @summary 查詢所有pointActivity 
- * -- 🔨 尚未弄好
+ * -- ✔️ 可以運作
  * -- 🚫 前端不應該使用
  * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
  * @returns {Array<PointActivity>} 200
  */
 
 /**
- * @route GET /point/activites/{id}
+ * @route GET /point/activities/{id}
  * @group point
  * @summary 查詢指定 id 的pointActivity
- * -- 🔨 尚未弄好
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
  * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
  * @returns {PointActivity.model} 200
  */
@@ -375,7 +376,7 @@
  * @route POST /point/transfer
  * @group point
  * @summary 轉移點數
- * -- 🔨 尚未弄好
+ * -- ✔️ 可以運作
  * @param {TransferPointsDto.model} dto.body.required
  * @returns {string} 200 - success
  * @returns {string} 400 - 所填資料有誤
@@ -387,7 +388,7 @@
  * @route POST /points/consume/{goodsId}
  * @group point
  * @summary 消費點數
- * -- 🔨 尚未弄好
+ * -- ✔️ 可以運作
  * @param {string} goodsId.path.required
  * @returns {string} 200 - success
  * @returns {string} 400 - 所填資料有誤

@@ -1,10 +1,9 @@
 import "fastrx";
 import "express";
-import { UserModel } from "./models/user.model";
 
 declare module "fastrx" {
   namespace Rx {
-    interface Observable {
+    export interface Observable {
       subscribe(
         n: (d: any) => void,
         e?: (d: Error) => void,
@@ -15,12 +14,18 @@ declare module "fastrx" {
 }
 
 declare global {
-  namespace CategoryDto {}
+  export module Express {
+    export interface User {
+      _id: string;
+      name: string;
+      password: string;
+      email: string;
+      cardIds: string[];
+      rewardPoints: number;
+      categoryTags: { [key: string]: string[] };
+    }
 
-  module Express {
-    interface Request {
-      user?: UserModel;
-
+    export interface Request {
       body_origin?: any;
       params_origin?: any;
       query_origin?: any;

@@ -18,7 +18,7 @@ const record_coll = collections.record;
 // pointActivity 要考慮 user
 
 // GET from database
-router.get("/", loginCheck(record_coll), async function (req, res) {
+router.get("/", async function (req, res) {
   // collRelation(record_coll, 'category', 'categoryId', '_id', 'categoryData');
   console.log(req.query);
   const { _one, _many, ...match } = req.query;
@@ -36,7 +36,7 @@ router.get("/", loginCheck(record_coll), async function (req, res) {
 });
 
 // GET certain data from database
-router.get("/:id", async function (req, res) {
+router.get("/:id", loginCheck(record_coll), async function (req, res) {
   const oneToManyFields = req.query._one;
   const manyToManyFields = req.query._many;
   const record = await findOneWithRelation(

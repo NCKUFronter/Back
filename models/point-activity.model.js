@@ -12,7 +12,7 @@ const TransferPointsSchema = AsyncJoi.object({
   email: AsyncJoi.schema(Joi.string().email().required()).addRule(
     existInDB(() => collections.user, "email")
   ),
-  amout: Joi.number().required(),
+  amount: Joi.number().required(),
 });
 
 /**

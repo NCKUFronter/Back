@@ -93,6 +93,10 @@ test("e2e > delete category", async () => {
   assert.equal(category, null);
 });
 
+async function simpleInsertCategories(name, agent) {
+  await agent.post(testUrls.insert).send({ name });
+}
+
 module.exports = {
   /** @param {import('express').Application} express_app */
   async run(express_app) {
@@ -102,4 +106,5 @@ module.exports = {
     await test.run();
     console.log = log; // 恢復log
   },
+  simpleInsertCategories
 };

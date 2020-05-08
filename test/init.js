@@ -52,7 +52,7 @@ async function initDBData(db) {
       password: "0000",
       email: "father@gmail.com",
       photo: "",
-      rewardPoints: 50,
+      rewardPoints: 150,
     },
     {
       _id: "2",

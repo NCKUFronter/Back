@@ -9,7 +9,8 @@ const {
   userPointActivities,
 } = require("../actions/user.actions");
 const { collections } = require("../models/mongo");
-const { simpleLogin } = require("./login.test");
+const { simpleLogin, get_child_agent } = require("./login.test");
+const { simpleInsertCategories } = require("./category.test");
 const { InvitationModel, PointActivityModel } = require("../models");
 
 /** @type {import('express').Application} */
@@ -109,6 +110,24 @@ test("e2e > user relativeUsers", async () => {
       assert(Array.isArray(users));
       for (const user of users) {
         assert.notEqual(user._id, "1");
+      }
+    });
+});
+
+test("e2e > user categories", async () => {
+  await simpleInsertCategories("category1", agent);
+  const child_agent = await get_child_agent(app);
+  await simpleInsertCategories("category2", child_agent);
+
+  await agent
+    .get("/api/user/categories")
+    .expect(200)
+    .then((res) => {
+      const categories = res.body;
+      assert(Array.isArray(categories));
+      for (const category of categories) {
+        assert(category.userId == null || category.userId == "1");
+        assert.notEqual(category.name, "category2");
       }
     });
 });

@@ -11,7 +11,7 @@ async function run() {
   try {
     // 不能改順序
     await require("./middleware.test").run();
-    await require("./point.test").run();
+    await require("./point.test").run(app);
     await require("./other.test").run();
     await require("./login.test").run(app);
     await require("./user.test").run(app);

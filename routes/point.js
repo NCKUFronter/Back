@@ -1,17 +1,55 @@
+// @ts-check
+/// <reference types="../types" />
 const router = require("express").Router();
 const { collections } = require("../models/mongo");
 const loginCheck = require("../middleware/login-check");
+const checkParamsIdExists = require("../middleware/check-params-id-exists");
 const validatePipe = require("../middleware/validate-pipe");
 const pointAction = require("../actions/point.actions");
+const { findWithRelation, findOneWithRelation } = require("../actions");
 const {
   TransferPointsSchema,
   ConsumePointsSchema,
 } = require("../models/point-activity.model");
 const countDays = require("../actions/dateCount");
 
+// GET from database
+router.get("/activities", async function (req, res) {
+  // collRelation(record_coll, 'category', 'categoryId', '_id', 'categoryData');
+  console.log(req.query);
+  const { _one, _many, ...match } = req.query;
+  const oneToManyFields = req.query._one;
+  const manyToManyFields = req.query._many;
+
+  const activities = await findWithRelation(
+    collections.pointActivity,
+    match,
+    // @ts-ignore
+    oneToManyFields,
+    manyToManyFields
+  );
+  res.status(200).json(activities);
+});
+
+// GET certain data from database
+router.get("/activities/:id", async function (
+  req,
+  res
+) {
+  const oneToManyFields = req.query._one;
+  const manyToManyFields = req.query._many;
+  const activities= await findOneWithRelation(
+    collections.pointActivity,
+    req.params.id,
+    // @ts-ignore
+    oneToManyFields,
+    manyToManyFields
+  );
+  res.status(200).json(activities);
+});
 router.post(
   "/transfer",
-  validatePipe(TransferPointsSchema),
+  validatePipe("body", TransferPointsSchema),
   loginCheck(collections.pointActivity),
   async function (req, res) {
     // const from = await collections.user.findOne({ _id: req.userId });
@@ -25,26 +63,25 @@ router.post(
     );
 
     console.log("transfer success");
-    res.status(200);
+    res.status(200).json("transfer success");
   }
 );
 
 router.post(
   "/consume/:goodsId",
-  validatePipe(ConsumePointsSchema),
   loginCheck(collections.pointActivity),
+  checkParamsIdExists(collections.goods, "goodsId"),
   async function (req, res) {
     // const user = await collections.user.findOne({ _id: "1" });
-    const goods = await collections.goods.findOne({ _id: req.params.goodsId });
+    const goods = req.convert_from_params.goodsId;
     if (!goods) return res.status(404).json("Goods Not Found");
     if (req.user.rewardPoints < goods.point)
       return res.status(400).json("No enough points");
 
     // console.log(user, good);
-    pointAction.consumePoints("", user, goods);
+    await pointAction.consumePoints("", req.user, goods);
 
-    console.log("consume success");
-    res.status(200);
+    res.status(200).json("consume success");
   }
 );
 
@@ -90,9 +127,24 @@ router.post("/event", loginCheck(collections.pointActivity), async function (
   //const ;
   //countDays(user.logInDate, user.lastDate, user.conDays)
 
-  pointAction.pointsFromEvent("每日", 10, user);
+  await pointAction.pointsFromEvent("每日", 10, user);
   console.log("Info: API point/event success");
-  res.status(200);
+  res.status(200).json("Info: API point/event success");
+});
+
+router.get("/point/activities", async (req, res, next) => {
+  const { _one, _many, ...match } = req.query;
+  const oneToManyFields = req.query._one;
+  const manyToManyFields = req.query._many;
+
+  const activities = await findWithRelation(
+    collections.pointActivity,
+    match,
+    // @ts-ignore
+    oneToManyFields,
+    manyToManyFields
+  );
+  res.status(200).json(activities);
 });
 
 module.exports = router;

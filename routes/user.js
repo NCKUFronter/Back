@@ -14,20 +14,17 @@ const router = require("express").Router();
 const user_coll = collections.user;
 
 // GET from database
-router.get(
-  "/",
-  validatePipe("query", UserSchema, { context: { partial: true } }),
-  function (req, res) {
-    user_coll
-      .find(req.query)
-      // .sort({ userId: 1 })
-      .toArray(function (err, result) {
-        if (err) throw err;
-        res.status(200).send(result);
-      });
-  }
-);
+router.get("/", function (req, res) {
+  user_coll
+    .find(req.query)
+    // .sort({ userId: 1 })
+    .toArray(function (err, result) {
+      if (err) throw err;
+      res.status(200).send(result);
+    });
+});
 
+// 此部份會與其他路徑相沖
 // router.get("/:id", function (req, res) {
 //   const getData = { _id: parseInt(req.params.id) };
 
@@ -123,10 +120,15 @@ router.get("/profile", loginCheck(user_coll), function (req, res) {
 
 router.get("/ledgers", loginCheck(user_coll), async function (req, res) {
   // const ledgers = await userLedgers(req.userId);
-  const { _one, _many } = req.query;
+  const { _one, _many, ...match } = req.query;
   const ledgers = await findWithRelation(
     collections.ledger,
-    { $or: [{ userIds: req.userId }, { adminId: req.userId }] },
+    {
+      $or: [
+        { ...match, userIds: req.userId },
+        { ...match, adminId: req.userId },
+      ],
+    },
     _one,
     _many
   );
@@ -189,8 +191,8 @@ router.get("/relativeUsers", loginCheck(user_coll), async function (req, res) {
     ])
     .toArray();
   const users = results[0].users;
-  for(let i = 0; i < users.length; i++) {
-    if(users[i]._id === req.userId) {
+  for (let i = 0; i < users.length; i++) {
+    if (users[i]._id === req.userId) {
       users.splice(i, 1);
       break;
     }
@@ -199,4 +201,12 @@ router.get("/relativeUsers", loginCheck(user_coll), async function (req, res) {
   res.status(200).json(users);
 });
 
+router.get("/categories", loginCheck(user_coll), async (req, res) => {
+  const categories = await collections.category
+    .find({
+      $or: [{ userId: null }, { userId: req.userId }],
+    })
+    .toArray();
+  res.status(200).json(categories);
+});
 module.exports = router;
