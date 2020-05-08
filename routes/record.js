@@ -4,12 +4,14 @@ const { RecordSchema } = require("../models/record.model");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
 const { getLedgerAuthGuard } = require("../middleware/auth-guard");
+const checkParamsIdExists = require("../middleware/check-params-id-exists");
 const {
   findWithRelation,
   findOneWithRelation,
   getCategoryTags,
 } = require("../actions");
 const pointAction = require("../actions/point.actions");
+const { removeRecord, updateRecord } = require("../actions/record.actions");
 const router = require("express").Router();
 
 const record_coll = collections.record;
@@ -95,8 +97,15 @@ router.patch(
   "/:id",
   validatePipe("body", RecordSchema, { context: { partial: true } }),
   loginCheck(record_coll),
-  function (req, res) {
+  checkParamsIdExists(collections.record),
+  async function (req, res) {
+    const record = req.convert_from_params.id;
+    if (record.userId !== req.userId) return res.status(403).json("No access");
+
+    await updateRecord(record, req.body);
+    res.status(200).json("success");
     // @ts-ignore
+    /*
     const patchFilter = { _id: req.params.id, userId: req.userId };
     const patchData = { $set: req.body };
     record_coll.findOneAndUpdate(
@@ -109,11 +118,22 @@ router.patch(
         res.status(200).send(result.value);
       }
     );
+    */
   }
 );
 
 // DELETE certain row
-router.delete("/:id", function (req, res) {
+router.delete(
+  "/:id",
+  loginCheck(record_coll),
+  checkParamsIdExists(collections.record),
+  async function (req, res) {
+    const record = req.convert_from_params.id;
+    if (record.userId !== req.userId) return res.status(403).json("No access");
+
+    await removeRecord(req.params.id);
+    res.status(200).json("delete successs");
+    /*
   var deleteFilter = { _id: req.params.id };
   record_coll.deleteOne(deleteFilter, (err, result) => {
     console.log(req.params.id, deleteFilter, result.result.n);
@@ -121,6 +141,8 @@ router.delete("/:id", function (req, res) {
       .status(200)
       .send("Delete row: " + req.params.id + " from db Successfully!");
   });
-});
+  */
+  }
+);
 
 module.exports = router;

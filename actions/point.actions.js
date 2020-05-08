@@ -48,7 +48,9 @@ async function innerGivenPoints(subtype, amount, record, user) {
 
       // add hashtags to user
       if (record.hashtags) {
-        userUpdate.$set = { categoryTags: getCategoryTags(record, user) };
+        userUpdate.$addToSet = {
+          [`categoryTags.${record.categoryId}`]: { $each: record.hashtags },
+        };
       }
     }
 
@@ -159,8 +161,7 @@ async function consumePoints(subtype, user, goods) {
   });
 }
 
-function updateRecord() {
-}
+function updateRecord() {}
 
 module.exports = {
   pointsFromEvent,
