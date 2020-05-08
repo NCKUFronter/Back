@@ -14,7 +14,6 @@
  * @group category
  * @summary 取德所有category 
  * -- ✔️ 可以運作
- * -- ✨
  * @returns {Array.<Category>} 200
  */
 
@@ -28,16 +27,15 @@
  */
 
 /**
- * ❔ 類別若新增在個人上，則單筆record要顯示自定意類別會很麻煩
  * @route POST /category
  * @summary 新增category
  * -- ✔️ 可以運作
- * -- ❔ 有待討論的問題
  * @group category
  * @param {CategoryDto.model} dto.body.required
  * @returns {Category.model} 201 - inserted model
  * @returns {string} 400 - 所填資料有誤
  * @returns {any} 404 - 找不到
+ * @security Basic
  */
 
 /**
@@ -50,6 +48,7 @@
  * @returns {Category.model} 200 - updated model
  * @returns {string} 400 - 所填資料有誤
  * @returns {any} 404 - 找不到
+ * @security Basic
  */
 
 /**
@@ -60,6 +59,7 @@
  * @param {string} id.path.required
  * @param {CategoryDto.model} name.body.required
  * @returns {string} 200 - success
+ * @security Basic
  */
 
 // ---------  Record ---------
@@ -226,8 +226,7 @@
  * @group user
  * @summary 取得使用者資料
  * -- ✔️ 可以運作
- * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser
- * @returns {Array<Invitation>} 200
+ * @returns {User} 200
  * @returns {string} 401 未登入
  * @security Basic
  */

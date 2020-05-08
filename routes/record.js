@@ -14,6 +14,9 @@ const router = require("express").Router();
 
 const record_coll = collections.record;
 
+// record 要考慮 pointActivity
+// pointActivity 要考慮 user
+
 // GET from database
 router.get("/", loginCheck(record_coll), async function (req, res) {
   // collRelation(record_coll, 'category', 'categoryId', '_id', 'categoryData');

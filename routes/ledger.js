@@ -4,6 +4,7 @@ const { LedgerSchema } = require("../models/ledger.model");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
 const { getLedgerAuthGuard } = require("../middleware/auth-guard");
+const checkParamsIdExists = require("../middleware/check-params-id-exists");
 const {
   findWithRelation,
   findOneWithRelation,
@@ -59,7 +60,7 @@ router.post(
     const postData = {
       _id: await fetchNextId(ledger_coll.collectionName),
       adminId: req.userId,
-      userIds: [req.userId],
+      userIds: [],
       ...req.body,
     };
     ledger_coll.insertOne(postData, function (err, result) {
@@ -120,8 +121,11 @@ router.patch(
 router.delete(
   "/:id",
   loginCheck(ledger_coll),
-  getLedgerAuthGuard((req) => req.params.id),
+  checkParamsIdExists(collections.ledger),
   function (req, res) {
+    if (req.userId !== req.convert_from_params.id.adminId)
+      return res.status(403).json("No auth to delete");
+
     // @ts-ignore
     const deleteFilter = { _id: req.params.id, adminId: req.userId };
     ledger_coll.deleteOne(deleteFilter, (err, result) => {

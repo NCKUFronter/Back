@@ -1,5 +1,4 @@
 // @ts-check
-require('dotenv').config();
 const { collections, client, connectDB } = require("../models/mongo");
 
 async function resetDB() {
@@ -208,13 +207,13 @@ async function initDBData(db) {
       _id: "1",
       name: "Main Account",
       adminId: "1",
-      userIds: ["1", "2"],
+      userIds: ["2"],
     },
     {
       _id: "2",
       name: "Bank SinoPac",
       adminId: "2",
-      userIds: ["1", "2"],
+      userIds: ["1"],
     },
   ]);
 

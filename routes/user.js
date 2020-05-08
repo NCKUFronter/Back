@@ -126,7 +126,7 @@ router.get("/ledgers", loginCheck(user_coll), async function (req, res) {
   const { _one, _many } = req.query;
   const ledgers = await findWithRelation(
     collections.ledger,
-    { userIds: req.userId },
+    { $or: [{ userIds: req.userId }, { adminId: req.userId }] },
     _one,
     _many
   );
@@ -163,7 +163,7 @@ router.get("/pointActivities", loginCheck(user_coll), async function (
 router.get("/relativeUsers", loginCheck(user_coll), async function (req, res) {
   // reference:
   // https://stackoverflow.com/questions/42291965/setunion-to-merge-array-from-multiple-documents-mongodb
-  const results = await collections.user
+  const results = await collections.ledger
     .aggregate([
       { $match: { userIds: req.userId } },
       {
@@ -188,8 +188,15 @@ router.get("/relativeUsers", loginCheck(user_coll), async function (req, res) {
       },
     ])
     .toArray();
-
-  res.status(200).json(results[0].users);
+  const users = results[0].users;
+  for(let i = 0; i < users.length; i++) {
+    if(users[i]._id === req.userId) {
+      users.splice(i, 1);
+      break;
+    }
+  }
+  /** @type {any[]} */
+  res.status(200).json(users);
 });
 
 module.exports = router;

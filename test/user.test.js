@@ -70,6 +70,7 @@ test("e2e > user ledgers", async () => {
     .then((res) => {
       const ledgers = res.body;
       assert(Array.isArray(ledgers));
+      assert.equal(ledgers.length, 2);
       for (const ledger of ledgers) {
         assert(ledger.adminId == "1" || ledger.userIds.includes("1"));
       }
@@ -89,13 +90,26 @@ test("e2e > user pointActivity", async () => {
     });
 });
 
-test("e2e > user pointActivity", async () => {
+test("e2e > user profile", async () => {
   await agent
     .get("/api/user/profile")
     .expect(200)
     .then((res) => {
       const profile = res.body;
       assert.equal(profile._id, "1");
+    });
+});
+
+test("e2e > user relativeUsers", async () => {
+  await agent
+    .get("/api/user/relativeUsers")
+    .expect(200)
+    .then((res) => {
+      const users = res.body;
+      assert(Array.isArray(users));
+      for (const user of users) {
+        assert.notEqual(user._id, "1");
+      }
     });
 });
 

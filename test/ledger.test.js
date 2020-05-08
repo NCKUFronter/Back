@@ -6,7 +6,7 @@ const supertest = require("supertest");
 const { LedgerModel, UserModel } = require("../models");
 const { findLast } = require("./init");
 const { collections } = require("../models/mongo");
-const { simpleLogin } = require("./login.test");
+const { simpleLogin, get_child_agent } = require("./login.test");
 
 /** @type {import('express').Application} */
 let app = null;
@@ -47,9 +47,8 @@ test("e2e > insert ledger > success", async () => {
       id = ledger._id;
       assert.equal(ledger.ledgerName, "child ledger");
       assert.equal(ledger.adminId, "1");
-      // return; // XXX
       assert(ledger.userIds != null);
-      assert.deepEqual(ledger.userIds, ["1"]);
+      assert.deepEqual(ledger.userIds, []);
     });
 });
 
@@ -60,7 +59,6 @@ test("e2e > patch ledger > return 400", async () => {
 });
 
 test("e2e > patch ledger", async () => {
-  const categoryId = "4";
   const ledger_dto = { ledgerName: "new ledger" };
 
   await agent
@@ -76,13 +74,14 @@ test("e2e > patch ledger", async () => {
 
 test("e2e > no auth to access ledger > return 403", async () => {
   /** @type {any} */
-  const child_agent = supertest.agent(app);
-  await simpleLogin(child_agent, "child@gmail.com");
+  const child_agent = await get_child_agent(app);
   const dto = { ledgerName: "my ledger" };
 
   await child_agent.get(testUrls.getOne(1)).expect(403);
   await child_agent.patch(testUrls.patch(1)).send(dto).expect(403);
   await child_agent.delete(testUrls.delete(1)).expect(403);
+
+  await agent.delete(testUrls.delete(2)).expect(403);
 });
 
 test("e2e > get all ledgers", async () => {
@@ -95,7 +94,7 @@ test("e2e > get all ledgers", async () => {
     });
 });
 
-test("e2e-delete ledger", async () => {
+test("e2e > delete ledger", async () => {
   await agent.delete(testUrls.delete(id)).expect(200);
   const ledger = await collections.ledger.findOne({ _id: id });
   assert(ledger == null);

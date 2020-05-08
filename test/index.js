@@ -10,6 +10,7 @@ async function run() {
   await resetDB();
   try {
     // 不能改順序
+    await require("./middleware.test").run();
     await require("./point.test").run();
     await require("./other.test").run();
     await require("./login.test").run(app);

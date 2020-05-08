@@ -9,6 +9,7 @@ const {
 } = require("../actions/coll-relation");
 const checkParamsIdExists = require("../middleware/check-params-id-exists");
 const { notification } = require("../actions/notification.service");
+const dateCount = require("../actions/dateCount");
 
 test("invitation > find many records", async () => {
   const records = await findWithRelation(collections.record, null, [
@@ -38,42 +39,19 @@ test("invitation > find one ledger", async () => {
 test("notification", async () => {
   const event = 5;
   const event$ = notification.listen();
+  // @ts-ignore
   event$.subscribe((res) => assert.equal(res, 5));
 
   notification.send(event);
 });
 
-test("middleware > checkParamsIdExists", async () => {
-  let myStatus = 0;
-  let result = "";
-  let id = "8";
-  let req = { params: { id } };
-  const res = {
-    status(s) {
-      myStatus = s;
-      return {
-        json: (message) => {
-          result = message;
-        },
-      };
-    },
-  };
-  const next = () => {
-    result = "next";
-  };
+test("dateCount", async () => {
+  let nowDate = new Date(2019, 4, 12, 1);
+  let lastDate = new Date(2019, 4, 11, 8);
+  assert.equal(dateCount(nowDate, lastDate, 0), 1);
 
-  await checkParamsIdExists(collections.goods)(req, res, next);
-  assert.equal(myStatus, 0);
-  assert.equal(result, "next");
-  assert(req.convert_from_params);
-  assert(req.convert_from_params.id);
-  assert.equal(req.convert_from_params.id._id, id);
-
-  req = { params: { id } };
-  await checkParamsIdExists(collections.ledger)(req, res, next);
-  assert.equal(myStatus, 404);
-  assert.notEqual(result, "next");
-  assert.equal(req.convert_from_params, null);
+  nowDate.setDate(13)
+  assert.equal(dateCount(nowDate, lastDate, 0), 0);
 });
 
 module.exports = {
