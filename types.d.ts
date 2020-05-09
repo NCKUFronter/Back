@@ -23,6 +23,8 @@ declare global {
       cardIds: string[];
       rewardPoints: number;
       categoryTags: { [key: string]: string[] };
+      conDays: number;
+      lastLoginCheck: Date;
     }
 
     export interface Request {

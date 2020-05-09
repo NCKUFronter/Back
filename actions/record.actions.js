@@ -22,8 +22,8 @@ async function updateRecord(old_record, update_dto) {
       update_dto.rewardPoints = new_point;
       if (new_point !== old_record.rewardPoints) {
         activity_prom = collections.pointActivity.updateOne(
-          { _id: old_record._id },
-          { $set: { rewardPoints: new_point } },
+          { fromRecordId: old_record._id },
+          { $set: { amount: new_point } },
           { session }
         );
       }

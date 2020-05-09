@@ -108,15 +108,12 @@ test("e2e > insert record > success", async () => {
 test("e2e > patch record > return 400", async () => {
   const record_dto = { categoryId: 4, hashtags: ["tag3", "tag2"] };
 
-  await agent
-    .patch(testUrls.patch(id))
-    .send(record_dto)
-    .expect(400)
-})
+  await agent.patch(testUrls.patch(id)).send(record_dto).expect(400);
+});
 
 test("e2e > patch record", async () => {
-  const categoryId = "4"
-  const record_dto = { categoryId, hashtags: ["tag3", "tag2"] };
+  const categoryId = "4";
+  const record_dto = { categoryId, hashtags: ["tag3", "tag2"], money: 5000 };
 
   await agent
     .patch(testUrls.patch(id))
@@ -139,6 +136,10 @@ test("e2e > patch record", async () => {
       assert.equal(new Set(tags).size, tags.length);
       assert(tags.includes("tag2"));
       assert(tags.includes("tag3"));
+
+      const activity = await collections.pointActivity.findOne({ fromRecordId: id });
+      assert.equal(activity.amount, record.rewardPoints);
+      assert.equal(activity.amount, 50);
     });
 });
 
@@ -163,10 +164,13 @@ test("e2e > get one record", async () => {
     });
 });
 
-test("e2e-delete record", async () => {
+test("e2e > delete record", async () => {
   await agent.delete(testUrls.delete(id)).expect(200);
   const record = await collections.record.findOne({ _id: id });
   assert(record == null);
+
+  const activity = await collections.pointActivity.findOne({ fromRecordId: id });
+  assert(activity == null);
 });
 
 module.exports = {

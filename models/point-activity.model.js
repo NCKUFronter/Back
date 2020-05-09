@@ -32,6 +32,7 @@ const ConsumePointsSchema = AsyncJoi.object({
  * @property {enum} type.required - - eg:new,transfer,consume
  * @property {string} subtype.required
  * @property {string} time.required - real type: Date
+ * @property {number} amount.required - amount of points
  * @property {string} fromRecordId - for type = 'new'
  * @property {string} toUserId - for type = 'transfer' or 'new'
  * @property {string} fromUserId - for type = 'consume' or 'transfer'

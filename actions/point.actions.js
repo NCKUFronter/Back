@@ -161,8 +161,6 @@ async function consumePoints(subtype, user, goods) {
   });
 }
 
-function updateRecord() {}
-
 module.exports = {
   pointsFromEvent,
   pointsFromRecord,

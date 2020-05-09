@@ -8,7 +8,6 @@ const checkParamsIdExists = require("../middleware/check-params-id-exists");
 const {
   findWithRelation,
   findOneWithRelation,
-  getCategoryTags,
 } = require("../actions");
 const pointAction = require("../actions/point.actions");
 const { removeRecord, updateRecord } = require("../actions/record.actions");

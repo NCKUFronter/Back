@@ -152,10 +152,10 @@ router.get("/pointActivities", loginCheck(user_coll), async function (
   res
 ) {
   // const activities = await userPointActivities(req.userId);
-  const { _one, _many } = req.query;
+  const { _one, _many, ...match } = req.query;
   const activities = await findWithRelation(
     collections.pointActivity,
-    { $or: [{ fromUserId: req.userId }, { toUserId: req.userId }] },
+    { $or: [{ ...match, fromUserId: req.userId }, { ...match, toUserId: req.userId }] },
     _one,
     _many
   );

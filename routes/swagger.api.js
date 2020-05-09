@@ -4,6 +4,8 @@
  * -- 🔨 尚未弄好
  * -- ⚠️ 可能有bug
  * -- ❔ 有待討論的問題
+ * -- ℹ️ 有資訊
+ * ℹ️ 有資訊
  * ⚠️ bug說明
  * ❔ 疑問?
  */
@@ -27,9 +29,11 @@
  */
 
 /**
+ * ℹ️ 可連同使用者的categoryTags，一併新增
  * @route POST /category
  * @summary 新增category
  * -- ✔️ 可以運作
+ * -- ℹ️ 有資訊
  * @group category
  * @param {CategoryDto.model} dto.body.required
  * @returns {Category.model} 201 - inserted model
@@ -41,10 +45,12 @@
  */
 
 /**
+ * ℹ️ 會連同使用者的categoryTags，一併更改
  * @route PATCH /category/{id}
  * @group category
  * @summary 部分修改指定 id 的category
  * -- ✔️ 可以運作
+ * -- ℹ️ 有資訊
  * @param {string} id.path.required
  * @param {CategoryDto.model} name.body.required
  * @returns {Category.model} 200 - updated model
@@ -96,12 +102,12 @@
  * @property {number} rewardPoints
  */
 /**
- * ❔ 未登入使用者的點數?
+ * ℹ️ 點數發放簡單用money/100發放
  * @route POST /record
  * @group record
  * @summary 新增的record
  * -- ✔️ 可以運作
- * -- ❔ 有待討論的問題
+ * -- ℹ️ 有資訊
  * @param {RecordDto.model} dto.body.required
  * @returns {InsertRecordResponse.model} 201 - inserted model
  * @returns {string} 400 - 所填資料有誤
@@ -111,13 +117,12 @@
  */
 
 /**
- * ⚠️ 未處理category,tag更新後，使用者的categoryTags
- * ❔ Record修改後的點數?
+ * ℹ️ 使用者categoryTags，也一併更改
+ * ℹ️ pointActivity的點數，也一併更改
  * @route PATCH /record/{id}
  * @group record
  * @summary 部分修改指定 id 的record
- * -- ⚠️ 可能有bug
- * -- ❔ 有待討論的問題
+ * -- ℹ️ 有資訊
  * @param {string} id.path.required
  * @param {RecordDto.model} dto.body.required
  * @returns {Record.model} 200 - updated model
@@ -129,12 +134,12 @@
  */
 
 /**
- * ❔ ledger內，誰能刪除record?
+ * ℹ️ 相關pointActivity會一併刪除
  * @route DELETE /record/{id}
  * @group record
  * @summary 刪除指定 id 的預設record
  * -- ✔️ 可以運作
- * -- ❔ 有待討論的問題
+ * -- ℹ️ 有資訊
  * @param {string} id.path.required
  * @returns {string} 200 - success
  * @returns {any} 401 - 未登入
@@ -203,6 +208,8 @@
  * @group user
  * @summary 取得使用者所有點數紀錄
  * -- ✔️ 可以運作
+ * @param {enum} type.query - activity type - eg: new, transfer, consume
+ * @param {string} subtype.query - activity subtype 
  * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
  * @returns {Array<PointActivity>} 200
  * @security Basic
@@ -221,7 +228,7 @@
 /**
  * @route GET /user/categories
  * @group user
- * @summary 取得使用者待回覆的邀請
+ * @summary 取得使用者的所有類別(包含預設)
  * -- ✔️ 可以運作
  * @returns {Array<Category>} 200
  * @security Basic

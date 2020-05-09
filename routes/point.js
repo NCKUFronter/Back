@@ -32,13 +32,10 @@ router.get("/activities", async function (req, res) {
 });
 
 // GET certain data from database
-router.get("/activities/:id", async function (
-  req,
-  res
-) {
+router.get("/activities/:id", async function (req, res) {
   const oneToManyFields = req.query._one;
   const manyToManyFields = req.query._many;
-  const activities= await findOneWithRelation(
+  const activities = await findOneWithRelation(
     collections.pointActivity,
     req.params.id,
     // @ts-ignore
@@ -85,10 +82,35 @@ router.post(
   }
 );
 
-router.post("/event", loginCheck(collections.pointActivity), async function (
-  req,
-  res
-) {
+router.post(
+  "/loginEvent",
+  loginCheck(collections.pointActivity),
+  async function (req, res) {
+    const user = req.user;
+    const userUpdate = {};
+    let total = 10;
+
+    await pointAction.pointsFromEvent("每日", 10, user);
+
+    userUpdate.$set = { lastLoginCheck: new Date() };
+    if (user.lastLoginCheck == null) {
+      userUpdate.$set = { conDays: 1 };
+    } else {
+      // const new_conDays = countDays(new Date(), user.lastLoginCheck, user.conDays);
+      let new_conDays = user.conDays + 1; // 先不算連續天數
+      if (new_conDays !== user.conDays) {
+        if (new_conDays % 7 == 0) {
+          total = total + 10;
+          await pointAction.pointsFromEvent("連續", 10, user);
+          new_conDays = 0;
+        }
+        userUpdate.$set = { conDays: new_conDays };
+      }
+    }
+    await collections.user.updateOne({ _id: req.userId }, userUpdate);
+    res.status(200).json();
+
+    /*
   const user = await collections.user.findOne({ _id: "1" });
   //console.log(user,user.logInDate, user.lastLogIn, user.conDays)
   const nowDate = user.logInDate;
@@ -112,7 +134,7 @@ router.post("/event", loginCheck(collections.pointActivity), async function (
     }
   }
   if (user.conDays % 7 === 0) {
-    pointAction.pointsFromEvent("連續", 10, user);
+    await pointAction.pointsFromEvent("連續", 10, user);
   }
 
   collections.user.findOneAndUpdate(
@@ -130,7 +152,9 @@ router.post("/event", loginCheck(collections.pointActivity), async function (
   await pointAction.pointsFromEvent("每日", 10, user);
   console.log("Info: API point/event success");
   res.status(200).json("Info: API point/event success");
-});
+  */
+  }
+);
 
 router.get("/point/activities", async (req, res, next) => {
   const { _one, _many, ...match } = req.query;
