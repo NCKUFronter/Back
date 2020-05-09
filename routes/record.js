@@ -66,7 +66,7 @@ router.post(
     const user = await collections.user.findOne({ _id: req.userId });
     const amount = Math.round(req.body.money / 100);
 
-    await pointAction.pointsFromRecord("", amount, postData, user);
+    await pointAction.pointsFromRecord("record", amount, postData, user);
     console.log("1 document inserted.");
     res.status(201).json({ message: "Insert Success", rewardPoints: amount });
   }
@@ -130,7 +130,7 @@ router.delete(
     const record = req.convert_from_params.id;
     if (record.userId !== req.userId) return res.status(403).json("No access");
 
-    await removeRecord(req.params.id);
+    await removeRecord(record, req.userId);
     res.status(200).json("delete successs");
     /*
   var deleteFilter = { _id: req.params.id };

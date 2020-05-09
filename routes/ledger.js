@@ -176,4 +176,43 @@ router.get(
   }
 );
 
+router.post(
+  "/:id/leave",
+  loginCheck(ledger_coll),
+  checkParamsIdExists(collections.ledger),
+  getLedgerAuthGuard((req) => req.convert_from_params.id),
+  async function (req, res) {
+    if (req.convert_from_params.id.adminId === req.userId)
+      return res.status(400).json("Admin cannot leave ledger");
+
+    await collections.ledger.updateOne(
+      { _id: req.params.id },
+      { $pull: { userIds: req.userId } }
+    );
+    res.status(200).json("success");
+  }
+);
+
+router.post(
+  "/:id/leave/:userId",
+  loginCheck(ledger_coll),
+  checkParamsIdExists(collections.ledger),
+  checkParamsIdExists(collections.user, "userId"),
+  getLedgerAuthGuard((req) => req.convert_from_params.id),
+  async function (req, res) {
+    if (req.convert_from_params.id.adminId !== req.userId)
+      return res.status(403).json("Only admin can make people leave ledger");
+
+    if (req.params.userId === req.userId)
+      return res.status(400).json("Admin cannot leave ledger");
+
+    await collections.ledger.updateOne(
+      { _id: req.params.id },
+      { $pull: { userIds: req.params.userId } }
+    );
+
+    res.status(200).json("success");
+  }
+);
+
 module.exports = router;

@@ -9,10 +9,12 @@ function countDays(nowDate, lastDate, conDays) {
   let nextLastDate = new Date(lastDate);
   nextLastDate.setDate(lastDate.getDate() + 1);
 
-  if (nextLastDate.toDateString() === nowDate.toDateString()) {
+  if (nowDate.toDateString() === lastDate.toDateString()) {
+    return conDays;
+  } else if (nextLastDate.toDateString() === nowDate.toDateString()) {
     return conDays + 1;
   }
-  return conDays;
+  return 1;
 }
 
 /*

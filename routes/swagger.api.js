@@ -185,6 +185,20 @@
  */
 
 /**
+ * @typedef PointCheckResponse
+ * @property {number} perLogin
+ * @property {number} continueLogin
+ */
+/**
+ * @route POST /user/pointCheck
+ * @group user
+ * @summary 取得登入點數
+ * -- ✔️ 可以運作
+ * @returns {LoginResponse.model} 200
+ * @returns {string} 401 - 登入失敗，帳號或密碼錯誤
+ */
+
+/**
  * @route POST /user/logout
  * @group user
  * @summary 登出
@@ -364,6 +378,31 @@
  * @param {string} id.path.required
  * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser
  * @returns {Array<Invitation>} 200
+ * @security Basic
+ */
+
+/**
+ * @route POST /ledger/{id}/leave
+ * @group ledger
+ * @summary 使用者離開ledger
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @returns {string} 200 - success
+ * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
+ * @security Basic
+ */
+
+/**
+ * @route POST /ledger/{id}/leave/{userId}
+ * @group ledger
+ * @summary 使用者離開ledger
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required - ledgerId
+ * @param {string} userId.path.required - 要踢走的使用者id
+ * @returns {string} 200 - success
+ * @returns {any} 401 - 未登入
+ * @returns {any} 403 - 沒有權限訪問
  * @security Basic
  */
 

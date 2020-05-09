@@ -45,6 +45,9 @@ async function initDB() {
 
 /** @param {import('mongodb').Db} db */
 async function initDBData(db) {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate()-1);
+
   await db.collection("user").insertMany([
     {
       _id: "1",
@@ -60,6 +63,8 @@ async function initDBData(db) {
       password: "0000",
       photo: "",
       email: "mother@gmail.com",
+      conDays: 5,
+      lastLogin: new Date(),
       rewardPoints: 0,
     },
     {
@@ -68,6 +73,8 @@ async function initDBData(db) {
       email: "child@gmail.com",
       password: "0000",
       photo: "",
+      conDays: 6,
+      lastLogin: yesterday,
       rewardPoints: 100,
     },
     {

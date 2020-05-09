@@ -115,6 +115,9 @@ test("e2e > patch record", async () => {
   const categoryId = "4";
   const record_dto = { categoryId, hashtags: ["tag3", "tag2"], money: 5000 };
 
+  const user = await collections.user.findOne({_id: "1"});
+  const before_point = user.rewardPoints;
+
   await agent
     .patch(testUrls.patch(id))
     .send(record_dto)
@@ -136,6 +139,7 @@ test("e2e > patch record", async () => {
       assert.equal(new Set(tags).size, tags.length);
       assert(tags.includes("tag2"));
       assert(tags.includes("tag3"));
+      assert.equal(user.rewardPoints, before_point + 39);
 
       const activity = await collections.pointActivity.findOne({ fromRecordId: id });
       assert.equal(activity.amount, record.rewardPoints);
@@ -165,12 +169,18 @@ test("e2e > get one record", async () => {
 });
 
 test("e2e > delete record", async () => {
+  let user = await collections.user.findOne({_id: "1"});
+  const before_point = user.rewardPoints;
+
   await agent.delete(testUrls.delete(id)).expect(200);
   const record = await collections.record.findOne({ _id: id });
   assert(record == null);
 
   const activity = await collections.pointActivity.findOne({ fromRecordId: id });
   assert(activity == null);
+
+  user = await collections.user.findOne({ _id: "1" });
+  assert.equal(user.rewardPoints, before_point - 50);
 });
 
 module.exports = {

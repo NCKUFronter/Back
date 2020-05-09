@@ -144,6 +144,22 @@ test("e2e > accept invitation > return 200", async () => {
   assert(ledger.userIds.includes("3"));
 });
 
+test("e2e > leave ledger > return 200", async () => {
+  await child_agent.post('/api/ledger/1/leave').expect(200);
+
+  const ledger = await collections.ledger.findOne({ _id: "1" });
+  assert.equal(ledger.userIds.length, new Set(ledger.userIds).size);
+  assert.equal(ledger.userIds.includes("3"), false);
+});
+
+test("e2e > make somebody leave ledger > return 200", async () => {
+  await agent.post('/api/ledger/1/leave/2').expect(200);
+
+  const ledger = await collections.ledger.findOne({ _id: "1" });
+  assert.equal(ledger.userIds.length, new Set(ledger.userIds).size);
+  assert.equal(ledger.userIds.includes("2"), false);
+});
+
 module.exports = {
   /** @param {import('express').Application} express_app */
   async run(express_app) {

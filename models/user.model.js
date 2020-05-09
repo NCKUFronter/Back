@@ -23,8 +23,8 @@ const UserSchema = Joi.object({
  * @property {string} name.required
  * @property {string} email.required
  * @property {string} photo
- * @property {string} money.required
- * @property {string} lastLoginCheck.required - real type: Date
+ * @property {number} conDays
+ * @property {string} lastLogin.required - real type: Date
  * @property {string[]} cardIds
  * @property {object} categoryTags.required
  */
@@ -54,7 +54,7 @@ class UserModel {
   conDays;
 
   /** @type {Date} */
-  lastLoginCheck;
+  lastLogin;
 }
 
 module.exports = {

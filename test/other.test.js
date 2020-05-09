@@ -51,7 +51,7 @@ test("dateCount", async () => {
   assert.equal(dateCount(nowDate, lastDate, 0), 1);
 
   nowDate.setDate(13)
-  assert.equal(dateCount(nowDate, lastDate, 0), 0);
+  assert.equal(dateCount(nowDate, lastDate, 0), 1);
 });
 
 module.exports = {

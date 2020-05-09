@@ -5,6 +5,7 @@ const test = require("baretest")("login-test");
 const supertest = require("supertest");
 const assert = require("assert");
 const { collections } = require("../models/mongo");
+const { findLast } = require("./init");
 
 /** @type {import('express').Application} */
 let app = null;
@@ -23,6 +24,45 @@ test("e2e > local login", async () => {
     .send({ email: "father@gmail.com", password: "0000" })
     .expect(200);
   await agent.get("/api/ledger/2").expect(200);
+});
+
+test("e2e > login point check > no point", async () => {
+  const mother_agent = await get_mother_agent(app);
+  let mother = await collections.user.findOne({_id: "2"});
+  const before_mother_points = mother.rewardPoints;
+
+  await mother_agent.post('/api/user/pointCheck').expect(200).then(res=> {
+    assert.deepEqual(res.body, {});
+  });
+
+  mother = await collections.user.findOne({_id: "2"});
+  assert.equal(mother.rewardPoints, before_mother_points);
+});
+
+test("e2e > login point check > login point", async () => {
+  const father_agent = agent;
+  let father = await collections.user.findOne({_id: "1"});
+  const before_father_points = father.rewardPoints;
+
+  await father_agent.post('/api/user/pointCheck').expect(200).then(res=> {
+    assert.deepEqual(res.body, {perLogin: 10});
+  });
+
+  father = await collections.user.findOne({_id: "1"});
+  assert.equal(father.rewardPoints, before_father_points + 10);
+});
+
+test("e2e > login point check > login + continue point", async () => {
+  const child_agent = await get_child_agent(app);
+  let child = await collections.user.findOne({_id: "3"});
+  const before_child_points = child.rewardPoints;
+
+  await child_agent.post('/api/user/pointCheck').expect(200).then(res=> {
+    assert.deepEqual(res.body, {perLogin: 10, continueLogin: 10});
+  });
+
+  child = await collections.user.findOne({_id: "3"});
+  assert.equal(child.rewardPoints, before_child_points + 20);
 });
 
 test("e2e > local logout", async () => {

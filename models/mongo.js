@@ -95,7 +95,8 @@ async function workInTransaction(fn) {
   } catch (err) {
     console.log(err);
     await session.endSession();
-    return false;
+    throw err;
+    // return false;
   }
   await session.endSession();
   return true;

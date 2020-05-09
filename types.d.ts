@@ -24,7 +24,7 @@ declare global {
       rewardPoints: number;
       categoryTags: { [key: string]: string[] };
       conDays: number;
-      lastLoginCheck: Date;
+      lastLogin: Date;
     }
 
     export interface Request {
