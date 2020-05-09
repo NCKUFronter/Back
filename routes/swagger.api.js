@@ -31,7 +31,7 @@
 /**
  * ℹ️ 可連同使用者的categoryTags，一併新增
  * @route POST /category
- * @summary 新增category
+ * @summary 新增category與hashtags
  * -- ✔️ 可以運作
  * -- ℹ️ 有資訊
  * @group category
@@ -48,7 +48,7 @@
  * ℹ️ 會連同使用者的categoryTags，一併更改
  * @route PATCH /category/{id}
  * @group category
- * @summary 部分修改指定 id 的category
+ * @summary 部分修改指定 id 的category與hashtags
  * -- ✔️ 可以運作
  * -- ℹ️ 有資訊
  * @param {string} id.path.required
@@ -222,6 +222,15 @@
  * -- ✔️ 可以運作
  * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser
  * @returns {Array<Invitation>} 200
+ * @security Basic
+ */
+
+/**
+ * @route GET /user/relativeUsers
+ * @group user
+ * @summary 取得相關使用者資訊
+ * -- ✔️ 可以運作
+ * @returns {Array<User>} 200
  * @security Basic
  */
 

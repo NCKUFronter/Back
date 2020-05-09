@@ -155,7 +155,12 @@ router.get("/pointActivities", loginCheck(user_coll), async function (
   const { _one, _many, ...match } = req.query;
   const activities = await findWithRelation(
     collections.pointActivity,
-    { $or: [{ ...match, fromUserId: req.userId }, { ...match, toUserId: req.userId }] },
+    {
+      $or: [
+        { ...match, fromUserId: req.userId },
+        { ...match, toUserId: req.userId },
+      ],
+    },
     _one,
     _many
   );
@@ -167,7 +172,7 @@ router.get("/relativeUsers", loginCheck(user_coll), async function (req, res) {
   // https://stackoverflow.com/questions/42291965/setunion-to-merge-array-from-multiple-documents-mongodb
   const results = await collections.ledger
     .aggregate([
-      { $match: { userIds: req.userId } },
+      { $match: { $or: [{ userIds: req.userId }, { adminId: req.userId }] } },
       {
         $lookup: {
           from: "user",
