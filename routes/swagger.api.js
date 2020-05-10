@@ -45,6 +45,7 @@
  */
 
 /**
+ * ℹ️ 預設類別不能更名
  * ℹ️ 會連同使用者的categoryTags，一併更改
  * @route PATCH /category/{id}
  * @group category
@@ -126,9 +127,9 @@
  * @param {string} id.path.required
  * @param {RecordDto.model} dto.body.required
  * @returns {Record.model} 200 - updated model
- * @returns {string} 400 - 所填資料有誤
+ * @returns {string} 400 - 所填資料有誤 || 不能修改預設類別名稱
  * @returns {any} 401 - 未登入
- * @returns {any} 403 - 沒有權限訪問
+ * @returns {any} 403 - 沒有權限訪問 
  * @returns {any} 404 - 找不到
  * @security Basic
  */
@@ -190,11 +191,13 @@
  * @property {number} continueLogin
  */
 /**
+ * ℹ️ 沒有做防護，只要call就有點數
  * @route POST /user/pointCheck
  * @group user
  * @summary 取得登入點數
  * -- ✔️ 可以運作
- * @returns {LoginResponse.model} 200
+ * -- ℹ️ 有資訊
+ * @returns {PointCheckResponse.model} 200
  * @returns {string} 401 - 登入失敗，帳號或密碼錯誤
  */
 

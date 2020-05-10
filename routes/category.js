@@ -101,11 +101,19 @@ router.patch(
   checkParamsIdExists(category_coll),
   function (req, res) {
     const category = req.convert_from_params.id;
-    if (category.userId !== req.userId)
+    if (
+      category.userId == null &&
+      req.body.name != null &&
+      req.body.name != category.name
+    ) {
+      return res.status(403).json("Cannot rename default category");
+    }
+
+    if (category.userId != null && category.userId !== req.userId)
       return res.status(403).json("No access");
 
     workInTransaction(async (session) => {
-      if (req.body.name) {
+      if (req.body.name && req.body.name !== category.name) {
         await collections.category.updateOne(
           { _id: req.params.id },
           { $set: { name: req.body.name } },
@@ -155,7 +163,9 @@ router.delete(
       return res.status(403).json("No access");
 
     await collections.category.deleteOne({ _id: req.params.id });
-    res.status(200).json("Delete row: " + req.params.id + " from db Successfully!");
+    res
+      .status(200)
+      .json("Delete row: " + req.params.id + " from db Successfully!");
 
     /*
     const deleteFilter = {

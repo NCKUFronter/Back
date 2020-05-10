@@ -29,9 +29,9 @@ router.post("/pointCheck", loginCheck(collections.user), async (req, res) => {
     let nextLastDate = new Date(lastLogin);
     nextLastDate.setDate(lastLogin.getDate() + 1);
 
-    if (now.toDateString() === lastLogin.toDateString()) {
+    if (false && now.toDateString() === lastLogin.toDateString()) {
       // do nothing
-    } else if (nextLastDate.toDateString() === now.toDateString()) {
+    } else if (true || nextLastDate.toDateString() === now.toDateString()) {
       // every day login
       await pointsFromEvent("perLogin", 10, req.user);
       result.perLogin = 10;

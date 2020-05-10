@@ -54,6 +54,14 @@ test("e2e > patch category", async () => {
   assert.notEqual(user.categoryTags[id], null);
 });
 
+test("e2e > category > return 403", async () => {
+  const category_dto = { name: "yourCategory" };
+  const child_agent = await get_child_agent(app);
+
+  await child_agent.patch(testUrls.patch("1")).send(category_dto).expect(403);
+  await child_agent.delete(testUrls.patch("1")).expect(403);
+});
+
 test("e2e > category > no access", async () => {
   const category_dto = { name: "yourCategory" };
   const child_agent = await get_child_agent(app);
