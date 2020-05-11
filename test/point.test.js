@@ -122,7 +122,7 @@ test("unit > consumePoints", async function () {
   const before_point = user.rewardPoints;
 
   let goods = await collections.goods.findOne({ _id: goodsId });
-  await consumePoints("", user, goods);
+  await consumePoints("", user, goods, 1);
 
   // check user
   await checkUserPoints(userId, before_point, -goods.point);
@@ -159,13 +159,15 @@ test("e2e > consumePoints", async function () {
   let user = await collections.user.findOne({ _id: "1" });
   const before_point = user.rewardPoints;
   let goods = await collections.goods.findOne({ _id: goodsId });
-  await agent.post(`/api/point/consume/${goodsId}`).expect(200);
+  await agent.post(`/api/point/consume/${goodsId}`).send({quantity: 2}).expect(200);
 
   // check user
-  await checkUserPoints("1", before_point, -goods.point);
+  await checkUserPoints("1", before_point, -(goods.point * 2));
 
   // check activity
-  await checkActivity("consume", "", goods.point, "1", goodsId);
+  await checkActivity("consume", "", goods.point * 2, "1", goodsId);
+  const activity = await findLast(collections.pointActivity);
+  assert.equal(activity.quantity, 2);
 });
 
 module.exports = {

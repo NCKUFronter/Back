@@ -66,6 +66,7 @@ router.post(
 
 router.post(
   "/consume/:goodsId",
+  validatePipe("body", ConsumePointsSchema),
   loginCheck(collections.pointActivity),
   checkParamsIdExists(collections.goods, "goodsId"),
   async function (req, res) {
@@ -76,7 +77,7 @@ router.post(
       return res.status(400).json("No enough points");
 
     // console.log(user, good);
-    await pointAction.consumePoints("", req.user, goods);
+    await pointAction.consumePoints("", req.user, goods, req.body.quantity);
 
     res.status(200).json("consume success");
   }

@@ -17,13 +17,10 @@ const TransferPointsSchema = AsyncJoi.object({
 
 /**
  * @typedef ConsumePointsDto
- * @property {string} email.required
- * @property {number} amount.required - amount of points
+ * @property {string} quantity.required
  */
-const ConsumePointsSchema = AsyncJoi.object({
-  goodsId: AsyncJoi.schema(JoiNumberString).addRule(
-    existInDB(() => collections.goods, "_id")
-  ),
+const ConsumePointsSchema = Joi.object({
+  quantity: Joi.number().min(1).required(),
 });
 
 /**
@@ -37,6 +34,7 @@ const ConsumePointsSchema = AsyncJoi.object({
  * @property {string} toUserId - for type = 'transfer' or 'new'
  * @property {string} fromUserId - for type = 'consume' or 'transfer'
  * @property {string} toGoodsId - for type = 'consume'
+ * @property {string} quantity - for type = 'consume'
  */
 class PointActivityModel {
   /** @type {string} */

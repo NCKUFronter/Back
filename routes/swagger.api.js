@@ -252,11 +252,18 @@
  */
 
 /**
+ * @typedef CategoryResponse
+ * @property {string} _id.required
+ * @property {string} name.required
+ * @property {string} userId
+ * @property {string[]} hashtags
+ */
+/**
  * @route GET /user/categories
  * @group user
  * @summary 取得使用者的所有類別(包含預設)
  * -- ✔️ 可以運作
- * @returns {Array<Category>} 200
+ * @returns {Array<CategoryResponse>} 200
  * @security Basic
  */
 
@@ -443,7 +450,7 @@
  */
 
 /**
- * @route POST /points/consume/{goodsId}
+ * @route POST /point/consume/{goodsId}
  * @group point
  * @summary 消費點數
  * -- ✔️ 可以運作

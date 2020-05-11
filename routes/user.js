@@ -212,6 +212,11 @@ router.get("/categories", loginCheck(user_coll), async (req, res) => {
       $or: [{ userId: null }, { userId: req.userId }],
     })
     .toArray();
+  if(req.user.categoryTags) {
+    for(const category of categories) {
+      category.hashtags = req.user.categoryTags[category._id];
+    }
+  }
   res.status(200).json(categories);
 });
 module.exports = router;
