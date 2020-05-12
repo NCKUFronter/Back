@@ -2,16 +2,15 @@
 const log = console.log;
 const test = require("baretest")("goods-test");
 const assert = require("assert");
-const supertest = require("supertest");
-const { simpleLogin } = require("./login.test");
+const { get_test_agents } = require("./login.test");
 const { collections } = require("../models/mongo");
 const { CategoryModel } = require("../models");
 const {} = require("./init");
 
 /** @type {import('express').Application} */
 let app = null;
-/** @type {import('supertest').SuperTest} */
-let agent = null;
+/** @type {import('./login.test').Agents} */
+let agents = null;
 
 const testUrls = {
   insert: "/api/goods",
@@ -23,11 +22,11 @@ const testUrls = {
 let id = null;
 
 test.before(async () => {
-  await simpleLogin(agent);
+  agents = await get_test_agents(app);
 });
 
 test("e2e > get all goods", async () => {
-  await agent
+  await agents.father.agent
     .get(testUrls.getAll)
     .expect(200)
     .then((res) => {
@@ -38,7 +37,7 @@ test("e2e > get all goods", async () => {
 
 test("e2e > get one goods", async () => {
   const id = "1"
-  await agent
+  await agents.father.agent
     .get(testUrls.getOne(id))
     .expect(200)
     .then((res) => {
@@ -53,7 +52,6 @@ module.exports = {
   async run(express_app) {
     console.log = () => {};
     app = express_app;
-    agent = supertest.agent(app);
     await test.run();
     console.log = log; // 恢復log
   },

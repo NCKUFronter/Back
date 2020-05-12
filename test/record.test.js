@@ -6,12 +6,13 @@ const supertest = require("supertest");
 const { RecordModel, UserModel } = require("../models");
 const { findLast } = require("./init");
 const { collections } = require("../models/mongo");
-const { simpleLogin } = require("./login.test");
+const { get_test_agents } = require("./login.test");
 
 /** @type {import('express').Application} */
 let app = null;
-/** @type {import('supertest').SuperTest} */
-let agent = null;
+
+/** @type {import('./login.test').Agents} */
+let agents = null;
 
 const testUrls = {
   insert: "/api/record",
@@ -22,7 +23,9 @@ const testUrls = {
 };
 let id = null;
 
-test.before(async () => simpleLogin(agent));
+test.before(async () => {
+  agents = await get_test_agents(app);
+});
 
 test("e2e > insert record > return schema error", async () => {
   /** @type {any} */
@@ -33,19 +36,19 @@ test("e2e > insert record > return schema error", async () => {
     categoryId: "3",
     date: new Date(),
   };
-  await agent.post(testUrls.insert).send(record_dto).expect(400);
+  await agents.father.agent.post(testUrls.insert).send(record_dto).expect(400);
 
   record_dto.recordType = "income";
   delete record_dto.money;
-  await agent.post(testUrls.insert).send(record_dto).expect(400);
+  await agents.father.agent.post(testUrls.insert).send(record_dto).expect(400);
 
   record_dto.money = 40;
   record_dto.categoryId = 20;
-  await agent.post(testUrls.insert).send(record_dto).expect(400);
+  await agents.father.agent.post(testUrls.insert).send(record_dto).expect(400);
 
   record_dto.categoryId = 2;
   record_dto.ledgerId = 10;
-  await agent.post(testUrls.insert).send(record_dto).expect(400);
+  await agents.father.agent.post(testUrls.insert).send(record_dto).expect(400);
 });
 
 test("e2e > insert record > return 403", async () => {
@@ -59,10 +62,7 @@ test("e2e > insert record > return 403", async () => {
     hashtags: ["tag1", "tag2"],
   };
 
-  const child_agent = supertest.agent(app);
-  await simpleLogin(child_agent, "child@gmail.com");
-
-  await child_agent.post(testUrls.insert).send(record_dto).expect(403);
+  await agents.child.agent.post(testUrls.insert).send(record_dto).expect(403);
 });
 
 test("e2e > insert record > success", async () => {
@@ -76,7 +76,7 @@ test("e2e > insert record > success", async () => {
     hashtags: ["tag1", "tag2"],
   };
 
-  await agent
+  await agents.father.agent
     .post(testUrls.insert)
     .send(record_dto)
     .expect(201)
@@ -108,17 +108,20 @@ test("e2e > insert record > success", async () => {
 test("e2e > patch record > return 400", async () => {
   const record_dto = { categoryId: 4, hashtags: ["tag3", "tag2"] };
 
-  await agent.patch(testUrls.patch(id)).send(record_dto).expect(400);
+  await agents.father.agent
+    .patch(testUrls.patch(id))
+    .send(record_dto)
+    .expect(400);
 });
 
 test("e2e > patch record", async () => {
   const categoryId = "4";
   const record_dto = { categoryId, hashtags: ["tag3", "tag2"], money: 5000 };
 
-  const user = await collections.user.findOne({_id: "1"});
+  const user = await collections.user.findOne({ _id: "1" });
   const before_point = user.rewardPoints;
 
-  await agent
+  await agents.father.agent
     .patch(testUrls.patch(id))
     .send(record_dto)
     .expect(200)
@@ -141,14 +144,16 @@ test("e2e > patch record", async () => {
       assert(tags.includes("tag3"));
       assert.equal(user.rewardPoints, before_point + 39);
 
-      const activity = await collections.pointActivity.findOne({ fromRecordId: id });
+      const activity = await collections.pointActivity.findOne({
+        fromRecordId: id,
+      });
       assert.equal(activity.amount, record.rewardPoints);
       assert.equal(activity.amount, 50);
     });
 });
 
 test("e2e > get all records", async () => {
-  await agent
+  await agents.father.agent
     .get(testUrls.getAll)
     .expect(200)
     .then((res) => {
@@ -158,7 +163,7 @@ test("e2e > get all records", async () => {
 });
 
 test("e2e > get one record", async () => {
-  await agent
+  await agents.father.agent
     .get(testUrls.getOne(id))
     .expect(200)
     .then((res) => {
@@ -169,14 +174,16 @@ test("e2e > get one record", async () => {
 });
 
 test("e2e > delete record", async () => {
-  let user = await collections.user.findOne({_id: "1"});
+  let user = await collections.user.findOne({ _id: "1" });
   const before_point = user.rewardPoints;
 
-  await agent.delete(testUrls.delete(id)).expect(200);
+  await agents.father.agent.delete(testUrls.delete(id)).expect(200);
   const record = await collections.record.findOne({ _id: id });
   assert(record == null);
 
-  const activity = await collections.pointActivity.findOne({ fromRecordId: id });
+  const activity = await collections.pointActivity.findOne({
+    fromRecordId: id,
+  });
   assert(activity == null);
 
   user = await collections.user.findOne({ _id: "1" });
@@ -188,7 +195,6 @@ module.exports = {
   async run(express_app) {
     console.log = () => {};
     app = express_app;
-    agent = supertest.agent(app);
     await test.run();
     console.log = log;
   },

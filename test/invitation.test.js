@@ -2,18 +2,16 @@
 const log = console.log;
 const test = require("baretest")("invitation-test");
 const assert = require("assert");
-const supertest = require("supertest");
 const { invite, answerInvitation } = require("../actions/invitation.actions");
 const { collections } = require("../models/mongo");
 const { InvitationModel } = require("../models");
 const { findLast } = require("./init");
-const { simpleLogin, get_child_agent } = require("./login.test");
+const { get_test_agents } = require("./login.test");
 
 /** @type {import('express').Application} */
 let app = null;
-/** @type {import('supertest').SuperTest} */
-let agent = null;
-let child_agent = null;
+/** @type {import('./login.test').Agents} */
+let agents = null;
 
 const testUrls = {
   invite: "/api/invitation/invite",
@@ -22,8 +20,7 @@ const testUrls = {
 let id = null;
 
 test.before(async () => {
-  simpleLogin(agent);
-  child_agent = await get_child_agent(app);
+  agents = await get_test_agents(app);
 });
 
 async function doInviteTest(ledgerId, fromUserId, toUserId) {
@@ -82,20 +79,20 @@ test("unit > reject invitation", async () => {
 
 test("e2e > invite > return 403", async () => {
   let dto = { ledgerId: "1", email: "child@gmail.com" };
-  await child_agent.post(testUrls.invite).send(dto).expect(403);
+  await agents.child.agent.post(testUrls.invite).send(dto).expect(403);
 });
 
 test("e2e > invite > return 400", async () => {
   let dto = { ledgerId: "2", email: "xxxx@gmail.com" };
-  await agent.post(testUrls.invite).send(dto).expect(400);
+  await agents.father.agent.post(testUrls.invite).send(dto).expect(400);
 
   dto.email = "father@gmail.com";
-  await agent.post(testUrls.invite).send(dto).expect(400);
+  await agents.father.agent.post(testUrls.invite).send(dto).expect(400);
 });
 
 test("e2e > invite > return 200", async () => {
   let dto = { ledgerId: "1", email: "child@gmail.com" };
-  await agent
+  await agents.father.agent
     .post(testUrls.invite)
     .send(dto)
     .expect(200)
@@ -111,15 +108,15 @@ test("e2e > invite > return 200", async () => {
 });
 
 test("e2e > answer invitation > return 403", async () => {
-  await agent.put(testUrls.answer(id)).send({ answer: true }).expect(403);
+  await agents.father.agent.put(testUrls.answer(id)).send({ answer: true }).expect(403);
 });
 
 test("e2e > answer invitation > return 400", async () => {
-  await agent.put(testUrls.answer(id)).send({ anwser: 1 }).expect(400);
+  await agents.father.agent.put(testUrls.answer(id)).send({ anwser: 1 }).expect(400);
 });
 
 test("e2e > reject invitation > return 200", async () => {
-  await child_agent
+  await agents.child.agent
     .put(testUrls.answer(id))
     .send({ answer: false })
     .expect(200);
@@ -134,7 +131,7 @@ test("e2e > reject invitation > return 200", async () => {
 
 test("e2e > accept invitation > return 200", async () => {
   await doInviteTest("1", "1", "3");
-  await child_agent.put(testUrls.answer(id)).send({ answer: true }).expect(200);
+  await agents.child.agent.put(testUrls.answer(id)).send({ answer: true }).expect(200);
 
   const invitation = await collections.invitation.findOne({ _id: id });
   assert.equal(invitation.type, 1);
@@ -145,7 +142,7 @@ test("e2e > accept invitation > return 200", async () => {
 });
 
 test("e2e > leave ledger > return 200", async () => {
-  await child_agent.post('/api/ledger/1/leave').expect(200);
+  await agents.child.agent.post('/api/ledger/1/leave').expect(200);
 
   const ledger = await collections.ledger.findOne({ _id: "1" });
   assert.equal(ledger.userIds.length, new Set(ledger.userIds).size);
@@ -153,7 +150,7 @@ test("e2e > leave ledger > return 200", async () => {
 });
 
 test("e2e > make somebody leave ledger > return 200", async () => {
-  await agent.post('/api/ledger/1/leave/2').expect(200);
+  await agents.father.agent.post('/api/ledger/1/leave/2').expect(200);
 
   const ledger = await collections.ledger.findOne({ _id: "1" });
   assert.equal(ledger.userIds.length, new Set(ledger.userIds).size);
@@ -165,7 +162,6 @@ module.exports = {
   async run(express_app) {
     console.log = () => {};
     app = express_app;
-    agent = supertest.agent(app);
     await test.run();
     console.log = log;
   },

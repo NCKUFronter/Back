@@ -1,7 +1,6 @@
 // @ts-check
 const log = console.log;
 const test = require("baretest")("point-test");
-const supertest = require("supertest");
 const assert = require("assert");
 const {
   pointsFromEvent,
@@ -11,14 +10,16 @@ const {
 } = require("../actions/point.actions");
 const { collections } = require("../models/mongo");
 const { findLast } = require("./init");
-const { simpleLogin } = require("./login.test");
+const { get_test_agents } = require("./login.test");
 
 /** @type {import('express').Application} */
 let app = null;
-/** @type {import('supertest').SuperTest} */
-let agent = null;
+/** @type {import('./login.test').Agents} */
+let agents = null;
 
-test.before(async () => simpleLogin(agent));
+test.before(async () => {
+  agents = await get_test_agents(app);
+});
 
 async function checkActivity(type, subtype, amount, fromId, toId) {
   const activity = await findLast(collections.pointActivity);
@@ -133,39 +134,44 @@ test("unit > consumePoints", async function () {
 
 test("e2e > transferPoints", async function () {
   let amount = 5;
+  let fromUserId = agents.father.id;
+  let toUserId = agents.mother.id;
 
-  let fromUser = await collections.user.findOne({ _id: "1" });
+  let fromUser = await collections.user.findOne({ _id: fromUserId });
   const from_before_point = fromUser.rewardPoints;
 
-  let toUser = await collections.user.findOne({ _id: "2" });
+  let toUser = await collections.user.findOne({ _id: toUserId });
   const to_before_point = toUser.rewardPoints;
 
-  await agent
+  await agents.father.agent
     .post("/api/point/transfer")
     .send({ email: "mother@gmail.com", amount })
     .expect(200);
 
   // check user
-  await checkUserPoints("1", from_before_point, -amount);
-  await checkUserPoints("2", to_before_point, amount);
+  await checkUserPoints(fromUserId, from_before_point, -amount);
+  await checkUserPoints(toUserId, to_before_point, amount);
 
   // check activity
-  await checkActivity("transfer", "", amount, "1", "2");
+  await checkActivity("transfer", "", amount, fromUserId, toUserId);
 });
 
 test("e2e > consumePoints", async function () {
   const goodsId = "2";
 
-  let user = await collections.user.findOne({ _id: "1" });
+  let user = await collections.user.findOne({ _id: agents.father.id });
   const before_point = user.rewardPoints;
   let goods = await collections.goods.findOne({ _id: goodsId });
-  await agent.post(`/api/point/consume/${goodsId}`).send({quantity: 2}).expect(200);
+  await agents.father.agent
+    .post(`/api/point/consume/${goodsId}`)
+    .send({ quantity: 2 })
+    .expect(200);
 
   // check user
-  await checkUserPoints("1", before_point, -(goods.point * 2));
+  await checkUserPoints(agents.father.id, before_point, -(goods.point * 2));
 
   // check activity
-  await checkActivity("consume", "", goods.point * 2, "1", goodsId);
+  await checkActivity("consume", "", goods.point * 2, agents.father.id, goodsId);
   const activity = await findLast(collections.pointActivity);
   assert.equal(activity.quantity, 2);
 });
@@ -175,7 +181,6 @@ module.exports = {
   async run(express_app) {
     console.log = () => {};
     app = express_app;
-    agent = supertest.agent(app);
     await test.run();
     console.log = log;
   },

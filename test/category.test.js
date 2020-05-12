@@ -2,16 +2,15 @@
 const log = console.log;
 const test = require("baretest")("category-test");
 const assert = require("assert");
-const supertest = require("supertest");
-const { simpleLogin, get_child_agent } = require("./login.test");
+const { get_test_agents } = require("./login.test");
 const { collections } = require("../models/mongo");
 const { CategoryModel } = require("../models");
-const {} = require("./init");
 
 /** @type {import('express').Application} */
 let app = null;
-/** @type {import('supertest').SuperTest} */
-let agent = null;
+
+/** @type {import('./login.test').Agents} */
+let agents = null;
 
 const testUrls = {
   insert: "/api/category",
@@ -23,12 +22,12 @@ const testUrls = {
 let id = null;
 
 test.before(async () => {
-  await simpleLogin(agent);
+  agents = await get_test_agents(app);
 });
 
 test("e2e > insert category", async () => {
   const category_dto = { name: "myCategory" };
-  await agent
+  await agents.father.agent
     .post(testUrls.insert)
     .send(category_dto)
     .expect(201)
@@ -37,41 +36,33 @@ test("e2e > insert category", async () => {
       const category = res.body;
       id = category._id;
       assert.equal(category.name, category_dto.name);
-      assert.equal(category.userId, "1");
+      assert.equal(category.userId, agents.father.id);
     });
 });
 
 test("e2e > patch category", async () => {
   const category_dto = { name: "yourCategory", hashtags: ["xxx1", "xxx2"] };
 
-  await agent.patch(testUrls.patch(id)).send(category_dto).expect(200);
+  await agents.father.agent.patch(testUrls.patch(id)).send(category_dto).expect(200);
 
   const category = await collections.category.findOne({ _id: id });
   assert.equal(category.name, "yourCategory");
 
-  const user = await collections.user.findOne({ _id: "1" });
+  const user = await collections.user.findOne({ _id: agents.father.id });
   assert.notEqual(user.categoryTags, null);
   assert.notEqual(user.categoryTags[id], null);
 });
 
 test("e2e > category > return 403", async () => {
+  const child_no_auth_id = "1";
   const category_dto = { name: "yourCategory" };
-  const child_agent = await get_child_agent(app);
 
-  await child_agent.patch(testUrls.patch("1")).send(category_dto).expect(403);
-  await child_agent.delete(testUrls.patch("1")).expect(403);
-});
-
-test("e2e > category > no access", async () => {
-  const category_dto = { name: "yourCategory" };
-  const child_agent = await get_child_agent(app);
-
-  await child_agent.patch(testUrls.patch(id)).send(category_dto).expect(403);
-  await child_agent.delete(testUrls.patch(id)).expect(403);
+  await agents.child.agent.patch(testUrls.patch(child_no_auth_id)).send(category_dto).expect(403);
+  await agents.child.agent.delete(testUrls.patch(child_no_auth_id)).expect(403);
 });
 
 test("e2e > get all category", async () => {
-  await agent
+  await agents.father.agent
     .get(testUrls.getAll)
     .expect(200)
     .then((res) => {
@@ -85,7 +76,7 @@ test("e2e > get all category", async () => {
 });
 
 test("e2e > get one category", async () => {
-  await agent
+  await agents.father.agent
     .get(testUrls.getOne(id))
     .expect(200)
     .then((res) => {
@@ -96,7 +87,7 @@ test("e2e > get one category", async () => {
 });
 
 test("e2e > delete category", async () => {
-  await agent.delete(testUrls.delete(id)).expect(200);
+  await agents.father.agent.delete(testUrls.delete(id)).expect(200);
   const category = await collections.category.findOne({ _id: id });
   assert.equal(category, null);
 });
@@ -110,7 +101,6 @@ module.exports = {
   async run(express_app) {
     console.log = () => {};
     app = express_app;
-    agent = supertest.agent(app);
     await test.run();
     console.log = log; // 恢復log
   },

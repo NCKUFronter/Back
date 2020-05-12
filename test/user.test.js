@@ -2,23 +2,24 @@
 const log = console.log;
 const test = require("baretest")("user-test");
 const assert = require("assert");
-const supertest = require("supertest");
 const {
   userLedgers,
   userInvitations,
   userPointActivities,
 } = require("../actions/user.actions");
 const { collections } = require("../models/mongo");
-const { simpleLogin, get_child_agent } = require("./login.test");
+const { get_test_agents } = require("./login.test");
 const { simpleInsertCategories } = require("./category.test");
 const { InvitationModel, PointActivityModel } = require("../models");
 
 /** @type {import('express').Application} */
 let app = null;
-/** @type {import('supertest').SuperTest} */
-let agent = null;
+/** @type {import('./login.test').Agents} */
+let agents = null;
 
-test.before(async () => simpleLogin(agent));
+test.before(async () => {
+  agents = await get_test_agents(app);
+});
 
 test("unit > user ledgers", async () => {
   const userId = "3";
@@ -51,7 +52,7 @@ test("unit > user pointActivity", async () => {
 });
 
 test("e2e > user invitations", async () => {
-  await agent
+  await agents.father.agent
     .get("/api/user/invitations")
     .expect(200)
     .then((res) => {
@@ -65,7 +66,7 @@ test("e2e > user invitations", async () => {
 });
 
 test("e2e > user ledgers", async () => {
-  await agent
+  await agents.father.agent
     .get("/api/user/ledgers")
     .expect(200)
     .then((res) => {
@@ -79,7 +80,7 @@ test("e2e > user ledgers", async () => {
 });
 
 test("e2e > user pointActivity", async () => {
-  await agent
+  await agents.father.agent
     .get("/api/user/pointActivities")
     .expect(200)
     .then((res) => {
@@ -92,17 +93,17 @@ test("e2e > user pointActivity", async () => {
 });
 
 test("e2e > user profile", async () => {
-  await agent
+  await agents.father.agent
     .get("/api/user/profile")
     .expect(200)
     .then((res) => {
       const profile = res.body;
-      assert.equal(profile._id, "1");
+      assert.equal(profile._id, agents.father.id);
     });
 });
 
 test("e2e > user relativeUsers", async () => {
-  await agent
+  await agents.father.agent
     .get("/api/user/relativeUsers")
     .expect(200)
     .then((res) => {
@@ -115,11 +116,10 @@ test("e2e > user relativeUsers", async () => {
 });
 
 test("e2e > user categories", async () => {
-  await simpleInsertCategories("category1", agent);
-  const child_agent = await get_child_agent(app);
-  await simpleInsertCategories("category2", child_agent);
+  await simpleInsertCategories("category1", agents.father.agent);
+  await simpleInsertCategories("category2", agents.child.agent);
 
-  await agent
+  await agents.father.agent
     .get("/api/user/categories")
     .expect(200)
     .then((res) => {
@@ -137,7 +137,6 @@ module.exports = {
   async run(express_app) {
     console.log = () => {};
     app = express_app;
-    agent = supertest.agent(app);
     await test.run();
     console.log = log;
   },
