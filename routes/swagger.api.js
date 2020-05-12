@@ -279,7 +279,7 @@
 
 // ---------  Invitation ---------
 /**
- * @route GET /invitation/invite
+ * @route POST /invitation/invite
  * @group invitation
  * @summary 發送ledger的邀請
  * -- ✔️ 可以運作
@@ -291,7 +291,7 @@
  */
 
 /**
- * @route GET /invitation/{id}/answer
+ * @route PUT /invitation/{id}/answer
  * @group invitation
  * @summary 回應邀請 
  * -- ✔️ 可以運作
