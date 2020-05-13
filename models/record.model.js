@@ -42,7 +42,7 @@ const RecordSchema = AsyncJoi.object(
 
     from: Joi.string().allow(null),
   },
-  Joi.not()
+  Joi.not({})
 );
 
 /**

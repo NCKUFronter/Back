@@ -30,7 +30,9 @@ function mergePropPromisesResult(prop_results, oldResult) {
   let hasError = Boolean(oldResult.hasError);
 
   for (const prop_result of prop_results) {
-    value[prop_result.item.property] = prop_result.result.value;
+    if (prop_result.result.value != null) {
+      value[prop_result.item.property] = prop_result.result.value;
+    }
     const prop_error = removeEmptyError(prop_result.result).error;
     if (prop_error) {
       error.prop[prop_result.item.property] = prop_error;
@@ -200,7 +202,8 @@ class AsyncJoiSchema {
     /** @type { ValidateResult } */
     let result = await this._validate_prop(data, options);
     result = mergeJoiValidation(this._self_joi, result, options);
-    return await this._validate_self(result, options);
+    result = await this._validate_self(result, options);
+    return result;
   }
 
   /**
