@@ -60,7 +60,7 @@ router.post(
     const postData = {
       _id: await fetchNextId(ledger_coll.collectionName),
       adminId: req.userId,
-      userIds: [],
+      userIds: [req.userId],
       ...req.body,
     };
     ledger_coll.insertOne(postData, function (err, result) {
