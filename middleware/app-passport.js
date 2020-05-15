@@ -15,7 +15,7 @@ AppPassport.use(
     async function (accessToken, refreshToken, profile, done) {
       console.log(accessToken, profile);
       const user_coll = collections.user;
-      const date = new Date()
+      const date = new Date();
       user_coll.findOneAndUpdate(
         { _id: profile.id },
         {
@@ -28,9 +28,9 @@ AppPassport.use(
             // conDays: 0,
             // logInDate: date,
           },
-          // $setOnInsert: {
-            
-          // }
+          $setOnInsert: {
+            rewardPoints: 0,
+          },
         },
         { upsert: true, returnOriginal: false },
         function (err, user) {

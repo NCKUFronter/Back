@@ -3,6 +3,7 @@
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
+const compression = require("compression");
 const fs = require("fs");
 const https = require("https");
 const http = require("http");
@@ -35,6 +36,8 @@ async function startup() {
   app.use(express.static(__dirname+ "/Front/dist"))
   // @ts-ignore
   app.use(cookieParser());
+  // @ts-ignore
+  app.use(compression());
   app.get("/", function (req, res) {
     console.log(req.cookies);
     res.send("Main page loading properly!");
@@ -61,6 +64,7 @@ async function startup() {
   app.use("/api/point", require("./routes/point"));
   app.use("/api/goods", require("./routes/goods"));
   app.use("/api/invitation", require("./routes/invitaion"));
+  app.use("/api/sse", require("./routes/notification"));
 
   // swagger setting
   // @ts-ignore
