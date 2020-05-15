@@ -11,7 +11,10 @@ const checkParamsIdExists = require("../middleware/check-params-id-exists");
 const { notification } = require("../actions/notification.service");
 const dateCount = require("../actions/dateCount");
 
-test("invitation > find many records", async () => {
+/** @type {import('express').Application} */
+let app = null;
+
+test("unit > invitation > find many records", async () => {
   const records = await findWithRelation(collections.record, null, [
     "category",
     "ledger",
@@ -23,7 +26,7 @@ test("invitation > find many records", async () => {
   }
 });
 
-test("invitation > find one ledger", async () => {
+test("unit > invitation > find one ledger", async () => {
   const ledgerId = "1";
   const ledger = await findOneWithRelation(
     collections.ledger,
@@ -36,7 +39,7 @@ test("invitation > find one ledger", async () => {
   assert(Array.isArray(ledger.users));
 });
 
-test("notification", async () => {
+test("unit > notification", async () => {
   const event = 5;
   const event$ = notification.listen();
   // @ts-ignore
@@ -45,7 +48,7 @@ test("notification", async () => {
   notification.send(event);
 });
 
-test("dateCount", async () => {
+test("unit > dateCount", async () => {
   let nowDate = new Date(2019, 4, 12, 1);
   let lastDate = new Date(2019, 4, 11, 8);
   assert.equal(dateCount(nowDate, lastDate, 0), 1);
@@ -54,9 +57,14 @@ test("dateCount", async () => {
   assert.equal(dateCount(nowDate, lastDate, 0), 1);
 });
 
+test("e2e > notification", () => {
+});
+
 module.exports = {
-  async run() {
+  /** @param {import('express').Application} express_app*/
+  async run(express_app) {
     console.log = () => {};
+    app = express_app;
     await test.run();
     console.log = log;
   },

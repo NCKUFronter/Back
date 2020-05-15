@@ -1,5 +1,6 @@
 import "fastrx";
 import "express";
+import { SSE } from "./actions/sse.actions";
 
 declare module "fastrx" {
   namespace Rx {
@@ -35,6 +36,10 @@ declare global {
       convert_from_body?: any;
       convert_from_query?: any;
       convert_from_params?: any;
+    }
+
+    export interface Response {
+      sse?: SSE;
     }
   }
 }

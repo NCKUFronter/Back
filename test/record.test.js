@@ -117,6 +117,7 @@ test("e2e > patch record > return 400", async () => {
 test("e2e > patch record", async () => {
   const categoryId = "4";
   const record_dto = { categoryId, hashtags: ["tag3", "tag2"], money: 5000 };
+  const origin_record = await collections.record.findOne({ _id: id });
 
   const user = await collections.user.findOne({ _id: "1" });
   const before_point = user.rewardPoints;
@@ -130,9 +131,10 @@ test("e2e > patch record", async () => {
       let record = await collections.record.findOne({ _id: id });
       assert(record.hashtags);
       assert.deepEqual(
-        record_dto.hashtags.toString(),
-        record.hashtags.toString()
+        record.hashtags.toString(),
+        record_dto.hashtags.toString()
       );
+      assert.equal(origin_record.ledgerId, record.ledgerId);
 
       /** @type {UserModel} */
       const user = await collections.user.findOne({ _id: "1" });

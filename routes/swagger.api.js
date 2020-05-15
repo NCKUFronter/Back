@@ -460,3 +460,16 @@
  * @returns {string} 401 - 未登入
  * @security Basic
  */
+
+// ---------  SSE ---------
+/**
+ * @route GET /sse/notification
+ * @group sse
+ * @summary 取得即時通知
+ * -- ✔️ 可以運作
+ * -- ‼️ Swagger不能測試
+ * @produces text/event-stream
+ * @returns {string} 200 - success
+ * @returns {string} 401 - 未登入
+ * @security Basic
+ */

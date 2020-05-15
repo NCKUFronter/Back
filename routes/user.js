@@ -212,11 +212,69 @@ router.get("/categories", loginCheck(user_coll), async (req, res) => {
       $or: [{ userId: null }, { userId: req.userId }],
     })
     .toArray();
-  if(req.user.categoryTags) {
-    for(const category of categories) {
+  if (req.user.categoryTags) {
+    for (const category of categories) {
       category.hashtags = req.user.categoryTags[category._id];
     }
   }
   res.status(200).json(categories);
 });
+
+router.get("/ledgers/records", loginCheck(user_coll), async (req, res) => {
+  const ledgersWithRecords = await collections.ledger
+    .aggregate([
+      { $match: { $or: [{ adminId: "1" }, { userIds: "1" }] } },
+      {
+        $lookup: {
+          from: "record",
+          foreignField: "ledgerId",
+          localField: "_id",
+          as: "records",
+        },
+      },
+      { $unwind: { path: "$records", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "user",
+          foreignField: "_id",
+          localField: "records.userId",
+          as: "records.user",
+        },
+      },
+      { $unwind: { path: "$records.user", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "category",
+          foreignField: "_id",
+          localField: "records.categoryId",
+          as: "records.category",
+        },
+      },
+      {
+        $unwind: {
+          path: "$records.category",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          ledgerName: { $first: "$ledgerName" },
+          userIds: { $first: "$userIds" },
+          records: { $push: "$records" },
+        },
+      },
+      {
+        $lookup: {
+          from: "user",
+          foreignField: "_id",
+          localField: "userIds",
+          as: "users",
+        },
+      },
+    ])
+    .toArray();
+  res.status(200).json(ledgersWithRecords);
+});
+
 module.exports = router;
