@@ -32,12 +32,12 @@ async function startup() {
     })
   );
 
-  app.use(require("./middleware/front-end-hook"));
-  app.use(express.static(__dirname+ "/Front/dist"))
-  // @ts-ignore
-  app.use(cookieParser());
   // @ts-ignore
   app.use(compression());
+  app.use(require("./middleware/front-end-hook"));
+  // app.use(express.static(__dirname+ "/Front/dist"))
+  // @ts-ignore
+  app.use(cookieParser());
   app.get("/", function (req, res) {
     console.log(req.cookies);
     res.send("Main page loading properly!");
