@@ -195,6 +195,8 @@ router.get("/relativeUsers", loginCheck(user_coll), async function (req, res) {
       },
     ])
     .toArray();
+  if(results.length == 0) return res.status(200).json([]);
+
   const users = results[0].users;
   for (let i = 0; i < users.length; i++) {
     if (users[i]._id === req.userId) {
