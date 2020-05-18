@@ -226,7 +226,8 @@ router.get("/ledger", loginCheck(null), async function (req, res) {
     .find({ userIds: req.userId })
     .toArray();
   const ledgerIds = ledgers.map((ledger) => ledger._id);
-  const summary = await makeStatistic({ ledgerId: { $in: ledgerIds } }, order);
+  let summary = await makeStatistic({ ledgerId: { $in: ledgerIds } }, order);
+  if(!summary) summary = {}
   summary.name = "帳本";
 
   return res.status(200).json(summary);
@@ -276,7 +277,8 @@ router.get("/points", loginCheck(null), async function (req, res) {
   basePipeline.push(...endPipeline(coll_name, "amount"));
 
   const arr = await collections.pointActivity.aggregate(basePipeline).toArray();
-  const summary = arr[0];
+  let summary = arr[0];
+  if(!summary) summary = {}
   summary.name = "點數";
 
   return res.status(200).json(summary);
@@ -285,7 +287,8 @@ router.get("/points", loginCheck(null), async function (req, res) {
 // available: recordType, categor, ledger
 router.get("/personal", loginCheck(null), async function (req, res) {
   const { order } = req.query;
-  const summary = await makeStatistic({ userId: req.userId }, order);
+  let summary = await makeStatistic({ userId: req.userId }, order);
+  if(!summary) summary = {}
   summary.name = "個人";
 
   return res.status(200).json(summary);
