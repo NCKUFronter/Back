@@ -6,6 +6,7 @@ const loginCheck = require("../middleware/login-check");
 const checkParamsIdExists = require("../middleware/check-params-id-exists");
 const validatePipe = require("../middleware/validate-pipe");
 const pointAction = require("../actions/point.actions");
+const { notification } = require("../actions");
 const { findWithRelation, findOneWithRelation } = require("../actions");
 const {
   TransferPointsSchema,
@@ -60,6 +61,16 @@ router.post(
     );
 
     console.log("transfer success");
+    notification.send(
+      req,
+      {
+        type: "point",
+        action: "transfer",
+        to: req.convert_from_body.email,
+        body: req.body
+      },
+      [req.convert_from_body.email._id]
+    );
     res.status(200).json("transfer success");
   }
 );
@@ -113,7 +124,7 @@ router.post(
     res.status(200).json();
     */
 
-    /*
+/*
   const user = await collections.user.findOne({ _id: "1" });
   //console.log(user,user.logInDate, user.lastLogIn, user.conDays)
   const nowDate = user.logInDate;

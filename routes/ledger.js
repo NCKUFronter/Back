@@ -9,6 +9,7 @@ const {
   findWithRelation,
   findOneWithRelation,
 } = require("../actions/coll-relation");
+const { notification } = require("../actions/notification.service");
 const router = require("express").Router();
 
 // 假設已經 connectDB
@@ -66,6 +67,16 @@ router.post(
     ledger_coll.insertOne(postData, function (err, result) {
       if (err) throw err;
       console.log("1 document inserted.");
+
+      notification.send(
+        req,
+        {
+          type: "ledger",
+          action: "create",
+          body: req.body,
+        },
+        [req.userId]
+      );
       res.status(201).send(result.ops[0]);
     });
   }
@@ -98,7 +109,8 @@ router.patch(
   "/:id",
   validatePipe("body", LedgerSchema, { context: { partial: true } }),
   loginCheck(ledger_coll),
-  getLedgerAuthGuard((req) => req.params.id),
+  checkParamsIdExists(collections.ledger),
+  getLedgerAuthGuard((req) => req.convert_from_params.id),
   function (req, res) {
     // @ts-ignore
     const patchFilter = { _id: req.params.id, adminId: req.userId };
@@ -112,6 +124,17 @@ router.patch(
       function (err, result) {
         if (err) throw err;
         console.log("1 document updated");
+
+        const ledger = req.convert_from_params.id;
+        notification.send(
+          req,
+          {
+            type: "ledger",
+            action: "update",
+            ledger,
+          },
+          ledger.userIds
+        );
         res.status(200).send(result.value);
       }
     );
@@ -136,6 +159,17 @@ router.delete(
           deleteFilter +
           ". Deleted: " +
           result.result.n
+      );
+
+      const ledger = req.convert_from_params.id;
+      notification.send(
+        req,
+        {
+          type: "ledger",
+          action: "delete",
+          ledger: ledger,
+        },
+        ledger.userIds
       );
       res
         .status(200)
@@ -189,6 +223,16 @@ router.post(
       { _id: req.params.id },
       { $pull: { userIds: req.userId } }
     );
+    const ledger = req.convert_from_params.id;
+    notification.send(
+      req,
+      {
+        type: "ledger",
+        action: "leave",
+        ledger,
+      },
+      ledger.userIds
+    );
     res.status(200).json("success");
   }
 );
@@ -211,6 +255,17 @@ router.post(
       { $pull: { userIds: req.params.userId } }
     );
 
+    const ledger = req.convert_from_params.id;
+    notification.send(
+      req,
+      {
+        type: "ledger",
+        action: "kickout",
+        to: req.convert_from_params.userId,
+        ledger,
+      },
+      ledger.userIds
+    );
     res.status(200).json("success");
   }
 );

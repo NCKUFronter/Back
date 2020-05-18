@@ -54,8 +54,8 @@ class SSE {
     const subscription = source$.subscribe((data) => {
       this.sendEvent(data, eventName);
     });
-    console.log(subscription);
-    console.log(subscription.dispose);
+    // console.log(subscription);
+    // console.log(subscription.dispose);
 
     this.subscriptions.push(subscription);
   }
@@ -83,9 +83,10 @@ class SSE {
 
 const connections = {};
 function sseMiddleware(req, res, next) {
-  if (!connections[req.sessionID])
+  if (connections[req.sessionID])
     return res.status(400).json("Already connected");
   else connections[req.sessionID] = 1;
+  console.log(connections)
 
   req.socket.setTimeout(0);
   req.socket.setNoDelay(true);
@@ -108,11 +109,26 @@ function sseMiddleware(req, res, next) {
   const sse = new SSE(res);
   res.sse = sse; // let controller can get SSE object in nestjs
 
-  res.on("close", () => sse.close());
+  res.on("close", () => {
+    delete connections[req.sessionID];
+    sse.close();
+  });
   next();
+}
+
+function sseMessage(req, data, toUserIds) {
+  data.from = req.user;
+  data.time = Date.now();
+  return {
+    sessionID: req.sessionID,
+    toUserIds,
+    data,
+    from: req.user,
+  };
 }
 
 module.exports = {
   SSE,
   sseMiddleware,
+  sseMessage
 };

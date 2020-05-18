@@ -8,6 +8,7 @@ const {
 const { getLedgerAuthGuard } = require("../middleware/auth-guard");
 const checkParamsIdExists = require("../middleware/check-params-id-exists");
 const { answerInvitation } = require("../actions/invitation.actions");
+const { notification } = require("../actions/notification.service");
 const loginCheck = require("../middleware/login-check");
 const router = require("express").Router();
 
@@ -28,6 +29,14 @@ router.post(
         toUser._id
       );
       result = await simpleInsertOne(collections.invitation, invitation);
+
+      // send notification
+      notification.send(
+        req,
+        { type: "invitation", action: "invite", to: toUser, ledger },
+        [...ledger.userIds, toUser._id]
+      );
+
       return res.status(200).json(result.ops[0]);
     } else {
       return res.status(400).json("User already in ledger, no need to invite.");
@@ -48,6 +57,19 @@ router.put(
       return res.status(403).json("No access");
 
     await answerInvitation(req.convert_from_params.id, req.body.answer);
+
+    // send notification
+    notification.sendToLedgerUsers(
+      req,
+      {
+        type: "invitation",
+        action: "answer",
+        invitation,
+        body: req.body,
+      },
+      req.convert_from_params.id.ledgerId
+    );
+
     res.status(200).json("Answer Success");
   }
 );

@@ -4,11 +4,9 @@ const { RecordSchema } = require("../models/record.model");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
 const { getLedgerAuthGuard } = require("../middleware/auth-guard");
+const { notification } = require("../actions");
 const checkParamsIdExists = require("../middleware/check-params-id-exists");
-const {
-  findWithRelation,
-  findOneWithRelation,
-} = require("../actions");
+const { findWithRelation, findOneWithRelation } = require("../actions");
 const pointAction = require("../actions/point.actions");
 const { removeRecord, updateRecord } = require("../actions/record.actions");
 const router = require("express").Router();
@@ -68,6 +66,16 @@ router.post(
 
     await pointAction.pointsFromRecord("record", amount, postData, user);
     console.log("1 document inserted.");
+    const ledger = req.convert_from_body.ledgerId;
+    notification.send(
+      req,
+      {
+        type: "record",
+        action: "create",
+        ledger,
+      },
+      ledger.userIds
+    );
     res.status(201).json({ message: "Insert Success", rewardPoints: amount });
   }
 );
@@ -102,6 +110,14 @@ router.patch(
     if (record.userId !== req.userId) return res.status(403).json("No access");
 
     await updateRecord(record, req.body);
+    notification.sendToLedgerUsers(
+      req,
+      {
+        type: "record",
+        action: "update",
+      },
+      req.convert_from_params.id.ledgerId
+    );
     res.status(200).json("success");
     // @ts-ignore
     /*
@@ -131,6 +147,14 @@ router.delete(
     if (record.userId !== req.userId) return res.status(403).json("No access");
 
     await removeRecord(record, req.userId);
+    notification.sendToLedgerUsers(
+      req,
+      {
+        type: "record",
+        action: "delete",
+      },
+      req.convert_from_params.id.ledgerId
+    );
     res.status(200).json("delete successs");
     /*
   var deleteFilter = { _id: req.params.id };
