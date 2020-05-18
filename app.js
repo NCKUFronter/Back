@@ -65,6 +65,7 @@ async function startup() {
   app.use("/api/goods", require("./routes/goods"));
   app.use("/api/invitation", require("./routes/invitaion"));
   app.use("/api/sse", require("./routes/notification"));
+  app.use("/api/statistic", require("./routes/statistic"));
 
   // swagger setting
   // @ts-ignore

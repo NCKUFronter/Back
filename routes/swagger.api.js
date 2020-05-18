@@ -191,12 +191,10 @@
  * @property {number} continueLogin
  */
 /**
- * ℹ️ 沒有做防護，只要call就有點數
  * @route POST /user/pointCheck
  * @group user
  * @summary 取得登入點數
  * -- ✔️ 可以運作
- * -- ℹ️ 有資訊
  * @returns {PointCheckResponse.model} 200
  * @returns {string} 401 - 登入失敗，帳號或密碼錯誤
  */
@@ -469,6 +467,46 @@
  * -- ✔️ 可以運作
  * -- ‼️ Swagger不能測試
  * @produces text/event-stream
+ * @returns {string} 200 - success
+ * @returns {string} 401 - 未登入
+ * @security Basic
+ */
+
+// ---------  Statistic ---------
+/**
+ * ℹ️ 有資訊 order順序等同分類順序，請注意
+ * @route GET /statistic/ledger
+ * @group statistic
+ * @summary 取得帳本的統計
+ * -- ✔️ 可以運作
+ * -- ℹ️ 有資訊
+ * @param {string[]} order.query.required - available: ledger, recordType, user, category
+ * @returns {string} 200 - success
+ * @returns {string} 401 - 未登入
+ * @security Basic
+ */
+
+/**
+ * ℹ️ 有資訊 order順序等同分類順序，請注意
+ * @route GET /statistic/personal
+ * @group statistic
+ * @summary 取得個人的統計
+ * -- ✔️ 可以運作
+ * -- ℹ️ 有資訊
+ * @param {string[]} order.query.required - available: ledger, recordType, category
+ * @returns {string} 200 - success
+ * @returns {string} 401 - 未登入
+ * @security Basic
+ */
+
+/**
+ * ℹ️ 有資訊 order順序等同分類順序，請注意
+ * @route GET /statistic/points
+ * @group statistic
+ * @summary 取得點數的統計
+ * -- ✔️ 可以運作
+ * -- ℹ️ 有資訊
+ * @param {string[]} order.query.required - available: type, user, flow, subtype
  * @returns {string} 200 - success
  * @returns {string} 401 - 未登入
  * @security Basic

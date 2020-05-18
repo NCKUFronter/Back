@@ -65,7 +65,7 @@ test("unit > pointsFromRecord", async function () {
   delete fake_record._id;
   let user = await collections.user.findOne({ _id: userId });
   const before_point = user.rewardPoints;
-  await pointsFromRecord("every_record", amount, fake_record, user);
+  await pointsFromRecord("record", amount, fake_record, user);
 
   // check user
   await checkUserPoints(userId, before_point, amount);
@@ -75,7 +75,7 @@ test("unit > pointsFromRecord", async function () {
   assert.equal(record.rewardPoints, amount);
 
   // check activity
-  await checkActivity("new", "every_record", amount, record._id, userId);
+  await checkActivity("new", "record", amount, record._id, userId);
 });
 
 test("unit > pointsFromEvent", async function () {
@@ -84,14 +84,14 @@ test("unit > pointsFromEvent", async function () {
 
   let user = await collections.user.findOne({ _id: userId });
   const before_point = user.rewardPoints;
-  await pointsFromEvent("everyday", amount, user);
+  await pointsFromEvent("perLogin", amount, user);
 
   // check user
   user = await collections.user.findOne({ _id: userId });
   assert.equal(user.rewardPoints, before_point + amount);
 
   // check activity
-  await checkActivity("new", "everyday", amount, undefined, userId);
+  await checkActivity("new", "perLogin", amount, undefined, userId);
 });
 
 test("unit > transferPoints", async function () {

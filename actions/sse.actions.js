@@ -55,7 +55,7 @@ class SSE {
       this.sendEvent(data, eventName);
     });
     console.log(subscription);
-    console.log(subscription.dispose)
+    console.log(subscription.dispose);
 
     this.subscriptions.push(subscription);
   }
@@ -81,7 +81,12 @@ class SSE {
   }
 }
 
+const connections = {};
 function sseMiddleware(req, res, next) {
+  if (!connections[req.sessionID])
+    return res.status(400).json("Already connected");
+  else connections[req.sessionID] = 1;
+
   req.socket.setTimeout(0);
   req.socket.setNoDelay(true);
   req.socket.setKeepAlive(true);
