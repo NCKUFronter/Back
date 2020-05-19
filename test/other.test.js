@@ -39,6 +39,7 @@ test("unit > invitation > find one ledger", async () => {
   assert(Array.isArray(ledger.users));
 });
 
+/*
 test("unit > notification", async () => {
   const event = 5;
   const event$ = notification.listen();
@@ -47,6 +48,7 @@ test("unit > notification", async () => {
 
   notification.send(event);
 });
+*/
 
 test("unit > dateCount", async () => {
   let nowDate = new Date(2019, 4, 12, 1);
@@ -55,9 +57,6 @@ test("unit > dateCount", async () => {
 
   nowDate.setDate(13)
   assert.equal(dateCount(nowDate, lastDate, 0), 1);
-});
-
-test("e2e > notification", () => {
 });
 
 module.exports = {

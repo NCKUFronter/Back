@@ -140,7 +140,17 @@ async function consumePoints(subtype, user, goods, quantity) {
     // update user
     const user_prom = collections.user.updateOne(
       { _id: user._id },
-      { $inc: { rewardPoints: -goods.point * quantity } },
+      {
+        $inc: {
+          rewardPoints: -goods.point * quantity,
+        },
+      },
+      { session }
+    );
+
+    const game_user_prom = collections.gameUser.updateOne(
+      { _id: user.gameUserId },
+      { $inc: { ["bag." + goods._id]: quantity } },
       { session }
     );
 
@@ -159,7 +169,7 @@ async function consumePoints(subtype, user, goods, quantity) {
       activity,
       session
     );
-    await Promise.all([user_prom, activity_prom]);
+    await Promise.all([user_prom, activity_prom, game_user_prom]);
   });
 }
 

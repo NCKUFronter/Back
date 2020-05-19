@@ -11,10 +11,10 @@ const GoodsSchema = Joi.object({
 /**
  * "swagger model"
  * @typedef Goods
- * @property {string} _id
- * @property {string} name
- * @property {number} point
- * @property {string} intro
+ * @property {string} _id.required
+ * @property {string} name.required
+ * @property {number} point.required
+ * @property {string} intro.required
  */
 class GoodsModel {
   /** @type {string} */
@@ -25,6 +25,9 @@ class GoodsModel {
 
   /** @type {number} */
   point;
+
+  /** @type {string} */
+  intro;
 }
 
 module.exports = {

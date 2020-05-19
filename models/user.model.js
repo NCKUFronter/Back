@@ -23,6 +23,7 @@ const UserSchema = Joi.object({
  * @property {string} name.required
  * @property {string} email.required
  * @property {string} photo
+ * @property {string} gameUserId
  * @property {number} conDays
  * @property {string} lastLogin.required - real type: Date
  * @property {string[]} cardIds
@@ -37,6 +38,9 @@ class UserModel {
 
   /** @type {string} */
   password;
+
+  /** @type {string} */
+  gameUserId;
 
   /** @type {string} */
   email;

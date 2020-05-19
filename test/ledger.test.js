@@ -49,7 +49,7 @@ test("e2e > insert ledger > success", async () => {
       assert.equal(ledger.ledgerName, "child ledger");
       assert.equal(ledger.adminId, "1");
       assert(ledger.userIds != null);
-      assert.deepEqual(ledger.userIds, []);
+      assert.deepEqual(ledger.userIds, ["1"]);
     });
 });
 

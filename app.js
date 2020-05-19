@@ -66,6 +66,7 @@ async function startup() {
   app.use("/api/invitation", require("./routes/invitaion"));
   app.use("/api/sse", require("./routes/notification"));
   app.use("/api/statistic", require("./routes/statistic"));
+  app.use("/api/game", require("./routes/game"));
 
   // swagger setting
   // @ts-ignore

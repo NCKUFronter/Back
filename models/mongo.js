@@ -29,6 +29,8 @@ const collections = {
   counter: null,
   /** @type {Collection} */
   invitation: null,
+  /** @type {Collection} */
+  gameUser: null,
 };
 
 async function connectDB() {
@@ -45,6 +47,7 @@ async function connectDB() {
   collections.counter = db.collection("counter");
   collections.pointActivity = db.collection("point-activity");
   collections.invitation = db.collection("invitation");
+  collections.gameUser = db.collection("game-user");
 }
 
 /**

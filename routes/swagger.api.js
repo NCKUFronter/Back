@@ -14,7 +14,7 @@
 /**
  * @route GET /category
  * @group category
- * @summary 取德所有category 
+ * @summary 取德所有category
  * -- ✔️ 可以運作
  * @returns {Array.<Category>} 200
  */
@@ -79,8 +79,8 @@
 /**
  * @route GET /record
  * @group record
- * @summary 查詢所有record 
- * -- ✔️ 可以運作 
+ * @summary 查詢所有record
+ * -- ✔️ 可以運作
  * -- 🚫 前端不應該使用
  * @parm {string} ledger
  * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
@@ -129,7 +129,7 @@
  * @returns {Record.model} 200 - updated model
  * @returns {string} 400 - 所填資料有誤 || 不能修改預設類別名稱
  * @returns {any} 401 - 未登入
- * @returns {any} 403 - 沒有權限訪問 
+ * @returns {any} 403 - 沒有權限訪問
  * @returns {any} 404 - 找不到
  * @security Basic
  */
@@ -224,7 +224,7 @@
  * @summary 取得使用者所有點數紀錄
  * -- ✔️ 可以運作
  * @param {enum} type.query - activity type - eg: new, transfer, consume
- * @param {string} subtype.query - activity subtype 
+ * @param {string} subtype.query - activity subtype
  * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
  * @returns {Array<PointActivity>} 200
  * @security Basic
@@ -291,7 +291,7 @@
 /**
  * @route PUT /invitation/{id}/answer
  * @group invitation
- * @summary 回應邀請 
+ * @summary 回應邀請
  * -- ✔️ 可以運作
  * @param {string} id.path.required
  * @param {AnswerDto.model} dto.body.required
@@ -307,7 +307,7 @@
 /**
  * @route GET /ledger
  * @group ledger
- * @summary 查詢所有 ledger 
+ * @summary 查詢所有 ledger
  * -- ✔️ 可以運作
  * -- 🚫 前端不應該使用
  * @parm {string} ledgerId.query
@@ -370,7 +370,7 @@
 /**
  * @route GET /ledger/{id}/records
  * @group ledger
- * @summary 查詢帳本所有record 
+ * @summary 查詢帳本所有record
  * -- ✔️ 可以運作
  * @param {string} id.path.required
  * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
@@ -381,7 +381,7 @@
 /**
  * @route GET /ledger/{id}/invitations
  * @group ledger
- * @summary 查詢帳本所有邀請紀錄 
+ * @summary 查詢帳本所有邀請紀錄
  * -- ✔️ 可以運作
  * @param {string} id.path.required
  * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser
@@ -418,7 +418,7 @@
 /**
  * @route GET /point/activities
  * @group point
- * @summary 查詢所有pointActivity 
+ * @summary 查詢所有pointActivity
  * -- ✔️ 可以運作
  * -- 🚫 前端不應該使用
  * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,fromRecord,toGoods
@@ -453,6 +453,7 @@
  * @summary 消費點數
  * -- ✔️ 可以運作
  * @param {string} goodsId.path.required
+ * @param {ConsumePointsDto.model} dto.body.required
  * @returns {string} 200 - success
  * @returns {string} 400 - 所填資料有誤
  * @returns {string} 401 - 未登入
@@ -474,7 +475,7 @@
 
 // ---------  Statistic ---------
 /**
- * ℹ️ 有資訊 order順序等同分類順序，請注意
+ * ℹ️ order順序等同分類順序，請注意
  * @route GET /statistic/ledger
  * @group statistic
  * @summary 取得帳本的統計
@@ -487,7 +488,7 @@
  */
 
 /**
- * ℹ️ 有資訊 order順序等同分類順序，請注意
+ * ℹ️ order順序等同分類順序，請注意
  * @route GET /statistic/personal
  * @group statistic
  * @summary 取得個人的統計
@@ -500,7 +501,7 @@
  */
 
 /**
- * ℹ️ 有資訊 order順序等同分類順序，請注意
+ * ℹ️ order順序等同分類順序，請注意
  * @route GET /statistic/points
  * @group statistic
  * @summary 取得點數的統計
@@ -510,4 +511,55 @@
  * @returns {string} 200 - success
  * @returns {string} 401 - 未登入
  * @security Basic
+ */
+
+// ---------  Game ---------
+
+/**
+ * @typedef GameUser
+ * @property {string} _id.required
+ * @property {string} name.required
+ */
+/**
+ * @route GET /game/user
+ * @group game
+ * @summary 所有遊戲人物資訊
+ * -- ✔️ 可以運作
+ * @returns {Array<GameUser>} 200 - success
+ */
+
+/**
+ * @route GET /game/user/{id}
+ * @group game
+ * @summary 遊戲人物資訊
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @returns {GameUser.model} 200 - success
+ */
+
+/**
+ * @typedef BagItem
+ * @property {string} _id.required
+ * @property {string} name.required
+ * @property {number} point.required
+ * @property {string} intro.required
+ * @property {number} count - 數量
+ */
+/**
+ * @route GET /game/user/{id}/bag
+ * @group game
+ * @summary 遊戲人物的背包
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @returns {Array<BagItem>} 200 - success
+ */
+
+/**
+ * @route POST /game/user/{id}/use/{goodsId}
+ * @group game
+ * @summary 使用道具(單純將道具數量-1)
+ * -- ✔️ 可以運作
+ * @param {string} id.path.required
+ * @param {string} goodsId.path.required
+ * @returns {string} 200 - success
  */

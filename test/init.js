@@ -28,6 +28,7 @@ async function dropDB() {
   await dropNoError(collections.ledger);
   await dropNoError(collections.record);
   await dropNoError(collections.counter);
+  await dropNoError(collections.gameUser);
 }
 
 async function initDB() {
@@ -40,6 +41,7 @@ async function initDB() {
   await db.createCollection("record");
   await db.createCollection("ledger");
   await db.createCollection("counter");
+  await db.createCollection("game-user");
   await initDBData(db);
 }
 
@@ -54,6 +56,7 @@ async function initDBData(db) {
       name: "爸爸",
       password: "0000",
       email: "father@gmail.com",
+      gameUserId: "1",
       photo: "https://image.flaticon.com/icons/svg/305/305640.svg",
       rewardPoints: 150,
     },
@@ -64,6 +67,7 @@ async function initDBData(db) {
       photo: "https://image.flaticon.com/icons/svg/305/305645.svg",
       email: "mother@gmail.com",
       conDays: 5,
+      gameUserId: "2",
       lastLogin: new Date(),
       rewardPoints: 0,
     },
@@ -74,6 +78,7 @@ async function initDBData(db) {
       password: "0000",
       photo: "https://image.flaticon.com/icons/svg/305/305636.svg",
       conDays: 6,
+      gameUserId: "3",
       lastLogin: yesterday,
       rewardPoints: 100,
     },
@@ -305,6 +310,12 @@ async function initDBData(db) {
     { _id: "ledger", nowId: 2 },
     { _id: "category", nowId: 4 },
     { _id: "user", nowId: 3 },
+  ]);
+
+  await db.collection("game-user").insertMany([
+    { _id: "1", name: "爸爸", bag:{} },
+    { _id: "2", name: "媽媽", bag:{} },
+    { _id: "3", name: "小孩", bag:{} },
   ]);
 }
 

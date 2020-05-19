@@ -130,6 +130,13 @@ test("unit > consumePoints", async function () {
 
   // check activity
   await checkActivity("consume", "", goods.point, userId, goodsId);
+
+  // game user bag
+  const gameUser = await collections.gameUser.findOne({
+    _id: agents.father.id,
+  });
+  assert.notEqual(gameUser.bag, null);
+  assert.equal(gameUser.bag[goodsId], 1);
 });
 
 test("e2e > transferPoints", async function () {
@@ -171,9 +178,22 @@ test("e2e > consumePoints", async function () {
   await checkUserPoints(agents.father.id, before_point, -(goods.point * 2));
 
   // check activity
-  await checkActivity("consume", "", goods.point * 2, agents.father.id, goodsId);
+  await checkActivity(
+    "consume",
+    "",
+    goods.point * 2,
+    agents.father.id,
+    goodsId
+  );
   const activity = await findLast(collections.pointActivity);
   assert.equal(activity.quantity, 2);
+
+  // game user bag
+  const gameUser = await collections.gameUser.findOne({
+    _id: agents.father.id,
+  });
+  assert.notEqual(gameUser.bag, null);
+  assert.equal(gameUser.bag[goodsId], 1 + 2);
 });
 
 module.exports = {

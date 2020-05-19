@@ -1,5 +1,5 @@
 // @ts-check
-process.env.DB_URI = "mongodb://localhost/test";
+process.env.DB_URI = "mongodb://localhost/test1";
 process.env.PORT = "5000";
 const { connectDB, client } = require("../models/mongo");
 const { resetDB, initDB } = require("./init");
