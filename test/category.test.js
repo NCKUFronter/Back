@@ -3,8 +3,12 @@ const log = console.log;
 const test = require("baretest")("category-test");
 const assert = require("assert");
 const { get_test_agents } = require("./login.test");
-const { collections } = require("../models/mongo");
-const { CategoryModel } = require("../models");
+const { collections } = process.env.BABEL_TEST
+  ? require("../dist/models/mongo")
+  : require("../models/mongo");
+const { CategoryModel } = process.env.BABEL_TEST
+  ? require("../dist/models")
+  : require("../models");
 
 /** @type {import('express').Application} */
 let app = null;
@@ -43,7 +47,10 @@ test("e2e > insert category", async () => {
 test("e2e > patch category", async () => {
   const category_dto = { name: "yourCategory", hashtags: ["xxx1", "xxx2"] };
 
-  await agents.father.agent.patch(testUrls.patch(id)).send(category_dto).expect(200);
+  await agents.father.agent
+    .patch(testUrls.patch(id))
+    .send(category_dto)
+    .expect(200);
 
   const category = await collections.category.findOne({ _id: id });
   assert.equal(category.name, "yourCategory");
@@ -57,7 +64,10 @@ test("e2e > category > return 403", async () => {
   const child_no_auth_id = "1";
   const category_dto = { name: "yourCategory" };
 
-  await agents.child.agent.patch(testUrls.patch(child_no_auth_id)).send(category_dto).expect(403);
+  await agents.child.agent
+    .patch(testUrls.patch(child_no_auth_id))
+    .send(category_dto)
+    .expect(403);
   await agents.child.agent.delete(testUrls.patch(child_no_auth_id)).expect(403);
 });
 
@@ -104,5 +114,5 @@ module.exports = {
     await test.run();
     console.log = log; // 恢復log
   },
-  simpleInsertCategories
+  simpleInsertCategories,
 };

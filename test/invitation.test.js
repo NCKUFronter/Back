@@ -2,9 +2,15 @@
 const log = console.log;
 const test = require("baretest")("invitation-test");
 const assert = require("assert");
-const { invite, answerInvitation } = require("../actions/invitation.actions");
-const { collections } = require("../models/mongo");
-const { InvitationModel } = require("../models");
+const { invite, answerInvitation } = process.env.BABEL_TEST
+  ? require("../dist/actions/invitation.actions")
+  : require("../actions/invitation.actions");
+const { collections } = process.env.BABEL_TEST
+  ? require("../dist/models/mongo")
+  : require("../models/mongo");
+const { InvitationModel } = process.env.BABEL_TEST
+  ? require("../dist/models")
+  : require("../models");
 const { findLast } = require("./init");
 const { get_test_agents } = require("./login.test");
 
@@ -108,11 +114,17 @@ test("e2e > invite > return 200", async () => {
 });
 
 test("e2e > answer invitation > return 403", async () => {
-  await agents.father.agent.put(testUrls.answer(id)).send({ answer: true }).expect(403);
+  await agents.father.agent
+    .put(testUrls.answer(id))
+    .send({ answer: true })
+    .expect(403);
 });
 
 test("e2e > answer invitation > return 400", async () => {
-  await agents.father.agent.put(testUrls.answer(id)).send({ anwser: 1 }).expect(400);
+  await agents.father.agent
+    .put(testUrls.answer(id))
+    .send({ anwser: 1 })
+    .expect(400);
 });
 
 test("e2e > reject invitation > return 200", async () => {
@@ -131,7 +143,10 @@ test("e2e > reject invitation > return 200", async () => {
 
 test("e2e > accept invitation > return 200", async () => {
   await doInviteTest("1", "1", "3");
-  await agents.child.agent.put(testUrls.answer(id)).send({ answer: true }).expect(200);
+  await agents.child.agent
+    .put(testUrls.answer(id))
+    .send({ answer: true })
+    .expect(200);
 
   const invitation = await collections.invitation.findOne({ _id: id });
   assert.equal(invitation.type, 1);
@@ -142,7 +157,7 @@ test("e2e > accept invitation > return 200", async () => {
 });
 
 test("e2e > leave ledger > return 200", async () => {
-  await agents.child.agent.post('/api/ledger/1/leave').expect(200);
+  await agents.child.agent.post("/api/ledger/1/leave").expect(200);
 
   const ledger = await collections.ledger.findOne({ _id: "1" });
   assert.equal(ledger.userIds.length, new Set(ledger.userIds).size);
@@ -150,7 +165,7 @@ test("e2e > leave ledger > return 200", async () => {
 });
 
 test("e2e > make somebody leave ledger > return 200", async () => {
-  await agents.father.agent.post('/api/ledger/1/leave/2').expect(200);
+  await agents.father.agent.post("/api/ledger/1/leave/2").expect(200);
 
   const ledger = await collections.ledger.findOne({ _id: "1" });
   assert.equal(ledger.userIds.length, new Set(ledger.userIds).size);

@@ -1,5 +1,7 @@
 // @ts-check
-const { collections, client, connectDB } = require("../models/mongo");
+const { collections, client, connectDB } = process.env.BABEL_TEST
+  ? require("../dist/models/mongo")
+  : require("../models/mongo");
 
 async function resetDB() {
   try {
@@ -48,7 +50,7 @@ async function initDB() {
 /** @param {import('mongodb').Db} db */
 async function initDBData(db) {
   const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate()-1);
+  yesterday.setDate(yesterday.getDate() - 1);
 
   await db.collection("user").insertMany([
     {
@@ -232,70 +234,80 @@ async function initDBData(db) {
   await db.collection("goods").insertMany([
     {
       _id: "1",
-      photo: "https://drive.google.com/uc?export=view&id=1aFHKDRTHHYGsG0DZOg1OvbSfLW1-wcKX",
+      photo:
+        "https://drive.google.com/uc?export=view&id=1aFHKDRTHHYGsG0DZOg1OvbSfLW1-wcKX",
       name: "竹蜻蜓",
       intro: "飛飛飛飛飛飛飛飛飛飛飛飛飛飛飛飛飛飛",
       point: 20,
     },
     {
       _id: "2",
-      photo: "https://drive.google.com/uc?export=view&id=13Y51OCqmiCoNOSxiJDfqEdRek8DCtJ3y",
+      photo:
+        "https://drive.google.com/uc?export=view&id=13Y51OCqmiCoNOSxiJDfqEdRek8DCtJ3y",
       name: "黑洞",
       intro: "命運牌一張",
       point: 50,
     },
     {
       _id: "3",
-      photo: "https://drive.google.com/uc?export=view&id=1uIjbdtGX3idsaSdXWpkZUiIqgITPKAvg",
+      photo:
+        "https://drive.google.com/uc?export=view&id=1uIjbdtGX3idsaSdXWpkZUiIqgITPKAvg",
       name: "蟲洞",
       intro: "時空穿越",
       point: 90,
     },
     {
       _id: "4",
-      photo: "https://drive.google.com/uc?export=view&id=18xjKtZ0kkozzB0AWxEc3xq9K0WBUl-jm",
+      photo:
+        "https://drive.google.com/uc?export=view&id=18xjKtZ0kkozzB0AWxEc3xq9K0WBUl-jm",
       name: "無限手套",
       intro: "要收集寶石，先有無限手套",
       point: 50,
     },
     {
       _id: "5",
-      photo: "https://drive.google.com/uc?export=view&id=10eR6GRmW6WJZTrzGvt5elG5D94YRWzGI",
+      photo:
+        "https://drive.google.com/uc?export=view&id=10eR6GRmW6WJZTrzGvt5elG5D94YRWzGI",
       name: "靈魂寶石",
       intro: "要有無限手套，先集寶石",
       point: 20,
     },
     {
       _id: "6",
-      photo: "https://drive.google.com/uc?export=view&id=1LN9d34Bg5kfRJKLnGjll7AuE5nnfWSe-",
+      photo:
+        "https://drive.google.com/uc?export=view&id=1LN9d34Bg5kfRJKLnGjll7AuE5nnfWSe-",
       name: "時間寶石",
       intro: "要有無限手套，先集寶石",
       point: 20,
     },
     {
       _id: "7",
-      photo: "https://drive.google.com/uc?export=view&id=1XVzDjYpgfczvgEe7xEnXLg2A2-vx5uh5",
+      photo:
+        "https://drive.google.com/uc?export=view&id=1XVzDjYpgfczvgEe7xEnXLg2A2-vx5uh5",
       name: "空間寶石",
       intro: "要有無限手套，先集寶石",
       point: 20,
     },
     {
       _id: "8",
-      photo: "https://drive.google.com/uc?export=view&id=1mVD_76hrIcg7_F2H4Hb0yAKhFHt51eFl",
+      photo:
+        "https://drive.google.com/uc?export=view&id=1mVD_76hrIcg7_F2H4Hb0yAKhFHt51eFl",
       name: "心靈寶石",
       intro: "要有無限手套，先集寶石",
       point: 20,
     },
     {
       _id: "9",
-      photo: "https://drive.google.com/uc?export=view&id=19vJoYDDlG_20lZtjvGJxBbNC76lZ2OMc",
+      photo:
+        "https://drive.google.com/uc?export=view&id=19vJoYDDlG_20lZtjvGJxBbNC76lZ2OMc",
       name: "現實寶石",
       intro: "要有無限手套，先集寶石",
       point: 20,
     },
     {
       _id: "10",
-      photo: "https://drive.google.com/uc?export=view&id=1C9lI45HmY8agCPX7ZNP8mwrahlxbnvhe",
+      photo:
+        "https://drive.google.com/uc?export=view&id=1C9lI45HmY8agCPX7ZNP8mwrahlxbnvhe",
       name: "力量寶石",
       intro: "要有無限手套，先集寶石",
       point: 20,
@@ -313,9 +325,9 @@ async function initDBData(db) {
   ]);
 
   await db.collection("game-user").insertMany([
-    { _id: "1", name: "爸爸", bag:{} },
-    { _id: "2", name: "媽媽", bag:{} },
-    { _id: "3", name: "小孩", bag:{} },
+    { _id: "1", name: "爸爸", bag: {} },
+    { _id: "2", name: "媽媽", bag: {} },
+    { _id: "3", name: "小孩", bag: {} },
   ]);
 }
 

@@ -2,15 +2,18 @@
 const log = console.log;
 const test = require("baretest")("user-test");
 const assert = require("assert");
-const {
-  userLedgers,
-  userInvitations,
-  userPointActivities,
-} = require("../actions/user.actions");
-const { collections } = require("../models/mongo");
+const { userLedgers, userInvitations, userPointActivities } = process.env
+  .BABEL_TEST
+  ? require("../dist/actions/user.actions")
+  : require("../actions/user.actions");
+const { collections } = process.env.BABEL_TEST
+  ? require("../dist/models/mongo")
+  : require("../models/mongo");
 const { get_test_agents } = require("./login.test");
 const { simpleInsertCategories } = require("./category.test");
-const { InvitationModel, PointActivityModel } = require("../models");
+const { InvitationModel, PointActivityModel } = process.env.BABEL_TEST
+  ? require("../dist/models")
+  : require("../models");
 
 /** @type {import('express').Application} */
 let app = null;

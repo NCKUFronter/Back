@@ -7,8 +7,12 @@ const {
   pointsFromRecord,
   transferPoints,
   consumePoints,
-} = require("../actions/point.actions");
-const { collections } = require("../models/mongo");
+} = process.env.BABEL_TEST
+  ? require("../dist/actions/point.actions")
+  : require("../actions/point.actions");
+const { collections } = process.env.BABEL_TEST
+  ? require("../dist/models/mongo")
+  : require("../models/mongo");
 const { findLast } = require("./init");
 const { get_test_agents } = require("./login.test");
 

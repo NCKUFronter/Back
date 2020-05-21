@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-nocheck
 const { rx } = require("fastrx");
 const { collections } = require("../models/mongo");
 const { sseMessage } = require("../middleware/sse.middleware");

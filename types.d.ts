@@ -1,6 +1,5 @@
 import "fastrx";
 import "express";
-import { SSE } from "./actions/sse.actions";
 
 declare module "fastrx" {
   namespace Rx {

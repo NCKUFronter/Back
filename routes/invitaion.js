@@ -1,3 +1,4 @@
+// @ts-check
 const { collections, simpleInsertOne } = require("../models/mongo");
 const validatePipe = require("../middleware/validate-pipe");
 const {
@@ -28,7 +29,7 @@ router.post(
         fromUser._id,
         toUser._id
       );
-      result = await simpleInsertOne(collections.invitation, invitation);
+      const result = await simpleInsertOne(collections.invitation, invitation);
 
       // send notification
       notification.send(
@@ -37,6 +38,7 @@ router.post(
         [...ledger.userIds, toUser._id]
       );
 
+      // @ts-ignore
       return res.status(200).json(result.ops[0]);
     } else {
       return res.status(400).json("User already in ledger, no need to invite.");

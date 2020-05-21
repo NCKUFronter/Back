@@ -2,8 +2,12 @@
 const log = console.log;
 const test = require("baretest")("middlware-test");
 const assert = require("assert");
-const { collections } = require("../models/mongo");
-const checkParamsIdExists = require("../middleware/check-params-id-exists");
+const { collections } = process.env.BABEL_TEST
+  ? require("../dist/models/mongo")
+  : require("../models/mongo");
+const checkParamsIdExists =process.env.BABEL_TEST
+  ?require("../dist/middleware/check-params-id-exists")
+  :require("../middleware/check-params-id-exists");
 
 let result = "";
 let myStatus = 0;

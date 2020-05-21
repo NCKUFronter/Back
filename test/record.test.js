@@ -3,9 +3,13 @@ const log = console.log;
 const test = require("baretest")("record-test");
 const assert = require("assert");
 const supertest = require("supertest");
-const { RecordModel, UserModel } = require("../models");
+const { RecordModel, UserModel } = process.env.BABEL_TEST
+  ? require("../dist/models")
+  : require("../models");
 const { findLast } = require("./init");
-const { collections } = require("../models/mongo");
+const { collections } = process.env.BABEL_TEST
+  ? require("../dist/models/mongo")
+  : require("../models/mongo");
 const { get_test_agents } = require("./login.test");
 
 /** @type {import('express').Application} */

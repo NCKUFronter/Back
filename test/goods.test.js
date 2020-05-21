@@ -3,8 +3,12 @@ const log = console.log;
 const test = require("baretest")("goods-test");
 const assert = require("assert");
 const { get_test_agents } = require("./login.test");
-const { collections } = require("../models/mongo");
-const { CategoryModel } = require("../models");
+const { collections } = process.env.BABEL_TEST
+  ? require("../dist/models/mongo")
+  : require("../models/mongo");
+const { CategoryModel } = process.env.BABEL_TEST
+  ? require("../dist/models")
+  : require("../models");
 const {} = require("./init");
 
 /** @type {import('express').Application} */
@@ -36,7 +40,7 @@ test("e2e > get all goods", async () => {
 });
 
 test("e2e > get one goods", async () => {
-  const id = "1"
+  const id = "1";
   await agents.father.agent
     .get(testUrls.getOne(id))
     .expect(200)

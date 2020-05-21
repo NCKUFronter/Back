@@ -2,9 +2,13 @@
 const log = console.log;
 const test = require("baretest")("ledger-test");
 const assert = require("assert");
-const { LedgerModel, UserModel } = require("../models");
+const { LedgerModel, UserModel } = process.env.BABEL_TEST
+  ? require("../dist/models")
+  : require("../models");
 const { findLast } = require("./init");
-const { collections } = require("../models/mongo");
+const { collections } = process.env.BABEL_TEST
+  ? require("../dist/models/mongo")
+  : require("../models/mongo");
 const { get_test_agents } = require("./login.test");
 
 /** @type {import('express').Application} */
@@ -21,7 +25,7 @@ const testUrls = {
 };
 let id = null;
 
-test.before(async () =>{ 
+test.before(async () => {
   agents = await get_test_agents(app);
 });
 
@@ -56,7 +60,10 @@ test("e2e > insert ledger > success", async () => {
 test("e2e > patch ledger > return 400", async () => {
   const ledger_dto = { categoryId: 4, hashtags: ["tag3", "tag2"] };
 
-  await agents.father.agent.patch(testUrls.patch(id)).send(ledger_dto).expect(400);
+  await agents.father.agent
+    .patch(testUrls.patch(id))
+    .send(ledger_dto)
+    .expect(400);
 });
 
 test("e2e > patch ledger", async () => {

@@ -5,7 +5,9 @@ const log = console.log;
 const test = require("baretest")("login-test");
 const supertest = require("supertest");
 const assert = require("assert");
-const { collections } = require("../models/mongo");
+const { collections } = process.env.BABEL_TEST
+  ? require("../dist/models/mongo")
+  : require("../models/mongo");
 const { findLast } = require("./init");
 
 /** @type {import('express').Application} */

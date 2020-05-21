@@ -2,14 +2,21 @@
 const log = console.log;
 const test = require("baretest")("other-test");
 const assert = require("assert");
-const { collections } = require("../models/mongo");
-const {
-  findWithRelation,
-  findOneWithRelation,
-} = require("../actions/coll-relation");
-const checkParamsIdExists = require("../middleware/check-params-id-exists");
-const { notification } = require("../actions/notification.service");
-const dateCount = require("../actions/dateCount");
+const { collections } = process.env.BABEL_TEST
+  ? require("../dist/models/mongo")
+  : require("../models/mongo");
+const { findWithRelation, findOneWithRelation } = process.env.BABEL_TEST
+  ? require("../dist/actions/coll-relation")
+  : require("../actions/coll-relation");
+const checkParamsIdExists = process.env.BABEL_TEST
+  ? require("../dist/middleware/check-params-id-exists")
+  : require("../middleware/check-params-id-exists");
+const { notification } = process.env.BABEL_TEST
+  ? require("../dist/actions/notification.service")
+  : require("../actions/notification.service");
+const dateCount = process.env.BABEL_TEST
+  ? require("../dist/actions/dateCount")
+  : require("../actions/dateCount");
 
 /** @type {import('express').Application} */
 let app = null;
@@ -55,7 +62,7 @@ test("unit > dateCount", async () => {
   let lastDate = new Date(2019, 4, 11, 8);
   assert.equal(dateCount(nowDate, lastDate, 0), 1);
 
-  nowDate.setDate(13)
+  nowDate.setDate(13);
   assert.equal(dateCount(nowDate, lastDate, 0), 1);
 });
 
