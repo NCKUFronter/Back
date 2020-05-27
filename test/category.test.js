@@ -29,8 +29,28 @@ test.before(async () => {
   agents = await get_test_agents(app);
 });
 
-test("e2e > insert category", async () => {
+test("e2e > insert category > return 400", async () => {
   const category_dto = { name: "myCategory" };
+  await agents.father.agent
+    .post(testUrls.insert)
+    .send(category_dto)
+    .expect(400);
+
+  category_dto.icon = "mdi-arrow-left";
+  await agents.father.agent
+    .post(testUrls.insert)
+    .send(category_dto)
+    .expect(400);
+
+  category_dto.color = "#aaff";
+  await agents.father.agent
+    .post(testUrls.insert)
+    .send(category_dto)
+    .expect(400);
+});
+
+test("e2e > insert category(only category)", async () => {
+  const category_dto = { name: "myCategory", color: "#aabbcc", icon: "1" };
   await agents.father.agent
     .post(testUrls.insert)
     .send(category_dto)
@@ -41,11 +61,44 @@ test("e2e > insert category", async () => {
       id = category._id;
       assert.equal(category.name, category_dto.name);
       assert.equal(category.userId, agents.father.id);
+      assert.equal(category.color, "#aabbcc");
+      assert.strictEqual(category.icon, "1");
+    });
+});
+
+test("e2e > insert category(with hashtags)", async () => {
+  const category_dto = {
+    name: "myCategory2",
+    color: "#aabbcc",
+    icon: "1",
+    hashtags: ["xxx", "ooo"],
+  };
+  await agents.father.agent
+    .post(testUrls.insert)
+    .send(category_dto)
+    .expect(201)
+    .then(async (res) => {
+      /** @type {CategoryModel} */
+      const category = res.body;
+      id = category._id;
+      assert.equal(category.name, category_dto.name);
+      assert.equal(category.userId, agents.father.id);
+      assert.equal(category.color, "#aabbcc");
+      assert.strictEqual(category.icon, "1");
+      assert.strictEqual(category.hashtags, undefined);
+
+      const user = await collections.user.findOne({ _id: agents.father.id });
+      assert.notEqual(user.categoryTags, null);
+      assert.notEqual(user.categoryTags[id], ["xxx", "ooo"]);
     });
 });
 
 test("e2e > patch category", async () => {
-  const category_dto = { name: "yourCategory", hashtags: ["xxx1", "xxx2"] };
+  const category_dto = {
+    name: "yourCategory",
+    hashtags: ["xxx1", "xxx2"],
+    color: "#fffaaa",
+  };
 
   await agents.father.agent
     .patch(testUrls.patch(id))
@@ -54,10 +107,12 @@ test("e2e > patch category", async () => {
 
   const category = await collections.category.findOne({ _id: id });
   assert.equal(category.name, "yourCategory");
+  assert.strictEqual(category.hashtags, undefined);
+  assert.strictEqual(category.color, "#fffaaa");
 
   const user = await collections.user.findOne({ _id: agents.father.id });
   assert.notEqual(user.categoryTags, null);
-  assert.notEqual(user.categoryTags[id], null);
+  assert.deepEqual(user.categoryTags[id], ["xxx1", "xxx2"]);
 });
 
 test("e2e > category > return 403", async () => {
@@ -79,6 +134,8 @@ test("e2e > get all category", async () => {
       const categories = res.body;
       assert(Array.isArray(categories));
       for (const category of categories) {
+        assert(typeof category.icon == "string");
+        assert(typeof category.color == "string");
         assert(typeof category.name == "string");
         assert(typeof category._id == "string");
       }
@@ -100,6 +157,9 @@ test("e2e > delete category", async () => {
   await agents.father.agent.delete(testUrls.delete(id)).expect(200);
   const category = await collections.category.findOne({ _id: id });
   assert.equal(category, null);
+
+  const user = await collections.user.findOne({ _id: agents.father.id });
+  assert.notEqual(user.categoryTags[id], ["xxx", "ooo"]);
 });
 
 async function simpleInsertCategories(name, agent) {

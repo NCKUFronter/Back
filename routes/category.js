@@ -53,9 +53,11 @@ router.post(
     });
     */
     workInTransaction(async (session) => {
+      const { hashtags, ...cate_dto } = req.body;
+      cate_dto.userId = req.userId;
       const result = await simpleInsertOne(
         collections.category,
-        { name: req.body.name, userId: req.userId },
+        cate_dto,
         session
       );
 
@@ -113,10 +115,11 @@ router.patch(
       return res.status(403).json("No access");
 
     workInTransaction(async (session) => {
-      if (req.body.name && req.body.name !== category.name) {
+      const { hashtags, ...cate_dto } = req.body;
+      if (Object.keys(cate_dto).length !== 0) {
         await collections.category.updateOne(
           { _id: req.params.id },
-          { $set: { name: req.body.name } },
+          { $set: cate_dto },
           { session }
         );
       }
@@ -124,7 +127,7 @@ router.patch(
       if (req.body.hashtags) {
         await collections.user.updateOne(
           { _id: req.userId },
-          { $set: { [`categoryTags.${req.params.id}`]: req.body.hashtags } },
+          { $set: { [`categoryTags.${req.params.id}`]: hashtags } },
           { session }
         );
       }
@@ -162,7 +165,18 @@ router.delete(
     if (category.userId !== req.userId)
       return res.status(403).json("No access");
 
-    await collections.category.deleteOne({ _id: req.params.id });
+    await workInTransaction(async (session) => {
+      const cate_prom = collections.category.deleteOne(
+        { _id: req.params.id },
+        { session }
+      );
+      const user_prom = collections.user.updateOne(
+        { _id: req.userId },
+        { $unset: { [`categoryTags.${req.params.id}`]: "" } },
+        { session }
+      );
+      await Promise.all([cate_prom, user_prom]);
+    });
     res
       .status(200)
       .json("Delete row: " + req.params.id + " from db Successfully!");

@@ -98,18 +98,26 @@ async function initDBData(db) {
     {
       _id: "1",
       name: "食物",
+      color: "#fffaaa",
+      icon: "null"
     },
     {
       _id: "2",
       name: "交通",
+      color: "#aabbcc",
+      icon: "null"
     },
     {
       _id: "3",
       name: "治裝",
+      color: "#ccddee",
+      icon: "null"
     },
     {
       _id: "4",
       name: "娛樂",
+      color: "#abde23",
+      icon: "null"
     },
   ]);
 

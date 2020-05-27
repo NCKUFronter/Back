@@ -30,6 +30,7 @@
 
 /**
  * ℹ️ 可連同使用者的categoryTags，一併新增
+ * ℹ️ 顏色只支援hex 6碼格式
  * @route POST /category
  * @summary 新增category與hashtags
  * -- ✔️ 可以運作
@@ -54,7 +55,7 @@
  * -- ℹ️ 有資訊
  * @param {string} id.path.required
  * @param {CategoryDto.model} name.body.required
- * @returns {Category.model} 200 - updated model
+ * @returns {string} 200 - success
  * @returns {string} 400 - 所填資料有誤
  * @returns {any} 401 - 未登入
  * @returns {any} 403 - 沒有權限訪問
@@ -63,12 +64,13 @@
  */
 
 /**
+ * ℹ️ 會連同使用者的categoryTags，一併清除
  * @route DELETE /category/{id}
  * @group category
  * @summary 刪除指定 id 的category
  * -- ✔️ 可以運作
+ * -- ℹ️ 有資訊
  * @param {string} id.path.required
- * @param {CategoryDto.model} name.body.required
  * @returns {string} 200 - success
  * @returns {any} 401 - 未登入
  * @returns {any} 403 - 沒有權限訪問
@@ -90,8 +92,9 @@
 /**
  * @route GET /record/{id}
  * @group record
- * @summary 查詢所有record
+ * @summary 查詢指定id的record
  * -- ✔️ 可以運作
+ * -- 🚫 前端不應該使用
  * @param {string} id.path.required
  * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
  * @returns {Record.model} 200
@@ -123,6 +126,7 @@
  * @route PATCH /record/{id}
  * @group record
  * @summary 部分修改指定 id 的record
+ * -- ✔️ 可以運作
  * -- ℹ️ 有資訊
  * @param {string} id.path.required
  * @param {RecordDto.model} dto.body.required
