@@ -23,6 +23,16 @@ router.post(
     const fromUser = req.user;
     const toUser = req.convert_from_body.email; // await collections.user.findOne({ email: req.body.email });
 
+    // check no duplicate invitation
+    const checkInvitation = await collections.invitation.findOne({
+      ledgerId: ledger._id,
+      toUserId: toUser._id,
+      type: 2,
+    });
+    if (checkInvitation != null)
+      return res.status(400).json("user has been invited");
+
+    // check if user is already in ledger or not
     if (ledger.adminId != toUser._id && !ledger.userIds.includes(toUser._id)) {
       let invitation = new InvitationModel(
         ledger._id,

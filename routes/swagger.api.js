@@ -22,7 +22,7 @@
 /**
  * @route GET /category/{id}
  * @group category
- * @summary 取德指定 id 的category
+ * @summary 查詢指定 id 的category
  * -- ✔️ 可以運作
  * @param {string} id.path.required
  * @returns {Category.model} 200
@@ -54,7 +54,7 @@
  * -- ✔️ 可以運作
  * -- ℹ️ 有資訊
  * @param {string} id.path.required
- * @param {CategoryDto.model} name.body.required
+ * @param {CategoryDto.model} dto.body.required
  * @returns {string} 200 - success
  * @returns {string} 400 - 所填資料有誤
  * @returns {any} 401 - 未登入
@@ -98,6 +98,7 @@
  * @param {string} id.path.required
  * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
  * @returns {Record.model} 200
+ * @returns {any} 404 - 找不到
  */
 
 /**
@@ -217,7 +218,7 @@
  * @summary 取得使用者所有帳簿
  * -- ✔️ 可以運作
  * @param {enum[]} _one.query - one to one fields - eg: admin
- * @param {enum[]} _many.query - many-to-many relationship fields - eg: users,records
+ * @param {enum[]} _many.query - many-to-many relationship fields - eg: users,records,invitees
  * @returns {Array<Ledger>} 200
  * @security Basic
  */
@@ -316,7 +317,7 @@
  * -- 🚫 前端不應該使用
  * @parm {string} ledgerId.query
  * @param {enum[]} _one.query - one to one fields - eg: admin
- * @param {enum[]} _many.query - many-to-many relationship fields - eg: users,records
+ * @param {enum[]} _many.query - many-to-many relationship fields - eg: users,records,invitees
  * @returns {Array<Ledger>} 200
  */
 
@@ -326,7 +327,8 @@
  * @summary 查詢指定 id 的 ledger
  * -- ✔️ 可以運作
  * @param {string} id.path.required
- * @param {enum[]} _one.query - one to one fields - eg: category,user,ledger
+ * @param {enum[]} _one.query - one to one fields - eg: admin
+ * @param {enum[]} _many.query - many-to-many relationship fields - eg: users,records,invitees
  * @returns {Ledger.model} 200 - success
  * @returns {any} 401 - 未登入
  * @returns {any} 403 - 沒有權限訪問
@@ -339,7 +341,10 @@
  * @group ledger
  * @summary 新增 ledger
  * -- ✔️ 可以運作
- * @param {LedgerDto.model} name.body.required
+ * @consumes multipart/form-data
+ * @param {string} ledgerName.formData.required
+ * @param {file} upPhoto.formData - 上傳圖片
+ * @param {string} photo.formData - 圖片網址
  * @returns {Ledger.model} 201 - inserted model
  * @returns {any} 400 - 所填資料有誤
  * @returns {any} 401 - 未登入
@@ -351,8 +356,11 @@
  * @group ledger
  * @summary 部分修改指定 id 的 ledger
  * -- ✔️ 可以運作
+ * @consumes multipart/form-data
  * @param {string} id.path.required
- * @param {LedgerDto.model} dto.body.required
+ * @param {string} ledgerName.formData
+ * @param {file} upPhoto.formData - 上傳圖片
+ * @param {string} photo.formData - 圖片網址
  * @returns {Ledger.model} 200 - updated model
  * @returns {any} 401 - 未登入
  * @returns {any} 403 - 沒有權限訪問

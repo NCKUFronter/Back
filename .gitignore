@@ -5,6 +5,7 @@ config.*
 .vscode
 /node_modules
 /dist/**
+/img/user-ledger
 token.*
 gulpfile.js
 ngrok

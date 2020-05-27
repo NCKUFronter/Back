@@ -33,6 +33,26 @@ const manyToManyMap = {
   ledger: {
     users: { coll: "user", localField: "userIds", foreignField: "_id" },
     records: { coll: "record", localField: "_id", foreignField: "ledgerId" },
+    invitees: {
+      customLookup: {
+        from: "invitation",
+        let: { ledgerId: "$_id" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$ledgerId", "$$ledgerId"] }, type: 2 } },
+          {
+            $lookup: {
+              from: "user",
+              localField: "toUserId",
+              foreignField: "_id",
+              as: "toUser",
+            },
+          },
+          { $unwind: "$toUser" },
+          { $replaceRoot: { newRoot: "$toUser" } },
+        ],
+        as: "invitees",
+      },
+    },
   },
 };
 
@@ -72,14 +92,17 @@ function relationPipeline(coll_name, oneToManyFields, manyToManyFields) {
     for (const field of manyToManyFields) {
       const relation = many_map[field];
       if (!relation) continue;
-      pipeline.push({
-        $lookup: {
-          from: relation.coll,
-          localField: relation.localField,
-          foreignField: "_id",
-          as: field,
-        },
-      });
+      if (relation.customLookup)
+        pipeline.push({ $lookup: relation.customLookup });
+      else
+        pipeline.push({
+          $lookup: {
+            from: relation.coll,
+            localField: relation.localField,
+            foreignField: "_id",
+            as: field,
+          },
+        });
     }
   }
 

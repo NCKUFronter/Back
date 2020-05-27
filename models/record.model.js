@@ -60,6 +60,7 @@ const RecordSchema = AsyncJoi.object(
  * @property {string} from
  * @property {string} date.required - real type: Date
  * @property {string} reviseDate.required - real type: Date
+ * @property {string} createDate.required - real type: Date
  */
 class RecordModel {
   /** @type {string} */

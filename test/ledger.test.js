@@ -39,6 +39,7 @@ test("e2e > insert ledger > success", async () => {
   /** @type {any} */
   let ledger_dto = {
     ledgerName: "child ledger",
+    photo: "/xxx/xxx"
   };
 
   await agents.father.agent

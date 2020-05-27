@@ -50,6 +50,7 @@ test("unit > invite", async () => {
   const fromUserId = "2";
   const toUserId = "3";
   await doInviteTest(ledgerId, fromUserId, toUserId);
+  await collections.invitation.deleteOne({ _id: id });
 });
 
 test("unit > accept invitation", async () => {
@@ -111,6 +112,11 @@ test("e2e > invite > return 200", async () => {
       assert.equal(invitation.toUserId, "3");
       assert.equal(invitation.type, 2);
     });
+});
+
+test("e2e > duplicate invite > return 400", async () => {
+  let dto = { ledgerId: "1", email: "child@gmail.com" };
+  await agents.father.agent.post(testUrls.invite).send(dto).expect(400);
 });
 
 test("e2e > answer invitation > return 403", async () => {

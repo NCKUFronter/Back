@@ -4,6 +4,7 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const compression = require("compression");
+const fileUpload = require("express-fileupload");
 const fs = require("fs");
 const https = require("https");
 const http = require("http");
@@ -15,6 +16,14 @@ const flash = require("connect-flash");
 const { connectDB, collections, client } = require("./models/mongo");
 const swaggerGenerator = require("express-swagger-generator");
 const swaggerUi = require("swagger-ui-express");
+
+const createFolder = function(folder) {
+  try {
+    fs.accessSync(folder);
+  } catch (e) {
+    fs.mkdirSync(folder);
+  }
+}
 
 async function startup() {
   await connectDB();
@@ -35,15 +44,17 @@ async function startup() {
   // @ts-ignore
   app.use(compression());
   app.use(require("./middleware/front-end-hook"));
-  // app.use(express.static(__dirname+ "/Front/dist"))
   // @ts-ignore
   app.use(cookieParser());
-  app.get("/", function (req, res) {
-    console.log(req.cookies);
-    res.send("Main page loading properly!");
-  });
-  // Log in
+  // @ts-ignore
+  app.use(fileUpload({ limits: { fileSize: 1 * 1024 * 1024 } }));
+  app.use("/api/img", express.static(__dirname + "/img"));
 
+  // init ledger photo directory
+  createFolder(__dirname + "/img");
+  createFolder(__dirname + "/img/user-ledger");
+
+  // Log in
   // @ts-ignore: 型別定義不符合express，但可以work
   app.use(session({ secret: "cats", resave: false, saveUninitialized: false }));
   app.use(AppPassport.initialize());

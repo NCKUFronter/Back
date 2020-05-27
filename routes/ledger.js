@@ -11,9 +11,17 @@ const {
 } = require("../actions/coll-relation");
 const { notification } = require("../actions/notification.service");
 const router = require("express").Router();
+const fs = require("fs");
+const path = require("path");
 
 // 假設已經 connectDB
 const ledger_coll = collections.ledger;
+
+function makeImagePath(photo) {
+  const ext = photo.name.slice(photo.name.lastIndexOf("."));
+  return `/img/user-ledger/ledger-${Date.now()}${ext}`;
+}
+
 // GET from database
 router.get(
   "/",
@@ -58,12 +66,24 @@ router.post(
   validatePipe("body", LedgerSchema),
   loginCheck(ledger_coll),
   async function (req, res) {
+    let upPhoto = req.files && req.files.upPhoto;
+    if (req.body.photo == null && upPhoto == null)
+      return res.status(400).json("Must specify photo!!");
+
     const postData = {
       _id: await fetchNextId(ledger_coll.collectionName),
       adminId: req.userId,
       userIds: [req.userId],
       ...req.body,
     };
+
+    if (upPhoto) {
+      if (Array.isArray(upPhoto)) upPhoto = upPhoto[0];
+      const img_path = makeImagePath(upPhoto);
+      await upPhoto.mv(path.resolve("." + img_path));
+      postData.photo = img_path;
+    }
+
     ledger_coll.insertOne(postData, function (err, result) {
       if (err) throw err;
       console.log("1 document inserted.");
@@ -111,15 +131,27 @@ router.patch(
   loginCheck(ledger_coll),
   checkParamsIdExists(collections.ledger),
   getLedgerAuthGuard((req) => req.convert_from_params.id),
-  function (req, res) {
+  async function (req, res) {
     // @ts-ignore
+    const ledger = req.convert_from_params.id;
     const patchFilter = { _id: req.params.id, adminId: req.userId };
-    const patchData = {
-      $set: req.body,
-    };
+    const patchData = req.body;
+
+    let upPhoto = req.files && req.files.upPhoto;
+    if (Object.keys(req.body).length == 0 && upPhoto == null)
+      return res.status(400).json("Must specify body!!");
+
+    if (req.files && req.files.upPhoto) {
+      let photo = req.files.upPhoto;
+      if (Array.isArray(photo)) photo = photo[0];
+      const img_path = makeImagePath(photo);
+      await photo.mv(path.resolve("." + img_path));
+      patchData.photo = img_path;
+    }
+
     ledger_coll.findOneAndUpdate(
       patchFilter,
-      patchData,
+      { $set: patchData },
       { returnOriginal: false },
       function (err, result) {
         if (err) throw err;
@@ -135,6 +167,13 @@ router.patch(
           },
           ledger.userIds
         );
+
+        if (ledger.photo && ledger.photo.startsWith("/img/user-ledger")) {
+          fs.unlink(path.resolve("." + ledger.photo), function (err) {
+            console.log(err);
+          });
+        }
+
         res.status(200).send(result.value);
       }
     );
@@ -150,6 +189,7 @@ router.delete(
       return res.status(403).json("No access");
 
     // @ts-ignore
+
     const deleteFilter = { _id: req.params.id, adminId: req.userId };
     ledger_coll.deleteOne(deleteFilter, (err, result) => {
       console.log(
@@ -171,6 +211,13 @@ router.delete(
         },
         ledger.userIds
       );
+
+      if (ledger.photo && ledger.photo.startsWith("/img/user-ledger")) {
+        fs.unlink(path.resolve("." +ledger.photo), function (err) {
+          console.log(err);
+        });
+      }
+
       res
         .status(200)
         .send("Delete row: " + req.params.id + " from db Successfully!");
