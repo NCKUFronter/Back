@@ -2,7 +2,11 @@
 const router = require("express").Router();
 const loginCheck = require("../middleware/login-check");
 const { notification } = require("../actions");
-const { SSE, sseMiddleware } = require("../middleware/sse.middleware");
+const {
+  SSE,
+  sseMiddleware,
+  onlineUser,
+} = require("../middleware/sse.middleware");
 
 router.get("/notification", loginCheck(null), sseMiddleware, function (
   req,
@@ -12,20 +16,21 @@ router.get("/notification", loginCheck(null), sseMiddleware, function (
   const sse = res.sse;
   const obs$ = notification
     .listen()
-    .filter((e) => e.sessionID != req.sessionID)
+    .tap(console.log)
+    .filter((e) => (e.data.type === "init") === (e.sessionID === req.sessionID))
     .filter((e) => {
-      console.log({
-        send:
-          e.toUserIds == null
-            ? true
-            : e.toUserIds.includes(req.userId) || req.userId === e.from._id,
-      });
       return e.toUserIds == null
         ? true
         : e.toUserIds.includes(req.userId) || req.userId === e.from._id;
     })
     .map((e) => e.data);
   sse.subscribe(obs$);
+  // send init online users
+  notification.send(req, {
+    type: "init",
+    action: "onlineUser",
+    onlineUser,
+  });
   /*
   notification.send(req, {
     type: "invitation",

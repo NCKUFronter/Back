@@ -10,6 +10,7 @@ const https = require("https");
 const http = require("http");
 const cors = require("cors");
 const { AppPassport } = require("./middleware/app-passport");
+const AppSocketIO = require("./middleware/app-socketio");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
@@ -17,13 +18,13 @@ const { connectDB, collections, client } = require("./models/mongo");
 const swaggerGenerator = require("express-swagger-generator");
 const swaggerUi = require("swagger-ui-express");
 
-const createFolder = function(folder) {
+const createFolder = function (folder) {
   try {
     fs.accessSync(folder);
   } catch (e) {
     fs.mkdirSync(folder);
   }
-}
+};
 
 async function startup() {
   await connectDB();
@@ -113,6 +114,7 @@ async function startup() {
     ? https.createServer(KeyCert, app)
     : http.createServer(app);
 
+  AppSocketIO(server);
   await server.listen(port, function () {
     console.log(`App listening on port ${port}!`);
   });

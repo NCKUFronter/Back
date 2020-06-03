@@ -20,6 +20,7 @@
     "@babel/core": "^7.10.0",
     "@babel/runtime": "^7.9.6",
     "@hapi/joi": "^17.1.1",
+    "@types/socket.io": "^2.1.8",
     "compression": "^1.7.4",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.5",
@@ -36,6 +37,8 @@
     "passport": "^0.4.1",
     "passport-google-oauth": "^2.0.0",
     "passport-local": "^1.0.0",
+    "passport.socketio": "^3.7.0",
+    "socket.io": "^2.3.0",
     "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {

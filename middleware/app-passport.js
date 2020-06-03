@@ -50,7 +50,7 @@ AppPassport.use(
   ) {
     const user_coll = collections.user;
     user_coll.findOne({ email: email }, function (err, user) {
-      console.log({ now: "local strategy", user });
+      console.log({ now: "local strategy", username: user.name });
       if (err) {
         return done(err);
       }
@@ -66,14 +66,14 @@ AppPassport.use(
 );
 
 AppPassport.serializeUser(function (user, done) {
-  console.log({ type: "serialize", user });
+  console.log({ type: "serialize", username: user.name });
   done(null, { _id: user._id });
 });
 
 AppPassport.deserializeUser(function (filter, done) {
   console.log({ type: "deserialize", filter });
   collections.user.findOne(filter, function (err, user) {
-    console.log({ err, user });
+    console.log({ err, username: user && user.name });
     done(err, user);
   });
 });

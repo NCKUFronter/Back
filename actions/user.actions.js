@@ -38,9 +38,48 @@ function getCategoryTags(record, user) {
   return categoryTags;
 }
 
+/** @param {string} userId */
+async function userRelativeUserIds(userId) {
+  const results = await collections.ledger
+    .aggregate([
+      { $match: { $or: [{ userIds: userId }, { adminId: userId }] } },
+      { $group: { _id: 0, user: { $push: "$userIds" } } },
+      {
+        $project: {
+          userIds: {
+            $reduce: {
+              input: "$user",
+              initialValue: [],
+              in: { $setUnion: ["$$value", "$$this"] },
+            },
+          },
+        },
+      },
+    ])
+    .toArray();
+  if (results.length == 0) return [];
+
+  const userIds = results[0].userIds;
+  for (let i = 0; i < userIds.length; i++) {
+    if (userIds[i] === userId) {
+      userIds.splice(i, 1);
+      break;
+    }
+  }
+  return userIds;
+}
+
+function serializeUser(user) {
+  if (!user) return user;
+  const { _id, name, email, photo } = user;
+  return { _id, name, email, photo };
+}
+
 module.exports = {
   userInvitations,
   userLedgers,
   userPointActivities,
   getCategoryTags,
+  userRelativeUserIds,
+  serializeUser,
 };

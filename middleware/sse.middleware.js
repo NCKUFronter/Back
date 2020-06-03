@@ -1,6 +1,7 @@
 // @ts-check
 /// <reference types="../types" />
 const stringify = require("fast-stable-stringify");
+const { notification, sseMessage } = require("../actions/notification.service");
 
 class SSE {
   keepAlive;
@@ -82,11 +83,21 @@ class SSE {
 }
 
 const connections = {};
+const onlineUser = {};
 function sseMiddleware(req, res, next) {
   if (connections[req.sessionID])
     return res.status(400).json("Already connected");
   else connections[req.sessionID] = 1;
-  console.log(connections)
+
+  if (onlineUser[req.userId] == null) {
+    onlineUser[req.userId] = 1;
+    notification.sendToRelativeUsers(req, {
+      type: "user",
+      action: "online",
+    });
+  } else onlineUser[req.userId]++;
+
+  console.log({ onlineUser, connections });
 
   req.socket.setTimeout(0);
   req.socket.setNoDelay(true);
@@ -111,24 +122,27 @@ function sseMiddleware(req, res, next) {
 
   res.on("close", () => {
     delete connections[req.sessionID];
+
+    // avoid reconnect immediately
+    setTimeout(() => {
+      if (onlineUser[req.userId] == 1) {
+        notification.sendToRelativeUsers(req, {
+          type: "user",
+          action: "offline",
+        });
+        delete onlineUser[req.userId];
+      } else onlineUser[req.userId]--;
+    }, 3000);
+
     sse.close();
   });
   next();
 }
 
-function sseMessage(req, data, toUserIds) {
-  data.from = req.user;
-  data.time = Date.now();
-  return {
-    sessionID: req.sessionID,
-    toUserIds,
-    data,
-    from: req.user,
-  };
-}
-
 module.exports = {
   SSE,
   sseMiddleware,
-  sseMessage
+  sseMessage,
+  onlineUser,
+  connections,
 };

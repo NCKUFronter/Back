@@ -1,9 +1,20 @@
 // @ts-nocheck
 const { rx } = require("fastrx");
 const { collections } = require("../models/mongo");
-const { sseMessage } = require("../middleware/sse.middleware");
+const { userRelativeUserIds, serializeUser } = require("../actions/user.actions");
 /** @typedef {import('fastrx').Sink} Sink */
 /** @typedef {import('fastrx').Rx.Observable} Observable */
+
+function sseMessage(req, data, toUserIds) {
+  data.from = serializeUser(req.user);
+  data.time = Date.now();
+  return {
+    sessionID: req.sessionID,
+    toUserIds,
+    data,
+    from: req.user,
+  };
+}
 
 class NotificationService {
   /** @type {Sink & Observable} */
@@ -13,7 +24,7 @@ class NotificationService {
   /**
    * @param {import('express').Request} req
    * @param {any} data
-   * @param {string[]} toUserIds
+   * @param {string[]=} toUserIds
    */
   send(req, data, toUserIds) {
     this._subject.next(sseMessage(req, data, toUserIds));
@@ -25,6 +36,11 @@ class NotificationService {
     this.send(req, data, ledger.userIds);
   }
 
+  async sendToRelativeUsers(req, data) {
+    const toUserIds = await userRelativeUserIds(req.userId);
+    this.send(req, data, toUserIds);
+  }
+
   /** @return {Observable} */
   listen() {
     return this._subject;
@@ -33,4 +49,5 @@ class NotificationService {
 
 module.exports = {
   notification: new NotificationService(),
+  sseMessage,
 };
