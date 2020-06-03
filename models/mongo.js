@@ -48,6 +48,19 @@ async function connectDB() {
   collections.pointActivity = db.collection("point-activity");
   collections.invitation = db.collection("invitation");
   collections.gameUser = db.collection("game-user");
+
+  // mock session for lower version mongodb
+  if (process.env.NO_TRANSACTION) {
+    // @ts-ignore
+    client.startSession = () => {
+      return {
+        withTransaction: async (fn) => {
+          await fn(null);
+        },
+        endSession: () => {},
+      };
+    };
+  }
 }
 
 /**
@@ -92,9 +105,7 @@ async function simpleInsertOne(coll, value, session) {
 async function workInTransaction(fn) {
   const session = client.startSession();
   try {
-    await session.withTransaction(async () => {
-      await fn(session);
-    });
+    await session.withTransaction(fn);
   } catch (err) {
     console.log(err);
     await session.endSession();

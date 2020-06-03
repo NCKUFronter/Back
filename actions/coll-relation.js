@@ -7,54 +7,114 @@
  * foreignField = '_id'
  * as = 欄位
  */
-const oneToManyMap = {
+const relationMap = {
   ledger: {
-    admin: "user",
-  },
-  invitation: {
-    fromUser: "user",
-    toUser: "user",
-    ledger: "ledger",
-  },
-  record: {
-    category: "category",
-    ledger: "ledger",
-    user: "user",
-  },
-  "point-activity": {
-    fromUser: "user",
-    toUser: "user",
-    fromRecord: "record",
-    toGoods: "goods",
-  },
-};
-
-const manyToManyMap = {
-  ledger: {
-    users: { coll: "user", localField: "userIds", foreignField: "_id" },
-    records: { coll: "record", localField: "_id", foreignField: "ledgerId" },
+    admin: { coll: "user" },
+    users: {
+      isMany: true,
+      coll: "user",
+      localField: "userIds",
+      foreignField: "_id",
+    },
+    records: {
+      isMany: true,
+      coll: "record",
+      localField: "_id",
+      foreignField: "ledgerId",
+    },
     invitees: {
-      customLookup: {
-        from: "invitation",
-        let: { ledgerId: "$_id" },
-        pipeline: [
-          { $match: { $expr: { $eq: ["$ledgerId", "$$ledgerId"] }, type: 2 } },
-          {
-            $lookup: {
-              from: "user",
-              localField: "toUserId",
-              foreignField: "_id",
-              as: "toUser",
+      coll: "user",
+      isMany: true,
+      // prefix include '.'
+      customLookup(prefix = "") {
+        return {
+          from: "invitation",
+          let: { ledgerId: `$${prefix}_id` },
+          pipeline: [
+            {
+              $match: { $expr: { $eq: ["$ledgerId", "$$ledgerId"] }, type: 2 },
             },
-          },
-          { $unwind: "$toUser" },
-          { $replaceRoot: { newRoot: "$toUser" } },
-        ],
-        as: "invitees",
+            {
+              $lookup: {
+                from: "user",
+                localField: "toUserId",
+                foreignField: "_id",
+                as: "toUser",
+              },
+            },
+            { $unwind: "$toUser" },
+            { $replaceRoot: { newRoot: "$toUser" } },
+          ],
+          as: `${prefix}invitees`,
+        };
       },
     },
   },
+  invitation: {
+    fromUser: { coll: "user" },
+    toUser: { coll: "user" },
+    ledger: { coll: "ledger" },
+  },
+  record: {
+    category: { coll: "category" },
+    ledger: { coll: "ledger" },
+    user: { coll: "user" },
+  },
+  "point-activity": {
+    fromUser: { coll: "user" },
+    toUser: { coll: "user" },
+    fromRecord: { coll: "record" },
+    toGoods: { coll: "goods" },
+  },
 };
+
+/**
+ * @param {string} coll_name
+ * @param {string} field
+ */
+function getRelation(coll_name, field) {
+  return relationMap[coll_name] && relationMap[coll_name][field];
+}
+
+/**
+ * @param {array} pipeline
+ * @param {string} coll_name
+ * @param {string} field
+ */
+function addRelationPipeline(pipeline, coll_name, field) {
+  if (!field) return;
+
+  // support nest relation (e.g. 'ledger.admin')
+  let prefix = "";
+  let dotIdx = field.indexOf(".");
+  let relation = null;
+  if (dotIdx > 0) {
+    relation = getRelation(coll_name, field.slice(0, dotIdx));
+    coll_name = relation && relation.coll;
+    prefix = coll_name + ".";
+    field = field.slice(dotIdx + 1);
+  }
+  relation = getRelation(coll_name, field);
+  if (!relation) return;
+
+  if (relation.customLookup)
+    pipeline.push({ $lookup: relation.customLookup(prefix) });
+  else {
+    const lookup = {
+      from: relation.coll,
+      localField: prefix + (relation.localField || field + "Id"),
+      foreignField: relation.foreignField || "_id",
+      as: prefix + field,
+    };
+    pipeline.push({ $lookup: lookup });
+  }
+
+  if (!relation.isMany) {
+    pipeline.push({
+      $unwind: { path: "$" + prefix + field, preserveNullAndEmptyArrays: true },
+    });
+  }
+}
 
 /**
  * @param {string} coll_name
@@ -64,46 +124,11 @@ const manyToManyMap = {
  */
 function relationPipeline(coll_name, oneToManyFields, manyToManyFields) {
   const pipeline = [];
-
-  const one_map = oneToManyFields && oneToManyMap[coll_name];
-  console.log(one_map);
-  if (one_map) {
-    if (!Array.isArray(oneToManyFields)) oneToManyFields = [oneToManyFields];
-    for (const field of oneToManyFields) {
-      const relation_coll = one_map[field];
-      if (!relation_coll) continue;
-      pipeline.push({
-        $lookup: {
-          from: relation_coll,
-          localField: field + "Id",
-          foreignField: "_id",
-          as: field,
-        },
-      });
-      pipeline.push({
-        $unwind: { path: "$" + field, preserveNullAndEmptyArrays: true },
-      });
-    }
-  }
-
-  const many_map = manyToManyFields && manyToManyMap[coll_name];
-  if (many_map) {
-    if (!Array.isArray(manyToManyFields)) manyToManyFields = [manyToManyFields];
-    for (const field of manyToManyFields) {
-      const relation = many_map[field];
-      if (!relation) continue;
-      if (relation.customLookup)
-        pipeline.push({ $lookup: relation.customLookup });
-      else
-        pipeline.push({
-          $lookup: {
-            from: relation.coll,
-            localField: relation.localField,
-            foreignField: "_id",
-            as: field,
-          },
-        });
-    }
+  if (!Array.isArray(oneToManyFields)) oneToManyFields = [oneToManyFields];
+  if (!Array.isArray(manyToManyFields)) manyToManyFields = [manyToManyFields];
+  const allFields = [...oneToManyFields, ...manyToManyFields];
+  for (const field of allFields) {
+    addRelationPipeline(pipeline, coll_name, field);
   }
 
   return pipeline;

@@ -240,7 +240,7 @@
  * @group user
  * @summary 取得使用者待回覆的邀請
  * -- ✔️ 可以運作
- * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser
+ * @param {string[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,ledger
  * @returns {Array<Invitation>} 200
  * @security Basic
  */
@@ -396,7 +396,7 @@
  * @summary 查詢帳本所有邀請紀錄
  * -- ✔️ 可以運作
  * @param {string} id.path.required
- * @param {enum[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser
+ * @param {string[]} _one.query - one-to-many relationship fields - eg: fromUser,toUser,ledger
  * @returns {Array<Invitation>} 200
  * @security Basic
  */

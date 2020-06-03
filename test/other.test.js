@@ -33,7 +33,7 @@ test("unit > invitation > find many records", async () => {
   }
 });
 
-test("unit > invitation > find one ledger", async () => {
+test("unit > relation > ledger with admin, users", async () => {
   const ledgerId = "1";
   const ledger = await findOneWithRelation(
     collections.ledger,
@@ -44,6 +44,19 @@ test("unit > invitation > find one ledger", async () => {
   assert(!Array.isArray(ledger));
   assert(ledger.admin != null);
   assert(Array.isArray(ledger.users));
+});
+
+test("unit > nested relation > invitation with ledger, ledger.users", async () => {
+  const invitationId = "1";
+  const invitation = await findOneWithRelation(
+    collections.invitation,
+    invitationId,
+    ["ledger", "ledger.users"],
+    []
+  );
+  assert(!Array.isArray(invitation));
+  assert(invitation.ledger != null);
+  assert(Array.isArray(invitation.ledger.users));
 });
 
 /*
