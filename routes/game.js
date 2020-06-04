@@ -3,15 +3,12 @@ const { collections } = require("../models/mongo");
 const { GoodsSchema } = require("../models/goods.model");
 const loginCheck = require("../middleware/login-check");
 const checkParamsIdExists = require("../middleware/check-params-id-exists");
-const router = require("express").Router();
+const router = require("express-promise-router").default();
 
-router.get(
-  "/user",
-  async function (req, res) {
-    const users = await collections.gameUser.find().toArray();
-    res.status(200).json(users);
-  }
-);
+router.get("/user", async function (req, res) {
+  const users = await collections.gameUser.find().toArray();
+  res.status(200).json(users);
+});
 
 router.get(
   "/user/:id",

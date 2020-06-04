@@ -110,6 +110,7 @@ async function get_mother_agent(app) {
  * @property {PersonAgentInfo} father
  * @property {PersonAgentInfo} mother
  * @property {PersonAgentInfo} child
+ * @property { {agent: SuperTest} } notLogin
  */
 
 /**

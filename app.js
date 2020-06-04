@@ -80,6 +80,12 @@ async function startup() {
   app.use("/api/statistic", require("./routes/statistic"));
   app.use("/api/game", require("./routes/game"));
 
+  // default error handler
+  app.use((err, req, res, next) => {
+    if (err) res.status(500).send(err.message || err);
+    else next();
+  });
+
   // swagger setting
   // @ts-ignore
   const definition = {

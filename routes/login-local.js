@@ -1,5 +1,5 @@
 // @ts-check
-const router = require("express").Router();
+const router = require("express-promise-router").default();
 const { collections } = require("../models/mongo");
 const { AppPassport } = require("../middleware/app-passport");
 const loginCheck = require("../middleware/login-check");

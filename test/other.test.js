@@ -17,9 +17,37 @@ const { notification } = process.env.BABEL_TEST
 const dateCount = process.env.BABEL_TEST
   ? require("../dist/actions/dateCount")
   : require("../actions/dateCount");
+const { get_test_agents } = require("./login.test");
+const router = require("express-promise-router").default();
 
 /** @type {import('express').Application} */
 let app = null;
+/** @type {import('./login.test').Agents} */
+let agents = null;
+
+test.before(async () => {
+  agents = await get_test_agents(app);
+  // api test error
+  router.get("/api/error", (req, res) => {
+    throw "throw Error";
+  });
+  router.get("/api/error/callback", (req, res, next) => {
+    return collections.category.find().toArray(function (err, result) {
+      next("get error");
+    });
+  });
+  router.get("/api/error/promise", (req, res) => {
+    return Promise.reject("primse error");
+  });
+  router.get("/api/error/async", async (req, res) => {
+    await Promise.reject("async Error");
+  });
+  app.use(router);
+  app.use((err, req, res, next) => {
+    if (err) res.status(500).send(err.message || err);
+    else next();
+  });
+});
 
 test("unit > invitation > find many records", async () => {
   const records = await findWithRelation(collections.record, null, [
@@ -77,6 +105,13 @@ test("unit > dateCount", async () => {
 
   nowDate.setDate(13);
   assert.equal(dateCount(nowDate, lastDate, 0), 1);
+});
+
+test("e2e > throw error > return 500", async () => {
+  await agents.notLogin.agent.get("/api/error").expect(500);
+  await agents.notLogin.agent.get("/api/error/callback").expect(500);
+  await agents.notLogin.agent.get("/api/error/promise").expect(500);
+  await agents.notLogin.agent.get("/api/error/async").expect(500);
 });
 
 module.exports = {

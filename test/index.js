@@ -12,6 +12,7 @@ async function run() {
     ? require("../dist/app.js")
     : require("../app.js"));
   await resetDB();
+
   try {
     // 不能改順序
     await require("./middleware.test").run();
@@ -27,7 +28,7 @@ async function run() {
   } catch (err) {
     console.log(err);
   }
-  await server.close();
+  // await server.close();
   await client.close();
 }
 run();

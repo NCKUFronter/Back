@@ -10,7 +10,7 @@ const {
   findOneWithRelation,
 } = require("../actions/coll-relation");
 const { notification } = require("../actions/notification.service");
-const router = require("express").Router();
+const router = require("express-promise-router").default();
 const fs = require("fs");
 const path = require("path");
 
@@ -65,7 +65,7 @@ router.post(
   "/",
   validatePipe("body", LedgerSchema),
   loginCheck(ledger_coll),
-  async function (req, res) {
+  async function (req, res, next) {
     let upPhoto = req.files && req.files.upPhoto;
     if (req.body.photo == null && upPhoto == null)
       return res.status(400).json("Must specify photo!!");
@@ -85,7 +85,7 @@ router.post(
     }
 
     ledger_coll.insertOne(postData, function (err, result) {
-      if (err) throw err;
+      if (err) return next(err);
       console.log("1 document inserted.");
 
       notification.send(
@@ -131,7 +131,7 @@ router.patch(
   loginCheck(ledger_coll),
   checkParamsIdExists(collections.ledger),
   getLedgerAuthGuard((req) => req.convert_from_params.id),
-  async function (req, res) {
+  async function (req, res, next) {
     // @ts-ignore
     const ledger = req.convert_from_params.id;
     const patchFilter = { _id: req.params.id, adminId: req.userId };
@@ -154,7 +154,7 @@ router.patch(
       { $set: patchData },
       { returnOriginal: false },
       function (err, result) {
-        if (err) throw err;
+        if (err) return next(err);
         console.log("1 document updated");
 
         const ledger = req.convert_from_params.id;
@@ -184,14 +184,15 @@ router.delete(
   "/:id",
   loginCheck(ledger_coll),
   checkParamsIdExists(collections.ledger),
-  function (req, res) {
+  function (req, res, next) {
     if (req.userId !== req.convert_from_params.id.adminId)
       return res.status(403).json("No access");
 
     // @ts-ignore
-
     const deleteFilter = { _id: req.params.id, adminId: req.userId };
     ledger_coll.deleteOne(deleteFilter, (err, result) => {
+      if (err) return next(err);
+
       console.log(
         "Delete row: " +
           req.params.id +
@@ -213,7 +214,7 @@ router.delete(
       );
 
       if (ledger.photo && ledger.photo.startsWith("/img/user-ledger")) {
-        fs.unlink(path.resolve("." +ledger.photo), function (err) {
+        fs.unlink(path.resolve("." + ledger.photo), function (err) {
           console.log(err);
         });
       }

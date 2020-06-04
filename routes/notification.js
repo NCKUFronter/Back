@@ -1,5 +1,5 @@
 // @ts-check
-const router = require("express").Router();
+const router = require("express-promise-router").default();
 const loginCheck = require("../middleware/login-check");
 const { notification } = require("../actions");
 const {

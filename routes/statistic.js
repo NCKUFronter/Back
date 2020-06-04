@@ -2,7 +2,7 @@
 const { fetchNextId, collections } = require("../models/mongo");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
-const router = require("express").Router();
+const router = require("express-promise-router").default();
 
 const avail_coll = ["ledger", "user", "category"];
 function getEntityName(name, coll_prefix = "", non_coll_prefix = "") {

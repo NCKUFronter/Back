@@ -11,7 +11,7 @@ const checkParamsIdExists = require("../middleware/check-params-id-exists");
 const { answerInvitation } = require("../actions/invitation.actions");
 const { notification } = require("../actions/notification.service");
 const loginCheck = require("../middleware/login-check");
-const router = require("express").Router();
+const router = require("express-promise-router").default();
 
 router.post(
   "/invite",

@@ -1,6 +1,6 @@
 // @ts-check
 /// <reference types="../types" />
-const router = require("express").Router();
+const router = require("express-promise-router").default();
 const { collections } = require("../models/mongo");
 const loginCheck = require("../middleware/login-check");
 const checkParamsIdExists = require("../middleware/check-params-id-exists");

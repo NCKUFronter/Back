@@ -9,7 +9,7 @@ const checkParamsIdExists = require("../middleware/check-params-id-exists");
 const { findWithRelation, findOneWithRelation } = require("../actions");
 const pointAction = require("../actions/point.actions");
 const { removeRecord, updateRecord } = require("../actions/record.actions");
-const router = require("express").Router();
+const router = require("express-promise-router").default();
 
 const record_coll = collections.record;
 

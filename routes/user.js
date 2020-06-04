@@ -9,18 +9,18 @@ const {
   userInvitations,
   userPointActivities,
 } = require("../actions/user.actions");
-const router = require("express").Router();
+const router = require("express-promise-router").default();
 
 const user_coll = collections.user;
 
 // GET from database
-router.get("/", function (req, res) {
+router.get("/", function (req, res, next) {
   user_coll
     .find(req.query)
     // .sort({ userId: 1 })
     .toArray(function (err, result) {
-      if (err) throw err;
-      res.status(200).send(result);
+      if (err) next(err);
+      else res.status(200).send(result);
     });
 });
 
@@ -34,11 +34,12 @@ router.get("/", function (req, res) {
 //   });
 // });
 
+/*
 router.post(
   "/",
   validatePipe("body", UserSchema),
   loginCheck(user_coll),
-  async function (req, res) {
+  async function (req, res, next) {
     const postData = {
       _id: await fetchNextId(user_coll.collectionName),
       // @ts-ignore
@@ -47,12 +48,13 @@ router.post(
     };
 
     user_coll.insertOne(postData, function (err, result) {
-      if (err) throw err;
+      if (err) return next(err);
       console.log("1 user info inserted.");
       res.status(201).send(result.ops[0]);
     });
   }
 );
+*/
 
 // router.put("/", validatePipe("body", UserSchema), loginCheck(user_coll),
 //  function (req, res) {
@@ -73,11 +75,12 @@ router.post(
 //   );
 // });
 
+/*
 router.patch(
   "/",
   validatePipe("body", UserSchema, { context: { partial: true } }),
   loginCheck(user_coll),
-  function (req, res) {
+  function (req, res, next) {
     // @ts-ignore
     const patchFilter = { _id: req.userId };
     const patchData = {
@@ -88,18 +91,21 @@ router.patch(
       patchData,
       { returnOriginal: false },
       function (err, result) {
-        if (err) throw err;
+        if (err) return next(err);
         console.log("1 document updated");
         res.status(200).send(result.value);
       }
     );
   }
 );
+*/
 
-router.delete("/", loginCheck(user_coll), function (req, res) {
+router.delete("/", loginCheck(user_coll), function (req, res, next) {
   // @ts-ignore
   const deleteFilter = { _id: req.userId };
   user_coll.deleteOne(deleteFilter, (err, result) => {
+    if (err) return next(err);
+
     console.log(
       "Delete row: " +
         req.params.id +
@@ -195,7 +201,7 @@ router.get("/relativeUsers", loginCheck(user_coll), async function (req, res) {
       },
     ])
     .toArray();
-  if(results.length == 0) return res.status(200).json([]);
+  if (results.length == 0) return res.status(200).json([]);
 
   const users = results[0].users;
   for (let i = 0; i < users.length; i++) {

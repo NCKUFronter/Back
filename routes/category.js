@@ -9,28 +9,28 @@ const { CategorySchema } = require("../models/category.model");
 const checkParamsIdExists = require("../middleware/check-params-id-exists");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
-const router = require("express").Router();
+const router = require("express-promise-router").default();
 
 // 假設已經 connectDB
 const category_coll = collections.category;
 
 // GET from database
-router.get("/", function (req, res) {
+router.get("/", function (req, res, next) {
   category_coll
     .find(req.query)
     // .sort({ categoryId: 1 })
     .toArray(function (err, result) {
-      if (err) throw err;
-      res.status(200).send(result);
+      if (err) next(err);
+      else res.status(200).send(result);
     });
 });
 
 // GET certain data from database
-router.get("/:id", function (req, res) {
+router.get("/:id", function (req, res, next) {
   const getData = { _id: req.params.id };
   category_coll.findOne(getData, function (err, result) {
-    if (err) throw err;
-    res.status(200).send(result);
+    if (err) next(err);
+    else res.status(200).send(result);
   });
 });
 
@@ -52,7 +52,7 @@ router.post(
       res.status(201).send(result.ops[0]);
     });
     */
-    workInTransaction(async (session) => {
+    return workInTransaction(async (session) => {
       const { hashtags, ...cate_dto } = req.body;
       cate_dto.userId = req.userId;
       const result = await simpleInsertOne(
@@ -114,7 +114,7 @@ router.patch(
     if (category.userId != null && category.userId !== req.userId)
       return res.status(403).json("No access");
 
-    workInTransaction(async (session) => {
+    return workInTransaction(async (session) => {
       const { hashtags, ...cate_dto } = req.body;
       if (Object.keys(cate_dto).length !== 0) {
         await collections.category.updateOne(
