@@ -2,6 +2,7 @@
 const { fetchNextId, collections } = require("../models/mongo");
 const validatePipe = require("../middleware/validate-pipe");
 const loginCheck = require("../middleware/login-check");
+const { StatisticQuerySchema } = require("../models/statistic.model");
 const router = require("express-promise-router").default();
 
 const avail_coll = ["ledger", "user", "category"];
@@ -9,6 +10,36 @@ function getEntityName(name, coll_prefix = "", non_coll_prefix = "") {
   if (name === "ledger") return coll_prefix + "ledgerName";
   else if (avail_coll.includes(name)) return coll_prefix + "name";
   else return non_coll_prefix + name;
+}
+
+/**
+ * @param {Date} start
+ * @param {Date} end
+ * @param {any} match
+ */
+function recordDateCond(start, end, match = {}) {
+  // 存在資料庫不統一的情形(以前date假設包含時間，但現在沒有)
+  if (start || end) match.date = {};
+  if (start) match.date.$gte = start;
+  if (end) match.date.$lt = end;
+  return match;
+}
+
+function pointTimeCond(start, end, match = {}) {
+  // record的日期是Date格式，而pointActivity的time是string格式
+  if (start || end) match.time = {};
+  if (start) {
+    const new_start = new Date(start);
+    new_start.setHours(new_start.getHours() - 8);
+    match.time.$gte = new_start.toISOString();
+  }
+  if (end) {
+    const new_end = new Date(end);
+    new_end.setHours(end.getHours() - 8);
+    match.time.$lt = new_end.toISOString();
+  }
+  console.log(match);
+  return match;
 }
 
 /**
@@ -220,87 +251,129 @@ async function makeStatistic(match, branches, coll = collections.record) {
 // available branch: ledgerId, categoryId, userId, recordType
 // sum with money
 // hashtag always be latest one
-router.get("/ledger", loginCheck(null), async function (req, res) {
-  const { order } = req.query;
-  const ledgers = await collections.ledger
-    .find({ userIds: req.userId })
-    .toArray();
-  const ledgerIds = ledgers.map((ledger) => ledger._id);
-  let summary = await makeStatistic({ ledgerId: { $in: ledgerIds } }, order);
-  if(!summary) summary = {}
-  summary.name = "帳本";
+router.get(
+  "/ledger",
+  loginCheck(null),
+  validatePipe("query", StatisticQuerySchema),
+  async function (req, res) {
+    const { order, start, end } = req.query;
+    const ledgers = await collections.ledger
+      .find({ userIds: req.userId })
+      .toArray();
+    const ledgerIds = ledgers.map((ledger) => ledger._id);
+    let summary = await makeStatistic(
+      recordDateCond(start, end, { ledgerId: { $in: ledgerIds } }),
+      order
+    );
+    if (!summary) summary = {};
+    summary.name = "帳本";
 
-  return res.status(200).json(summary);
-});
+    return res.status(200).json(summary);
+  }
+);
 
 // available: type, user, flow, subtype
-router.get("/points", loginCheck(null), async function (req, res) {
-  const { order } = req.query;
-  let branches = order;
-  if (!Array.isArray(branches)) branches = [branches];
+router.get(
+  "/points",
+  loginCheck(null),
+  validatePipe("query", StatisticQuerySchema),
+  async function (req, res) {
+    const { order, start, end } = req.query;
+    let branches = order;
+    if (!Array.isArray(branches)) branches = [branches];
 
-  /** @type {any} */
-  const basePipeline = [
-    { $match: { $or: [{ fromUserId: req.userId }, { toUserId: req.userId }] } },
-    {
-      $addFields: {
-        flow: {
-          $cond: [{ $eq: ["$fromUserId", req.userId] }, "out", "in"],
-        },
-        userId: {
-          $cond: [
-            { $eq: ["$type", "transfer"] },
-            {
-              $cond: [
-                { $eq: ["$fromUserId", req.userId] },
-                "$toUserId",
-                "$fromUserId",
-              ],
-            },
-            "$$REMOVE",
+    /** @type {any} */
+    const basePipeline = [
+      {
+        $match: {
+          $or: [
+            pointTimeCond(start, end, { fromUserId: req.userId }),
+            pointTimeCond(start, end, { toUserId: req.userId }),
           ],
+        },
+      },
+      {
+        $addFields: {
+          flow: {
+            $cond: [{ $eq: ["$fromUserId", req.userId] }, "out", "in"],
+          },
+          userId: {
+            $cond: [
+              { $eq: ["$type", "transfer"] },
+              {
+                $cond: [
+                  { $eq: ["$fromUserId", req.userId] },
+                  "$toUserId",
+                  "$fromUserId",
+                ],
+              },
+              "$$REMOVE",
+            ],
+          },
+        },
+      },
+    ];
+
+    let coll_name = branches.pop();
+    basePipeline.push(...hashtagsPipeline(coll_name, branches, "amount"));
+
+    while (branches.length > 0) {
+      let last_coll_name = coll_name;
+      coll_name = branches.pop();
+      basePipeline.push(
+        ...otherPipeline(coll_name, last_coll_name, branches, "amount")
+      );
+    }
+    basePipeline.push(...endPipeline(coll_name, "amount"));
+    console.log(basePipeline);
+
+    const arr = await collections.pointActivity
+      .aggregate(basePipeline)
+      .toArray();
+    let summary = arr[0];
+    if (!summary) summary = {};
+    summary.name = "點數";
+
+    return res.status(200).json(arr);
+  }
+);
+
+// available: recordType, categor, ledger
+router.get(
+  "/personal",
+  loginCheck(null),
+  validatePipe("query", StatisticQuerySchema),
+  async function (req, res) {
+    const { order, start, end } = req.query;
+    let summary = await makeStatistic(
+      recordDateCond(start, end, { userId: req.userId }),
+      order
+    );
+    if (!summary) summary = {};
+    summary.name = "個人";
+
+    return res.status(200).json(summary);
+  }
+);
+
+const testbranches = () => ["ledger", "user", "recordType", "category"];
+
+function testPipeline() {
+  const branches = testbranches();
+  /** @type {any[]} */
+  const basePipeline = [
+    {
+      $match: {
+        ledgerId: { $in: ["1", "2"] },
+        date: {
+          $gte: new Date("2020-04-19T00:00:00.000Z"),
+          $lt: new Date("2020-04-22T00:00:00.000Z"),
         },
       },
     },
   ];
 
   let coll_name = branches.pop();
-  basePipeline.push(...hashtagsPipeline(coll_name, branches, "amount"));
-
-  while (branches.length > 0) {
-    let last_coll_name = coll_name;
-    coll_name = branches.pop();
-    basePipeline.push(
-      ...otherPipeline(coll_name, last_coll_name, branches, "amount")
-    );
-  }
-  basePipeline.push(...endPipeline(coll_name, "amount"));
-
-  const arr = await collections.pointActivity.aggregate(basePipeline).toArray();
-  let summary = arr[0];
-  if(!summary) summary = {}
-  summary.name = "點數";
-
-  return res.status(200).json(summary);
-});
-
-// available: recordType, categor, ledger
-router.get("/personal", loginCheck(null), async function (req, res) {
-  const { order } = req.query;
-  let summary = await makeStatistic({ userId: req.userId }, order);
-  if(!summary) summary = {}
-  summary.name = "個人";
-
-  return res.status(200).json(summary);
-});
-
-const testbranches = () => ["ledger", "user", "recordType", "category"];
-router.get("/test-pipeline", async function (req, res) {
-  const branches = testbranches();
-  /** @type {any[]} */
-  const basePipeline = [{ $match: { ledgerId: { $in: ["1", "2"] } } }];
-
-  let coll_name = branches.pop();
   basePipeline.push(...hashtagsPipeline(coll_name, branches));
 
   while (branches.length > 0) {
@@ -309,28 +382,18 @@ router.get("/test-pipeline", async function (req, res) {
     basePipeline.push(...otherPipeline(coll_name, last_coll_name, branches));
   }
   basePipeline.push(...endPipeline(coll_name));
-
-  return res.status(200).json(basePipeline);
+  return basePipeline;
+}
+router.get("/test-pipeline", async function (req, res) {
+  return res.status(200).json(testPipeline());
 });
 
 router.get("/test", async function (req, res) {
-  const branches = testbranches();
   /** @type {any[]} */
-  const basePipeline = [{ $match: { ledgerId: { $in: ["1", "2"] } } }];
-
-  let coll_name = branches.pop();
-  basePipeline.push(...hashtagsPipeline(coll_name, branches));
-
-  while (branches.length > 0) {
-    let last_coll_name = coll_name;
-    coll_name = branches.pop();
-    basePipeline.push(...otherPipeline(coll_name, last_coll_name, branches));
-  }
-  basePipeline.push(...endPipeline(coll_name));
-
+  const basePipeline = testPipeline();
   const arr = await collections.record.aggregate(basePipeline).toArray();
 
-  res.status(200).json(arr[0]);
+  res.status(200).json(arr);
 });
 
 /*

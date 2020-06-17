@@ -488,11 +488,15 @@
 // ---------  Statistic ---------
 /**
  * ℹ️ order順序等同分類順序，請注意
+ * ℹ️ 最底層才有hashtags的統計
+ * ℹ️ 假設時間都只填到日期(不填細部 時、分、秒)
  * @route GET /statistic/ledger
  * @group statistic
  * @summary 取得帳本的統計
  * -- ✔️ 可以運作
  * -- ℹ️ 有資訊
+ * @param {string} start.query - 包含 - eg:2019-05-06T15:21:32.202Z
+ * @param {string} end.query - 不包含 - eg:2020-05-06T15:21:32.202Z
  * @param {string[]} order.query.required - available: ledger, recordType, user, category
  * @returns {string} 200 - success
  * @returns {string} 401 - 未登入
@@ -501,11 +505,15 @@
 
 /**
  * ℹ️ order順序等同分類順序，請注意
+ * ℹ️ 最底層才有hashtags的統計
+ * ℹ️ 假設時間都只填到日期(不填細部 時、分、秒)
  * @route GET /statistic/personal
  * @group statistic
  * @summary 取得個人的統計
  * -- ✔️ 可以運作
  * -- ℹ️ 有資訊
+ * @param {string} start.query - 包含 - eg:2019-05-06T15:21:32.202Z
+ * @param {string} end.query - 不包含 - eg:2020-05-06T15:21:32.202Z
  * @param {string[]} order.query.required - available: ledger, recordType, category
  * @returns {string} 200 - success
  * @returns {string} 401 - 未登入
@@ -514,11 +522,15 @@
 
 /**
  * ℹ️ order順序等同分類順序，請注意
+ * ℹ️ 沒有對hashtags的統計(點數本身沒有hashtags，只是懶惰沒有去掉回傳中的hashtags)
+ * ℹ️ 假設時間都只填到日期(不填細部 時、分、秒)
  * @route GET /statistic/points
  * @group statistic
  * @summary 取得點數的統計
  * -- ✔️ 可以運作
  * -- ℹ️ 有資訊
+ * @param {string} start.query - 包含 - eg:2019-05-06T15:21:32.202Z
+ * @param {string} end.query - 不包含 - eg:2020-05-06T15:21:32.202Z
  * @param {string[]} order.query.required - available: type, user, flow, subtype
  * @returns {string} 200 - success
  * @returns {string} 401 - 未登入
