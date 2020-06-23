@@ -34,7 +34,7 @@ const ConsumePointsSchema = Joi.object({
  * @property {string} toUserId - for type = 'transfer' or 'new'
  * @property {string} fromUserId - for type = 'consume' or 'transfer'
  * @property {string} toGoodsId - for type = 'consume'
- * @property {string} quantity - for type = 'consume'
+ * @property {number} quantity.required
  */
 class PointActivityModel {
   /** @type {string} */
@@ -48,6 +48,9 @@ class PointActivityModel {
 
   /** @type {string} */
   time;
+
+  /** @type {number} */
+  quantity = 1;
 
   /**
    * @param {'new' | 'transfer' | 'consume'} type

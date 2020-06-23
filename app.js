@@ -56,8 +56,16 @@ async function startup() {
   createFolder(__dirname + "/img/user-ledger");
 
   // Log in
+  const sessionStore = new session.MemoryStore();
+  app.use(
   // @ts-ignore: 型別定義不符合express，但可以work
-  app.use(session({ secret: "cats", resave: false, saveUninitialized: false }));
+    session({
+      secret: process.env.SESSION_SECRET || "cats",
+      resave: false,
+      saveUninitialized: false,
+      store: sessionStore,
+    })
+  );
   app.use(AppPassport.initialize());
   app.use(AppPassport.session());
   // @ts-ignore: 型別定義不符合express，但可以work
@@ -120,7 +128,7 @@ async function startup() {
     ? https.createServer(KeyCert, app)
     : http.createServer(app);
 
-  AppSocketIO(server);
+  AppSocketIO(server, sessionStore);
   await server.listen(port, function () {
     console.log(`App listening on port ${port}!`);
   });

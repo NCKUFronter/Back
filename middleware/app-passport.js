@@ -2,7 +2,7 @@
 const AppPassport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
-const { collections } = require("../models/mongo");
+const { collections, workInTransaction } = require("../models/mongo");
 const keys = require("../config/keys");
 
 AppPassport.use(
@@ -50,10 +50,8 @@ AppPassport.use(
   ) {
     const user_coll = collections.user;
     user_coll.findOne({ email: email }, function (err, user) {
-      console.log({ now: "local strategy", username: user.name });
-      if (err) {
-        return done(err);
-      }
+      if (err) return done(err);
+      console.log({ now: "local strategy", username: user && user.name });
       if (!user) {
         return done(null, false, { message: "Incorrect email." });
       }
@@ -65,6 +63,22 @@ AppPassport.use(
   })
 );
 
+async function autoCreateGameUser(user) {
+  return workInTransaction(async (session) => {
+    const game_user_prom = collections.gameUser.insertOne(
+      { _id: user._id, name: user.name, bag: {} },
+      { session }
+    );
+
+    const user_prom = collections.user.updateOne(
+      { _id: user._id },
+      { $set: { gameUserId: user._id } },
+      { session }
+    );
+    await Promise.all([user_prom, game_user_prom]);
+  });
+}
+
 AppPassport.serializeUser(function (user, done) {
   console.log({ type: "serialize", username: user.name });
   done(null, { _id: user._id });
@@ -72,8 +86,9 @@ AppPassport.serializeUser(function (user, done) {
 
 AppPassport.deserializeUser(function (filter, done) {
   console.log({ type: "deserialize", filter });
-  collections.user.findOne(filter, function (err, user) {
+  collections.user.findOne(filter, async function (err, user) {
     console.log({ err, username: user && user.name });
+    if (user != null && user.gameUserId == null) await autoCreateGameUser(user);
     done(err, user);
   });
 });

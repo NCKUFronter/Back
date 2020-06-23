@@ -22,6 +22,7 @@ declare global {
       email: string;
       cardIds: string[];
       rewardPoints: number;
+      gameUserId: string;
       categoryTags: { [key: string]: string[] };
       conDays: number;
       lastLogin: Date;

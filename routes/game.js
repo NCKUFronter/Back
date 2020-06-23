@@ -1,5 +1,5 @@
 // @ts-check
-const { collections } = require("../models/mongo");
+const { collections, workInTransaction } = require("../models/mongo");
 const { GoodsSchema } = require("../models/goods.model");
 const loginCheck = require("../middleware/login-check");
 const checkParamsIdExists = require("../middleware/check-params-id-exists");

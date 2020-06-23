@@ -131,6 +131,7 @@ async function transferPoints(subtype, amount, fromUser, toUser) {
  * @param { string } subtype
  * @param { UserModel } user
  * @param { object } goods
+ * @param { number } quantity
  * @return { Promise<boolean> } 是否成功
  */
 async function consumePoints(subtype, user, goods, quantity) {
@@ -140,11 +141,7 @@ async function consumePoints(subtype, user, goods, quantity) {
     // update user
     const user_prom = collections.user.updateOne(
       { _id: user._id },
-      {
-        $inc: {
-          rewardPoints: -goods.point * quantity,
-        },
-      },
+      { $inc: { rewardPoints: -goods.point * quantity } },
       { session }
     );
 
@@ -161,7 +158,6 @@ async function consumePoints(subtype, user, goods, quantity) {
       user._id,
       goods._id
     );
-    // @ts-ignore
     activity.quantity = quantity;
 
     const activity_prom = simpleInsertOne(

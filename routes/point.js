@@ -86,9 +86,19 @@ router.post(
     if (!goods) return res.status(404).json("Goods Not Found");
     if (req.user.rewardPoints < goods.point)
       return res.status(400).json("No enough points");
-
     // console.log(user, good);
     await pointAction.consumePoints("", req.user, goods, req.body.quantity);
+
+    notification.send(
+      req,
+      {
+        type: "point",
+        action: "consume",
+        goodsId: req.params.goodsId,
+        quantity: req.body.quantity
+      },
+      [req.user._id]
+    );
 
     res.status(200).json("consume success");
   }

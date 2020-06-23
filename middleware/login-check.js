@@ -1,8 +1,8 @@
 // @ts-check
-const { collections } = require("../models/mongo");
+const { collections, workInTransaction } = require("../models/mongo");
 
 function loginCheck(coll) {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     if (req.isAuthenticated()) {
       if (Array.isArray(req.user)) req.user = req.user[0];
       req.userId = req.user._id;
