@@ -16,6 +16,7 @@ const flash = require("connect-flash");
 const { connectDB, collections, client } = require("./models/mongo");
 const swaggerGenerator = require("express-swagger-generator");
 const swaggerUi = require("swagger-ui-express");
+const path = require("path");
 
 const createFolder = function (folder) {
   try {
@@ -43,11 +44,16 @@ async function startup() {
 
   // @ts-ignore
   app.use(compression());
-  app.use(require("./middleware/front-end-hook"));
   // @ts-ignore
   app.use(cookieParser());
   // @ts-ignore
   app.use(fileUpload({ limits: { fileSize: 1 * 1024 * 1024 } }));
+  if (process.env.SUPPORT_GAME)
+    app.use(
+      "/game",
+      express.static(path.resolve(process.env.GAME_PREFIX || "../Game"))
+    );
+  app.use(require("./middleware/front-end-hook"));
   app.use("/api/img", express.static(__dirname + "/img"));
 
   // init ledger photo directory
