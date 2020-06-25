@@ -2,6 +2,7 @@
 const Props = require("../objects/props");
 const Weapon = require("../objects/Weapon");
 const Skill = require("../objects/skill");
+const Bag = require('../objects/bag');
 
 const ClassMapping = {
   [Props.name]: Props,
@@ -11,12 +12,13 @@ const ClassMapping = {
 
 /**
  * @template T
+ * @param {Bag} bag
  * @param {any} obj
  * @return {T}
  */
-function deserializeObject(obj) {
+function deserializeObject(bag, obj) {
   const classType = ClassMapping[obj.class_type];
-  return classType.deserialize(obj);
+  return classType.deserialize(bag, obj);
 }
 
 module.exports = {

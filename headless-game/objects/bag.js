@@ -104,10 +104,10 @@ class Bag {
   constructor(player) {
     this.player = player;
     this.skills = new SimpleBagGroup(player, [
-      Skill.deserialize(ObjectMall["xx1"]),
-      Skill.deserialize(ObjectMall["xx2"]),
-      Skill.deserialize(ObjectMall["xx3"]),
-      Skill.deserialize(ObjectMall["xx4"]),
+      Skill.deserialize(this, ObjectMall["xx1"]),
+      Skill.deserialize(this, ObjectMall["xx2"]),
+      Skill.deserialize(this, ObjectMall["xx3"]),
+      Skill.deserialize(this, ObjectMall["xx4"]),
     ]);
     this.weapons = new AmountBagGroup(player, null);
     this.props = new AmountBagGroup(player, null);
@@ -130,7 +130,7 @@ class Bag {
     const object_info = Object.assign({}, ObjectMall[goodsId]);
     if (quantity != null) object_info.amount = quantity;
 
-    const object = deserializeObject(object_info);
+    const object = deserializeObject(this, object_info);
     if (object.class_type === Weapon.name) {
       this.weapons.add(object);
     } else if (object.class_type === Props.name) {

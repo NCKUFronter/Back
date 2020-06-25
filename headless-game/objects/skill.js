@@ -1,11 +1,13 @@
 // @ts-check
 const Player = require("./player");
 const Bullet = require("./bullet");
+const Bag = require("./bag");
 
 /**
  * @typedef SkillParams
  * @property {Phaser.Scene} scene
  * @property {import('./bullet').BulletConfig} bulletCfg
+ * @property {Bag} bag
  * @property {number} timeout
  */
 
@@ -63,11 +65,14 @@ class Skill {
   }
 
   /**
+   * @param {Bag} bag
    * @param {any} obj
    * @return Skill
    */
-  static deserialize(obj) {
-    return Object.assign(new Skill(obj), obj);
+  static deserialize(bag, obj) {
+    const info = Object.assign({}, obj);
+    info.bag = bag;
+    return Object.assign(new Skill(info), info);
   }
 }
 

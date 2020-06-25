@@ -66,10 +66,13 @@ const ObjectMall = {
     type: "props",
     name: "竹蜻蜓",
     key: "",
-    intro: "角色移動速度加成30秒",
+    intro: "角色移動速度加成3秒",
     /** @type {(this:Props) => void} */
     _use() {
-      console.log("custom use");
+      this.owner.base_vel *= 2;
+      this.owner.getScene().time.delayedCall(3000, () => {
+        this.owner.base_vel /= 2;
+      });
     },
   },
   "2": {
@@ -93,10 +96,14 @@ const ObjectMall = {
     name: "蟲洞",
     intro: "切換場景",
     key: "",
+    field: "hp",
+    value: 2,
     /** @type {(this:Props) => void} */
+    /*
     _use() {
       console.log("custom use goods3");
     },
+    */
   },
   "4": {
     _id: "4",
@@ -106,9 +113,7 @@ const ObjectMall = {
     intro: "畫面閃動特效3秒",
     key: "",
     /** @type {(this:Props) => void} */
-    _use() {
-      console.log("custom use goods4");
-    },
+    _use() {},
   },
   "5": {
     _id: "5",
@@ -118,9 +123,9 @@ const ObjectMall = {
     key: "",
     bulletCfg: {
       key: "",
-      type: "atk",
-      speed: 1000,
-      atk: 100,
+      type: "heal",
+      speed: 1500,
+      heal: 0.5,
     },
   },
   "6": {
@@ -131,9 +136,9 @@ const ObjectMall = {
     key: "",
     bulletCfg: {
       key: "",
-      type: "poison",
+      type: "paralysis",
       speed: 1000,
-      atk: 5,
+      timeout: 2000,
     },
   },
   "7": {
@@ -145,8 +150,8 @@ const ObjectMall = {
     bulletCfg: {
       key: "",
       type: "paralysis",
-      speed: 1000,
-      atk: 0,
+      speed: 500,
+      timeout: 5000,
     },
   },
   "8": {
@@ -157,9 +162,9 @@ const ObjectMall = {
     key: "",
     bulletCfg: {
       key: "",
-      type: "atk",
-      speed: 1000,
-      atk: 100,
+      type: "heal",
+      speed: 500,
+      heal: 2,
     },
   },
   "9": {
@@ -170,9 +175,9 @@ const ObjectMall = {
     key: "",
     bulletCfg: {
       key: "",
-      type: "atk",
+      type: "poison",
       speed: 1000,
-      atk: 100,
+      poison: 1,
     },
   },
   "10": {
@@ -184,8 +189,8 @@ const ObjectMall = {
     bulletCfg: {
       key: "",
       type: "atk",
-      speed: 1000,
-      atk: 100,
+      speed: 500,
+      atk: 2,
     },
   },
   "11": {

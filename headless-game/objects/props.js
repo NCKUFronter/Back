@@ -1,9 +1,11 @@
 // @ts-check
 const Player = require("./player");
+const Bag = require("./bag");
 
 /**
  * @typedef PropsParams
  * @property {Phaser.Scene} scene
+ * @property {Bag} bag
  * @property {string=} field
  * @property {number=} value
  */
@@ -42,11 +44,14 @@ class Props {
   }
 
   /**
+   * @param {Bag} bag
    * @param {any} obj
    * @return Props
    */
-  static deserialize(obj) {
-    return Object.assign(new Props(obj), obj);
+  static deserialize(bag, obj) {
+    const info = Object.assign({}, obj);
+    info.bag = bag;
+    return Object.assign(new Props(info), info);
   }
 }
 
