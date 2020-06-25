@@ -1,6 +1,6 @@
 // @ts-check
 const Props = require("../objects/props");
-const Weapon = require("../objects/Weapon");
+const Weapon = require("../objects/weapon");
 const Skill = require("../objects/skill");
 const Bag = require('../objects/bag');
 
