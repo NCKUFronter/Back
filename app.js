@@ -10,7 +10,6 @@ const https = require("https");
 const http = require("http");
 const cors = require("cors");
 const { AppPassport } = require("./middleware/app-passport");
-const AppSocketIO = require("./middleware/app-socketio");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
@@ -58,7 +57,7 @@ async function startup() {
   // Log in
   const sessionStore = new session.MemoryStore();
   app.use(
-  // @ts-ignore: 型別定義不符合express，但可以work
+    // @ts-ignore: 型別定義不符合express，但可以work
     session({
       secret: process.env.SESSION_SECRET || "cats",
       resave: false,
@@ -128,7 +127,9 @@ async function startup() {
     ? https.createServer(KeyCert, app)
     : http.createServer(app);
 
-  AppSocketIO(server, sessionStore);
+  if (process.env.SUPPORT_GAME) {
+    require("./middleware/app-socketio")(server, sessionStore);
+  }
   await server.listen(port, function () {
     console.log(`App listening on port ${port}!`);
   });

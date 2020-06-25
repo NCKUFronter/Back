@@ -1,0 +1,53 @@
+// @ts-check
+const Player = require("./player");
+
+/**
+ * @typedef PropsParams
+ * @property {Phaser.Scene} scene
+ * @property {string=} field
+ * @property {number=} value
+ */
+
+class Props {
+  /** @type string */ _id;
+  /** @type Player */ owner;
+
+  /** @type string | undefined */ field;
+  /** @type number | undefined */ value;
+  /** @type number */ amount;
+
+  /** @param {PropsParams} params */
+  constructor(params) {
+    Object.assign(this, params); // 偷懶方式
+  }
+
+  canUse() {
+    if (this.owner) return this.amount > 0 && this.owner.active;
+    else return this.amount > 0;
+  }
+
+  /** @param {string=} uuid */
+  use(uuid) {
+    if (!this.canUse()) return;
+    this.amount--;
+
+    if (this.amount == 0) this.owner.bag.props.remove(this);
+    if (this.owner) this._use(uuid);
+  }
+
+  // for multiplayer scene
+  /** @param {string=} uuid */
+  _use(uuid) {
+    if (this.field) this.owner[this.field] += this.value;
+  }
+
+  /**
+   * @param {any} obj
+   * @return Props
+   */
+  static deserialize(obj) {
+    return Object.assign(new Props(obj), obj);
+  }
+}
+
+module.exports = Props;

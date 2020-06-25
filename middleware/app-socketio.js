@@ -5,70 +5,112 @@ const passportSocketio = require("passport.socketio");
 const { workInTransaction, collections } = require("../models/mongo");
 const {
   IdSchema,
-  BulletMovingSchema,
-  PositionSchema,
-  MovingSchema,
-  BulletSchema,
-  BulletHurtSchema,
+  CursorsSchema,
+  FnSchema,
+  MaybeFnSchema,
 } = require("../models/event.model");
 const uuid = require("uuid");
+const RoomManager = require("../headless-game/room-manager");
+const Bag = require("../headless-game/objects/bag");
 
 /**
  * @typedef AppSocketInfo
+ * @property {boolean} isLogin
  * @property {any} player
  * @property {string} playerId
+ * @property {Bag} bag
+ * @property {{[id: string]: number}} bagUse
  */
 /**
  * @typedef {AppSocketInfo & import('socket.io').Socket} AppSocket
  */
 
-const rooms = {
-  multiplayer: "multiplayer",
-};
-
-const players = {};
 const playerScoketIdMap = {};
-const bullets = {};
 
 const events = {
   player: {
-    use: "player:use",
+    use: "player:use", // client -> server
+    info: "player:info", // client <-> server
+    shopping: "player:shopping", // server -> client
+    join: "player:join", // client -> server
+    leave: "player:leave", // client -> server
     moving: "player:moving",
-    info: "player:info",
-    shooting: "player:shooting",
-    shopping: "player:shopping",
-    bag: "player:bag",
-  },
-  multi: {
-    init: "multi:init",
-    bullets: "multi:bullets",
-    join: "multi:join",
-    unjoin: "multi:unjoin",
-  },
-  bullet: {
-    moving: "bullet:moving",
-    hurt: "bullet:hurt",
-    destroy: "bullet:destroy",
   },
   server: {
     error: "server:error",
   },
 };
 
+/** @type RoomManager */ let room;
 /**
  * @param {AppSocket} socket
  * @param {import('@hapi/joi').Schema} schema
  * @param {Function} callback
- * @param {string=} room
+ * @param {string=} room_name
  */
-function SocketValidatePipe(socket, schema, callback, room) {
+function SocketValidatePipe(socket, schema, callback, room_name) {
   return (/** @type any */ data, fn) => {
     if (!schema) return;
-    if (room && !socket.rooms[room]) return; // ignore unauthorized error
-    const { error, value } = schema.validate(data);
+    if (room_name && !socket.rooms[room_name]) return; // ignore unauthorized error
+    const { error, value } = schema.validate(data, { abortEarly: false });
+    const error2 = MaybeFnSchema.validate(fn).error;
     if (error) socket.emit(events.server.error, { status: 400, error });
-    else callback(data, fn);
+    else if (error2)
+      socket.emit(events.server.error, {
+        status: 400,
+        error: "only accept one parameter",
+      });
+    else {
+      try {
+        callback(data, fn);
+      } catch (error) {
+        console.error(error);
+        socket.emit(events.server.error, { status: 500, error });
+      }
+    }
   };
+}
+
+/** @param {AppSocket} socket */
+function personInfo(socket) {
+  return Object.assign(socket.player, { bag: socket.bag.serialize() });
+}
+
+/** @param {AppSocket} socket */
+function loginCheck(socket, next) {
+  socket.isLogin = socket.request.user.logged_in;
+  socket.bagUse = {};
+
+  // 未登入可以玩，多頁面登入當作未登入
+  if (!socket.isLogin)
+    socket.emit(events.server.error, {
+      status: 401,
+      error: "No session found",
+    });
+  else if (playerScoketIdMap[socket.request.user.gameUserId]) {
+    socket.isLogin = false;
+    socket.emit(events.server.error, {
+      status: 403,
+      error: "Duplicate",
+    });
+  }
+
+  // 放入玩家資訊
+  if (socket.isLogin) {
+    const gameUserId = socket.request.user.gameUserId;
+    playerScoketIdMap[gameUserId] = socket.id;
+    collections.gameUser.findOne({ _id: gameUserId }).then((player) => {
+      socket.player = player;
+      next();
+    });
+  } else {
+    socket.player = {
+      _id: socket.id,
+      name: "訪客" + socket.id.slice(0, 5),
+      bag: {},
+    };
+    next();
+  }
 }
 
 /**
@@ -76,6 +118,7 @@ function SocketValidatePipe(socket, schema, callback, room) {
  */
 function AppSocketIO(server, store) {
   const io = SocketIO(server);
+  room = new RoomManager(io, "multiplayer");
   io.use(
     passportSocketio.authorize({
       secret: process.env.SESSION_SECRET,
@@ -83,108 +126,106 @@ function AppSocketIO(server, store) {
       /** @param {import('http').IncomingMessage} data */
       success: (data, accept) => {
         // @ts-ignore
-        if (false && playerScoketIdMap[data.user.gameUserId])
-          accept({ status: 400, message: "Duplicate" });
-        else accept(null, true);
+        // if (false && playerScoketIdMap[data.user.gameUserId])
+        // accept({ status: 400, message: "Duplicate" });
+        // else accept(null, true);
+        accept(null, true);
       },
       /** @param {import('http').IncomingMessage} data */
       fail: (data, message, err, accept) => {
         // if (err) throw new Error(message);
-        return accept({ status: 401, message }, false);
+        // return accept({ status: 401, message }, false);
+        accept(null, true);
       },
     })
-  ).use((/** @type {AppSocket} */ socket, next) => {
-    const gameUserId = socket.request.user.gameUserId;
-    playerScoketIdMap[gameUserId] = socket.id;
-    collections.gameUser.findOne({ _id: gameUserId }).then((player) => {
-      socket.player = player;
-      next();
-    });
-  });
+  );
+
+  io.use(loginCheck);
   io.on("connect", DefaultSocketHandler);
 }
 
 function DefaultSocketHandler(/** @type AppSocket */ socket) {
+  console.log(socket.id + " connect");
+  // init data
   socket.playerId = socket.player._id;
   socket.player._id = socket.id; // replace _id with socket.id
+  socket.bag = new Bag(null);
+  socket.bag.syncBag(socket.player.bag);
 
   // init
-  socket.emit(events.player.info, socket.player);
+  socket.emit(events.player.info, personInfo(socket));
   socket.emit("nothing", { xxx: "xxx" });
   socket.on(events.player.info, () => {
-    socket.emit(events.player.info, socket.player);
+    socket.emit(events.player.info, personInfo(socket));
   });
 
   socket.on(
     events.player.use,
     SocketValidatePipe(socket, IdSchema, (/** @type string */ goodsId, fn) => {
-      if (goodsId.startsWith("xx")) return;
-      else if (socket.player.bag && socket.player.bag[goodsId] > 0) {
-        fn(true);
-        socket.player.hasUseObject = true;
-        socket.player.bag[goodsId] -= 1;
-        if (socket.player.bag[goodsId] == 0) delete socket.player.bag[goodsId];
-      }
+      // if use
+      const obj = socket.bag.findObjectById(goodsId);
+      if (obj && obj.canUse()) {
+        // if safe to use
+        const id = uuid.v4();
+        fn(id);
+        obj.use(id);
+        if (obj["amount"] != null) {
+          if (socket.bagUse[goodsId] == null) socket.bagUse[goodsId] = -1;
+          else socket.bagUse[goodsId] -= 1;
+        }
+      } else fn(false);
     })
   );
-  const notices$ = notification
-    .listen()
-    .filter((e) => e.from._id === socket.request.user._id)
-    .filter((e) => e.data.type == "point" && e.data.action == "consume")
-    .subscribe(
-      (e) => {
-        const bag = socket.player.bag;
-        if (bag[e.data.goodsId] == null) bag[e.data.goodsId] = 0;
-        bag[e.data.goodsId] += e.data.quantity;
-        socket.emit(events.player.shopping, {
-          id: e.data.goodsId,
-          quantity: e.data.quantity,
-        });
-      },
-      console.log,
-      console.log
-    );
+
+  let notices$ = null;
+  if (socket.isLogin) {
+    notices$ = notification
+      .listen()
+      .filter((e) => e.from._id === socket.request.user._id)
+      .filter((e) => e.data.type == "point" && e.data.action == "consume")
+      .subscribe(
+        (e) => {
+          try {
+            socket.bag.updateBag(e.data.goodsId, e.data.quantity);
+            console.log(socket.emit)
+            socket.emit(events.player.shopping, {
+              id: e.data.goodsId,
+              quantity: e.data.quantity,
+            });
+          } catch (err) {
+            console.error(err);
+          }
+        },
+        null,
+        null
+      );
+  }
 
   socket.on("disconnecting", function () {
-    if (socket.player.hasUseObject) {
+    if (socket.isLogin && Object.keys(socket.bagUse).length > 0) {
+      const updateInc = {};
+      for (const goodsId in socket.bagUse) {
+        updateInc["bag." + goodsId] = socket.bagUse[goodsId];
+      }
       collections.gameUser
-        .updateOne(
-          { _id: socket.playerId },
-          { $set: { bag: socket.player.bag } }
-        )
-        .catch(console.log);
+        .updateOne({ _id: socket.playerId }, { $inc: updateInc })
+        .catch(console.error);
     }
-    if (socket.rooms[rooms.multiplayer]) {
-      socket
-        .to(rooms.multiplayer)
-        .broadcast.emit(events.multi.unjoin, socket.player);
-    }
+    if (socket.rooms[room.name]) room.playerLeave(socket.id);
+    if (notices$) notices$.dispose();
+    if (socket.isLogin) delete playerScoketIdMap[socket.request.user._id];
   });
   socket.on("disconnect", function () {
-    delete players[socket.id];
-    notices$.dispose();
-    console.log("disconnect");
+    console.log(socket.id + " disconnect");
   });
 
   // ---------- multiplayer game events ----------
   socket.on(
-    events.multi.join,
-    SocketValidatePipe(socket, PositionSchema, (pos) => {
-      socket.player.pos = pos;
-      socket.join(rooms.multiplayer, (error) => {
-        if (error)
-          return socket.emit(events.server.error, { status: 500, error });
-
-        socket.emit(
-          events.multi.init,
-          Object.values(players),
-          Object.values(bullets)
-        );
-        players[socket.id] = socket.player;
-        socket
-          .to(rooms.multiplayer)
-          .broadcast.emit(events.multi.join, socket.player);
-      });
+    events.player.join,
+    SocketValidatePipe(socket, FnSchema, (fn) => {
+      socket.join(room.name);
+      room.playerJoin(socket, socket.player, socket.bag);
+      fn();
     })
   );
 
@@ -192,83 +233,19 @@ function DefaultSocketHandler(/** @type AppSocket */ socket) {
     events.player.moving,
     SocketValidatePipe(
       socket,
-      MovingSchema,
-      (event) => {
-        socket.player.pos = event.pos;
-        socket.player.vel = event.vel;
-        socket.player.hp = event.hp;
-        event.time = Date.now();
-        socket
-          .to(rooms.multiplayer)
-          .broadcast.emit(events.player.moving, socket.id, event);
-      },
-      rooms.multiplayer
-    )
-  );
-
-  // 子彈發射，自身就是取得子彈id，廣播其他人子彈狀態
-  socket.on(
-    events.player.shooting,
-    SocketValidatePipe(
-      socket,
-      BulletSchema,
-      (info, fn) => {
-        info._id = uuid.v4();
-        bullets[info._id] = { from: socket.id, info };
-        socket
-          .to(rooms.multiplayer)
-          .broadcast.emit(events.player.shooting, socket.id, info);
-        fn(info._id);
-      },
-      rooms.multiplayer
-    )
-  );
-
-  // 同步子彈位置
-  socket.on(
-    events.bullet.moving,
-    SocketValidatePipe(
-      socket,
-      BulletMovingSchema,
-      (event) => {
-        const bullet = bullets[event._id].bullet;
-        if (bullet) {
-          bullet.x = event.pos.x;
-          bullet.y = event.pos.y;
-          bullet.updateTime = Date.now();
-        }
-      },
-      rooms.multiplayer
+      CursorsSchema,
+      (cursors) => room.playerMoving(socket.id, cursors),
+      room.name
     )
   );
 
   socket.on(
-    events.bullet.hurt,
+    events.player.leave,
     SocketValidatePipe(
       socket,
-      BulletHurtSchema,
-      ({ bulletId, playerId, playerInfo }) => {
-        if (bullets[bulletId].hurt) bullets[bulletId].hurt = playerId;
-        if (players[playerId].hp) playerInfo.hp;
-        socket
-          .to(rooms.multiplayer)
-          .broadcast.emit(events.bullet.hurt, playerId, playerInfo);
-      }
-    )
-  );
-
-  // 清除子彈，並轉發給其他人
-  socket.on(
-    events.bullet.destroy,
-    SocketValidatePipe(
-      socket,
-      IdSchema,
-      (/** @type string */ bulletId) => {
-        if (bullets[bulletId])
-          socket.to(rooms.multiplayer).emit(events.bullet.destroy, bulletId);
-        delete bullets[bulletId];
-      },
-      rooms.multiplayer
+      FnSchema,
+      () => room.playerLeave(socket.id),
+      room.name
     )
   );
 }
