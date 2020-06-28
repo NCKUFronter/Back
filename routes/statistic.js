@@ -332,7 +332,7 @@ router.get(
     if (!summary) summary = {};
     summary.name = "點數";
 
-    return res.status(200).json(arr);
+    return res.status(200).json(summary);
   }
 );
 

@@ -34,7 +34,7 @@ AppPassport.use(
         },
         { upsert: true, returnOriginal: false },
         function (err, user) {
-          console.log({ now: "Google Strategy", user, date });
+          console.log({ now: "Google Strategy", username: user.value && user.value.name, date });
           return done(err, user.value);
         }
       );

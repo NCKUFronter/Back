@@ -16,7 +16,6 @@ router.get("/notification", loginCheck(null), sseMiddleware, function (
   const sse = res.sse;
   const obs$ = notification
     .listen()
-    .tap(console.log)
     .filter((e) => (e.data.type === "init") === (e.sessionID === req.sessionID))
     .filter((e) => {
       return e.toUserIds == null
