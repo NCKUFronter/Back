@@ -38,7 +38,6 @@ function pointTimeCond(start, end, match = {}) {
     new_end.setHours(end.getHours() - 8);
     match.time.$lt = new_end.toISOString();
   }
-  console.log(match);
   return match;
 }
 
@@ -325,7 +324,6 @@ router.get(
       );
     }
     basePipeline.push(...endPipeline(coll_name, "amount"));
-    console.log(basePipeline);
 
     const arr = await collections.pointActivity
       .aggregate(basePipeline)

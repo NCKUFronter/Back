@@ -539,51 +539,51 @@
 
 // ---------  Game ---------
 
-/**
- * @typedef GameUser
- * @property {string} _id.required
- * @property {string} name.required
- */
-/**
- * @route GET /game/user
- * @group game
- * @summary 所有遊戲人物資訊
- * -- ✔️ 可以運作
- * @returns {Array<GameUser>} 200 - success
- */
-
-/**
- * @route GET /game/user/{id}
- * @group game
- * @summary 遊戲人物資訊
- * -- ✔️ 可以運作
- * @param {string} id.path.required
- * @returns {GameUser.model} 200 - success
- */
-
-/**
- * @typedef BagItem
- * @property {string} _id.required
- * @property {string} name.required
- * @property {number} point.required
- * @property {string} intro.required
- * @property {number} count - 數量
- */
-/**
- * @route GET /game/user/{id}/bag
- * @group game
- * @summary 遊戲人物的背包
- * -- ✔️ 可以運作
- * @param {string} id.path.required
- * @returns {Array<BagItem>} 200 - success
- */
-
-/**
- * @route POST /game/user/{id}/use/{goodsId}
- * @group game
- * @summary 使用道具(單純將道具數量-1)
- * -- ✔️ 可以運作
- * @param {string} id.path.required
- * @param {string} goodsId.path.required
- * @returns {string} 200 - success
- */
+// /**
+//  * @typedef GameUser
+//  * @property {string} _id.required
+//  * @property {string} name.required
+//  */
+// /**
+//  * @route GET /game/user
+//  * @group game
+//  * @summary 所有遊戲人物資訊
+//  * -- ✔️ 可以運作
+//  * @returns {Array<GameUser>} 200 - success
+//  */
+// 
+// /**
+//  * @route GET /game/user/{id}
+//  * @group game
+//  * @summary 遊戲人物資訊
+//  * -- ✔️ 可以運作
+//  * @param {string} id.path.required
+//  * @returns {GameUser.model} 200 - success
+//  */
+// 
+// /**
+//  * @typedef BagItem
+//  * @property {string} _id.required
+//  * @property {string} name.required
+//  * @property {number} point.required
+//  * @property {string} intro.required
+//  * @property {number} count - 數量
+//  */
+// /**
+//  * @route GET /game/user/{id}/bag
+//  * @group game
+//  * @summary 遊戲人物的背包
+//  * -- ✔️ 可以運作
+//  * @param {string} id.path.required
+//  * @returns {Array<BagItem>} 200 - success
+//  */
+// 
+// /**
+//  * @route POST /game/user/{id}/use/{goodsId}
+//  * @group game
+//  * @summary 使用道具(單純將道具數量-1)
+//  * -- ✔️ 可以運作
+//  * @param {string} id.path.required
+//  * @param {string} goodsId.path.required
+//  * @returns {string} 200 - success
+//  */

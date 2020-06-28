@@ -91,7 +91,7 @@ async function startup() {
   app.use("/api/invitation", require("./routes/invitaion"));
   app.use("/api/sse", require("./routes/notification"));
   app.use("/api/statistic", require("./routes/statistic"));
-  app.use("/api/game", require("./routes/game"));
+  // app.use("/api/game", require("./routes/game"));
 
   // default error handler
   app.use((err, req, res, next) => {

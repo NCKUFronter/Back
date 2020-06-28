@@ -67,6 +67,8 @@ class AmountBagGroup extends SimpleBagGroup {
   /** @type Array<T & {amount: number; _id: string}> */ items;
 
   add(obj) {
+    if (obj.amount === 0) return;
+
     obj.owner = this.owner;
     const bagItem = this.items.find((item) => item._id == obj._id);
     // @ts-ignore amount 可能不存在
@@ -126,7 +128,7 @@ class Bag {
 
   /** @param {string} goodsId; @param {number} quantity */
   _updateBag(goodsId, quantity) {
-    if (!ObjectMall[goodsId]) return;
+    if (!ObjectMall[goodsId] || quantity === 0) return;
     const object_info = Object.assign({}, ObjectMall[goodsId]);
     if (quantity != null) object_info.amount = quantity;
 
@@ -138,7 +140,7 @@ class Bag {
     } else if (object.class_type === Skill.name) {
       this.skills.add(object);
     } else {
-      console.error({object});
+      console.error({ object });
     }
   }
 

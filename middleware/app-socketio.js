@@ -187,7 +187,6 @@ function DefaultSocketHandler(/** @type AppSocket */ socket) {
         (e) => {
           try {
             socket.bag.updateBag(e.data.goodsId, e.data.quantity);
-            console.log(socket.emit)
             socket.emit(events.player.shopping, {
               id: e.data.goodsId,
               quantity: e.data.quantity,

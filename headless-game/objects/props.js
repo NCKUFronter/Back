@@ -17,6 +17,7 @@ class Props {
   /** @type string | undefined */ field;
   /** @type number | undefined */ value;
   /** @type number */ amount;
+  /** @type Bag */ bag;
 
   /** @param {PropsParams} params */
   constructor(params) {
@@ -33,7 +34,7 @@ class Props {
     if (!this.canUse()) return;
     this.amount--;
 
-    if (this.amount == 0) this.owner.bag.props.remove(this);
+    if (this.amount == 0) this.bag.props.remove(this);
     if (this.owner) this._use(uuid);
   }
 
