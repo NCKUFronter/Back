@@ -1,6 +1,11 @@
 // @ts-check
 const Joi = require("@hapi/joi");
 
+const RoleSettingSchema = Joi.object({
+  name: Joi.string().max(15).required(),
+  key: Joi.string().required(),
+})
+
 const PositionSchema = Joi.object({
   x: Joi.number().required(),
   y: Joi.number().required(),
@@ -52,6 +57,7 @@ const FnSchema = Joi.function().required();
 const MaybeFnSchema = Joi.function();
 
 module.exports = {
+  RoleSettingSchema,
   PositionSchema,
   MovingSchema,
   BulletSchema,

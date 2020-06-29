@@ -4,6 +4,7 @@ const { notification } = require("../actions/notification.service");
 const passportSocketio = require("passport.socketio");
 const { workInTransaction, collections } = require("../models/mongo");
 const {
+  RoleSettingSchema,
   IdSchema,
   CursorsSchema,
   FnSchema,
@@ -29,6 +30,7 @@ const playerScoketIdMap = {};
 
 const events = {
   player: {
+    setting: "player:setting",
     use: "player:use", // client -> server
     info: "player:info", // client <-> server
     shopping: "player:shopping", // server -> client
@@ -54,18 +56,19 @@ function SocketValidatePipe(socket, schema, callback, room_name) {
     if (room_name && !socket.rooms[room_name]) return; // ignore unauthorized error
     const { error, value } = schema.validate(data, { abortEarly: false });
     const error2 = MaybeFnSchema.validate(fn).error;
-    if (error) socket.emit(events.server.error, { status: 400, error });
-    else if (error2)
+    if (error) {
+      socket.emit(events.server.error, { status: 400, error, data });
+    } else if (error2) {
       socket.emit(events.server.error, {
         status: 400,
         error: "only accept one parameter",
       });
-    else {
+    } else {
       try {
         callback(data, fn);
       } catch (error) {
         console.error(error);
-        socket.emit(events.server.error, { status: 500, error });
+        socket.emit(events.server.error, { status: 500, error, data });
       }
     }
   };
@@ -155,9 +158,37 @@ function DefaultSocketHandler(/** @type AppSocket */ socket) {
   // init
   socket.emit(events.player.info, personInfo(socket));
   socket.emit("nothing", { xxx: "xxx" });
-  socket.on(events.player.info, () => {
-    socket.emit(events.player.info, personInfo(socket));
-  });
+  socket.on(
+    events.player.info,
+    SocketValidatePipe(socket, MaybeFnSchema, (fn) => {
+      if (fn) fn(personInfo(socket));
+      socket.emit(events.player.info, personInfo(socket));
+    })
+  );
+
+  socket.on(
+    events.player.setting,
+    SocketValidatePipe(socket, RoleSettingSchema, (setting, fn) => {
+      if (
+        socket.player.name === setting.name &&
+        socket.player.key === setting.key
+      )
+        return fn(true);
+
+      socket.player.name = setting.name;
+      socket.player.key = setting.key;
+      socket.emit(events.player.info, personInfo(socket));
+      if (socket.isLogin) {
+        collections.gameUser
+          .update(
+            { _id: socket.playerId },
+            { $set: { name: socket.player.name, key: socket.player.key } }
+          )
+          .then(() => fn(true))
+          .catch(console.error);
+      } else fn(true);
+    })
+  );
 
   socket.on(
     events.player.use,
