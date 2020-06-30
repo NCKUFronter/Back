@@ -1,4 +1,4 @@
-const allExt = [".js", ".png", ".jpg", ".ico", ".css", ".woff2"];
+const allExt = [".js", ".png", ".jpg", ".ico", ".css", ".woff2", ".svg"];
 var path = require("path");
 
 const frontendPrefix = process.env.FRONTEND_PREFIX || "./Front/dist";

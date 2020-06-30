@@ -96,14 +96,23 @@ const ObjectMall = {
     name: "蟲洞",
     intro: "切換場景",
     key: "",
-    field: "hp",
-    value: 2,
-    /** @type {(this:Props) => void} */
-    /*
+    // field: "hp",
+    // value: 2,
+    /** @type {(this: Props) => void} */
     _use() {
-      console.log("custom use goods3");
+      let not_avail = true;
+      while (not_avail) {
+        const x = Math.random() * 1900 + 16;
+        const y = Math.random() * 1900 + 16;
+        // @ts-ignore
+        /** @type {Phaser.Tilemaps.StaticTilemapLayer} */
+        const layer3 = this.owner.getScene().layer3;
+        if (!layer3.hasTileAtWorldXY(x, y)) {
+          not_avail = false;
+          this.owner.setPosition(x, y);
+        }
+      }
     },
-    */
   },
   "4": {
     _id: "4",
