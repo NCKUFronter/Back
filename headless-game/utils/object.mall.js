@@ -15,7 +15,7 @@ const ObjectMall = {
       speed: 500,
       atk: 1,
     },
-    timeout: 0,
+    timeout: 300,
   },
   xx2: {
     _id: "xx2",
@@ -30,7 +30,7 @@ const ObjectMall = {
       atk: 0,
       timeout: 5000,
     },
-    timeout: 0,
+    timeout: 300,
   },
   xx3: {
     _id: "xx3",
@@ -44,7 +44,7 @@ const ObjectMall = {
       speed: 500,
       heal: 1,
     },
-    timeout: 0,
+    timeout: 300,
   },
   xx4: {
     _id: "xx4",
@@ -58,7 +58,7 @@ const ObjectMall = {
       speed: 500,
       poison: 5,
     },
-    timeout: 0,
+    timeout: 1500,
   },
   1: {
     _id: "1",
@@ -105,9 +105,9 @@ const ObjectMall = {
         const x = Math.random() * 1900 + 16;
         const y = Math.random() * 1900 + 16;
         // @ts-ignore
-        /** @type {Phaser.Tilemaps.StaticTilemapLayer} */
-        const layer3 = this.owner.getScene().layer3;
-        if (!layer3.hasTileAtWorldXY(x, y)) {
+        /** @type {Phaser.Tilemaps.Tilemap} */
+        const map = this.owner.getScene().layer3.tilemap;
+        if (!map.hasTileAtWorldXY(x, y)) {
           not_avail = false;
           this.owner.setPosition(x, y);
         }
@@ -119,7 +119,7 @@ const ObjectMall = {
     class_type: Props.name,
     type: "props",
     name: "無限手套",
-    intro: "畫面閃動特效3秒",
+    intro: "畫面閃動特效1秒",
     key: "",
     /** @type {(this:Props) => void} */
     _use() {},

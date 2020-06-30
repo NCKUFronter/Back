@@ -59,6 +59,7 @@ class MultiplayerScene extends Phaser.Scene {
     this.load.image("blackHole", "assets/blackHole.png");
     this.load.image("bomb", "assets/bomb.png");
     this.load.image("star", "assets/star.png");
+    /*
     this.load.image("tile", "assets/tilesheet.png");
     this.load.image("tile2", "assets/transparent-bg-tiles.png");
     this.load.image("weitile", "assets/Spacepack 5.png");
@@ -68,16 +69,22 @@ class MultiplayerScene extends Phaser.Scene {
     this.load.image("weitile5", "assets/trees_plants.png");
     this.load.tilemapTiledJSON("map", "assets/map2.json");
     this.load.tilemapTiledJSON("darkForest", "assets/darkForest.json");
+    */
+
+    this.load.image("spatile4", "assets/mapSpace/asteroid.png");
+    this.load.image("spatile1", "assets/mapSpace/Nebula Aqua-Pink.png");
+    this.load.image("spatile2", "assets/mapSpace/Spacepack 2.png");
+    this.load.image("spatile3", "assets/mapSpace/Spacepack 4.png");
+    this.load.tilemapTiledJSON("warSpace", "assets/mapSpace/warSpace.json");
     console.log("game preload success!");
   }
 
   create() {
-    this.createBackground1();
     this.players = this.add.group({ runChildUpdate: true });
     this.bullets = this.add.group({ runChildUpdate: true });
+    this.createBackground3();
 
     this.physics.world.setBounds(0, 0, 1920, 1920, true, true, true, true);
-    this.physics.add.collider(this.layer3, this.players);
     this.physics.add.overlap(
       this.players,
       this.bullets,
@@ -87,12 +94,36 @@ class MultiplayerScene extends Phaser.Scene {
     this.game.events.emit("sceneCreated$", this);
   }
 
+  createBackground3() {
+    const map = this.make.tilemap({ key: "warSpace" });
+    const tileset = map.addTilesetImage("Nebula Aqua-Pink", "spatile1");
+    const tileset2 = map.addTilesetImage("Spacepack 2", "spatile2");
+    const tileset3 = map.addTilesetImage("Spacepack 4", "spatile3");
+    const tileset4 = map.addTilesetImage("asteroid", "spatile4");
+    this.layer1 = map.createStaticLayer("background", tileset, 0, 0);
+    this.layer2 = map.createStaticLayer("BASE", tileset2, 0, 0);
+    this.layer3 = map.createStaticLayer("BASE2", tileset3, 0, 0);
+    this.layer4 = map.createStaticLayer("asteroid", tileset4, 0, 0);
+    this.layer1.setScale(1.5);
+    this.layer2.setScale(1.5);
+    this.layer3.setScale(1.5);
+    this.layer4.setScale(1.5);
+    this.layer2.setCollisionByExclusion([-1], true);
+    this.layer3.setCollisionByExclusion([-1], true);
+    this.layer4.setCollisionByExclusion([-1], true);
+    this.physics.add.collider(this.layer4, this.players);
+    this.physics.add.collider(this.layer2, this.players);
+    this.physics.add.collider(this.layer3, this.players);
+  }
+
+  /*
   createBackground2() {
     const map = this.make.tilemap({ key: "darkForest" });
     const tileset = map.addTilesetImage("Spacepack 5", "weitile");
     this.layer3 = map.createStaticLayer("ship", tileset, 0, 0);
     this.layer3.setScale(1.5);
     this.layer3.setCollisionByExclusion([-1], true);
+    this.physics.add.collider(this.layer3, this.players);
   }
 
   createBackground1() {
@@ -101,12 +132,14 @@ class MultiplayerScene extends Phaser.Scene {
     this.layer3 = map.createStaticLayer("collision", tileset, 0, 0);
     this.layer3.setScale(1.5);
     this.layer3.setCollisionByExclusion([-1], true);
+    this.physics.add.collider(this.layer3, this.players);
   }
+  */
 
   update() {
     for (const bullet of this.bullets.getChildren()) {
       // @ts-ignore
-      if (this.layer3.hasTileAtWorldXY(bullet.x, bullet.y)) bullet.destroy();
+      if (this.layer3.tilemap.hasTileAtWorldXY(bullet.x, bullet.y)) bullet.destroy();
     }
   }
 }
