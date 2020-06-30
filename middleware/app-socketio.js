@@ -254,8 +254,7 @@ function DefaultSocketHandler(/** @type AppSocket */ socket) {
     events.player.join,
     SocketValidatePipe(socket, FnSchema, (fn) => {
       socket.join(room.name);
-      room.playerJoin(socket, socket.player, socket.bag);
-      fn();
+      room.playerJoin(socket, socket.player, socket.bag, fn);
     })
   );
 

@@ -150,6 +150,7 @@ class Bullet extends Phaser.Physics.Arcade.Image {
     return {
       _id: this._id,
       fromId: this.from && this.from._id,
+      time: Date.now(),
       x: this.x,
       y: this.y,
       directionX: this.directionX,

@@ -49,7 +49,8 @@ class RoomManager extends EventEmitter {
    * @param {import('../models/event.model').PlayerInfo} info
    * @param {import('./objects/bag')} bag
    */
-  playerJoin(socket, info, bag) {
+  playerJoin(socket, info, bag, fn) {
+    fn(this.scene.serializePlayers(true), this.scene.serializeBullets());
     socket.emit(
       events.init,
       this.scene.serializePlayers(true),
@@ -99,7 +100,11 @@ class RoomManager extends EventEmitter {
   bulletCreated(bullet) {
     bullet.on("destroy", this.bulletDestroy, this);
     bullet.on("onhurt$", this.bulletHurt, this);
-    const bundle = this.players[bullet.from._id];
+    // const bundle = this.players[bullet.from._id];
+      this.io
+        .to(this.name)
+        .emit(events.bullet.create, bullet.from._id, bullet.serialize());
+    /*
     if (bundle) {
       bundle.socket
         .to(this.name)
@@ -113,6 +118,7 @@ class RoomManager extends EventEmitter {
         .to(this.name)
         .emit(events.bullet.create, bullet.from._id, bullet.serialize());
     }
+    */
   }
 
   /** @param {Bullet} bullet; @param {Player} player */

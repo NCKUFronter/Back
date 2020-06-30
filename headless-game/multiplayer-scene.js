@@ -24,7 +24,7 @@ class MultiplayerScene extends Phaser.Scene {
   serializeBullets() {
     return this.bullets
       .getChildren()
-      .map((/** @type Bullet */ bullet) => bullet.info());
+      .map((/** @type Bullet */ bullet) => bullet.serialize());
   }
 
   /**
