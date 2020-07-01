@@ -54,11 +54,11 @@ async function startup() {
       express.static(path.resolve(process.env.GAME_PREFIX || "../Game"))
     );
   app.use(require("./middleware/front-end-hook"));
-  app.use("/api/img", express.static(__dirname + "/img"));
+  app.use("/api/img", express.static(path.resolve("./img")));
 
   // init ledger photo directory
-  createFolder(__dirname + "/img");
-  createFolder(__dirname + "/img/user-ledger");
+  createFolder(path.resolve("./img"));
+  createFolder(path.resolve("./img/user-ledger"));
 
   // Log in
   const sessionStore = new session.MemoryStore();
