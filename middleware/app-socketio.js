@@ -31,6 +31,7 @@ const playerScoketIdMap = {};
 const events = {
   player: {
     setting: "player:setting",
+    save: "player:save",
     use: "player:use", // client -> server
     info: "player:info", // client <-> server
     shopping: "player:shopping", // server -> client
@@ -163,6 +164,19 @@ function DefaultSocketHandler(/** @type AppSocket */ socket) {
     SocketValidatePipe(socket, MaybeFnSchema, (fn) => {
       if (fn) fn(personInfo(socket));
       socket.emit(events.player.info, personInfo(socket));
+    })
+  );
+
+  socket.on(
+    events.player.save,
+    SocketValidatePipe(socket, IdSchema, (sceneId) => {
+      if (socket.player.progress > sceneId) return;
+      socket.player.progress = sceneId;
+      if (socket.isLogin) {
+        collections.gameUser
+          .updateOne({ _id: socket.playerId }, { $set: { progress: sceneId } })
+          .catch(console.error);
+      }
     })
   );
 

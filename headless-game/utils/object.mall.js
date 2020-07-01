@@ -8,9 +8,9 @@ const ObjectMall = {
     class_type: Skill.name,
     type: "skill",
     name: "攻擊子彈",
-    key: "bullet",
+    key: "bullet-white",
     bulletCfg: {
-      key: "bullet",
+      key: "bullet-white",
       type: "atk",
       speed: 500,
       atk: 1,
@@ -22,24 +22,24 @@ const ObjectMall = {
     class_type: Skill.name,
     type: "skill",
     name: "麻痺子彈",
-    key: "paralysis",
+    key: "bullet-blue",
     bulletCfg: {
-      key: "",
+      key: "bullet-blue",
       type: "paralysis",
       speed: 500,
       atk: 0,
       timeout: 5000,
     },
-    timeout: 300,
+    timeout: 1500,
   },
   xx3: {
     _id: "xx3",
     class_type: Skill.name,
     type: "skill",
     name: "療癒子彈",
-    key: "heal",
+    key: "bullet-yellow",
     bulletCfg: {
-      key: "star",
+      key: "bullet-yellow",
       type: "heal",
       speed: 500,
       heal: 1,
@@ -51,9 +51,9 @@ const ObjectMall = {
     class_type: Skill.name,
     type: "skill",
     name: "帶毒子彈",
-    key: "bullet",
+    key: "bullet-green",
     bulletCfg: {
-      key: "bomb",
+      key: "bullet-green",
       type: "poison",
       speed: 500,
       poison: 5,
@@ -65,9 +65,8 @@ const ObjectMall = {
     class_type: Props.name,
     type: "props",
     name: "竹蜻蜓",
-    key: "",
+    key: "bambooDragonfly",
     intro: "角色移動速度加成3秒",
-    /** @type {(this:Props) => void} */
     _use() {
       this.owner.base_vel *= 2;
       this.owner.getScene().time.delayedCall(3000, () => {
@@ -80,7 +79,7 @@ const ObjectMall = {
     class_type: Weapon.name,
     type: "weapon",
     name: "黑洞",
-    intro: "消滅黑洞附近所有敵人",
+    // intro: "消滅黑洞附近所有敵人",
     key: "blackHole",
     bulletCfg: {
       key: "blackHole",
@@ -94,19 +93,17 @@ const ObjectMall = {
     class_type: Props.name,
     type: "props",
     name: "蟲洞",
-    intro: "切換場景",
-    key: "",
+    intro: "隨機移動角色位置",
+    key: "wormHole",
     // field: "hp",
     // value: 2,
-    /** @type {(this: Props) => void} */
     _use() {
       let not_avail = true;
       while (not_avail) {
         const x = Math.random() * 1900 + 16;
         const y = Math.random() * 1900 + 16;
         // @ts-ignore
-        /** @type {Phaser.Tilemaps.Tilemap} */
-        const map = this.owner.getScene().layer3.tilemap;
+        const map = this.scene.layer3.tilemap;
         if (!map.hasTileAtWorldXY(x, y)) {
           not_avail = false;
           this.owner.setPosition(x, y);
@@ -120,21 +117,22 @@ const ObjectMall = {
     type: "props",
     name: "無限手套",
     intro: "畫面閃動特效1秒",
-    key: "",
-    /** @type {(this:Props) => void} */
-    _use() {},
+    key: "glove",
+    _use() {
+      // this.scene.cameras.main.shake(1000);
+    },
   },
   "5": {
     _id: "5",
     class_type: Weapon.name,
     type: "weapon",
     name: "靈魂寶石",
-    key: "",
+    key: "blackGem",
     bulletCfg: {
-      key: "",
+      key: "blackGem",
       type: "heal",
       speed: 1500,
-      heal: 0.5,
+      heal: 3,
     },
   },
   "6": {
@@ -142,9 +140,9 @@ const ObjectMall = {
     class_type: Weapon.name,
     type: "weapon",
     name: "時間寶石",
-    key: "",
+    key: "greenGem",
     bulletCfg: {
-      key: "",
+      key: "greenGem",
       type: "paralysis",
       speed: 1000,
       timeout: 2000,
@@ -155,9 +153,9 @@ const ObjectMall = {
     class_type: Weapon.name,
     type: "weapon",
     name: "空間寶石",
-    key: "",
+    key: "blueGem",
     bulletCfg: {
-      key: "",
+      key: "blueGem",
       type: "paralysis",
       speed: 500,
       timeout: 5000,
@@ -168,12 +166,12 @@ const ObjectMall = {
     class_type: Weapon.name,
     type: "weapon",
     name: "心靈寶石",
-    key: "",
+    key: "yellowGem",
     bulletCfg: {
-      key: "",
+      key: "yellowGem",
       type: "heal",
       speed: 500,
-      heal: 2,
+      heal: 5,
     },
   },
   "9": {
@@ -181,12 +179,12 @@ const ObjectMall = {
     class_type: Weapon.name,
     type: "weapon",
     name: "現實寶石",
-    key: "",
+    key: "redGem",
     bulletCfg: {
-      key: "",
+      key: "redGem",
       type: "poison",
       speed: 1000,
-      poison: 1,
+      poison: 4,
     },
   },
   "10": {
@@ -194,12 +192,12 @@ const ObjectMall = {
     class_type: Weapon.name,
     type: "weapon",
     name: "力量寶石",
-    key: "",
+    key: "purpleGem",
     bulletCfg: {
-      key: "",
+      key: "purpleGem",
       type: "atk",
       speed: 500,
-      atk: 2,
+      atk: 8,
     },
   },
   "11": {
@@ -207,11 +205,11 @@ const ObjectMall = {
     class_type: Props.name,
     name: "生命藥水",
     type: "props",
-    key: "dude",
-    field: "hp",
-    value: "2",
-    amount: 50,
+    key: "liftPotion",
     intro: "hp加2",
+    _use() {
+      this.owner.hp += 2;
+    },
   },
 };
 

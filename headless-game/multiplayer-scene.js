@@ -59,6 +59,26 @@ class MultiplayerScene extends Phaser.Scene {
     this.load.image("blackHole", "assets/blackHole.png");
     this.load.image("bomb", "assets/bomb.png");
     this.load.image("star", "assets/star.png");
+
+    // ---------- goods ----------
+    // this.load.image("bambooDragonfly", "assets/objects/bamboo dragonfly.png");
+    // this.load.image("glove", "assets/objects/glove.png");
+    // this.load.image("black-hole", "assets/objects/black hole.png");
+    // this.load.image("liftPotion", "assets/objects/LIFE.png");
+    // this.load.image("wormHole", "assets/objects/wormhole.png");
+    this.load.image("redGem", "assets/objects/reg gem.png");
+    this.load.image("greenGem", "assets/objects/green gem.png");
+    this.load.image("blueGem", "assets/objects/blue gem.png");
+    this.load.image("yellowGem", "assets/objects/yellow gem.png");
+    this.load.image("purpleGem", "assets/objects/purple gem.png");
+    this.load.image("blackGem", "assets/objects/black diamond.png");
+
+    // ---------- bullets ----------
+    this.load.image("bullet-yellow", "assets/objects/yellow-bullet.png");
+    this.load.image("bullet-green", "assets/objects/green-bullet.png");
+    this.load.image("bullet-white", "assets/objects/white-bullet.png");
+    this.load.image("bullet-blue", "assets/objects/blue-bullet.png");
+
     /*
     this.load.image("tile", "assets/tilesheet.png");
     this.load.image("tile2", "assets/transparent-bg-tiles.png");
