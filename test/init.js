@@ -99,25 +99,25 @@ async function initDBData(db) {
       _id: "1",
       name: "食物",
       color: "#fffaaa",
-      icon: "null"
+      icon: "mdi-food"
     },
     {
       _id: "2",
       name: "交通",
       color: "#aabbcc",
-      icon: "null"
+      icon: "mdi-food"
     },
     {
       _id: "3",
       name: "治裝",
       color: "#ccddee",
-      icon: "null"
+      icon: "mdi-food"
     },
     {
       _id: "4",
       name: "娛樂",
       color: "#abde23",
-      icon: "null"
+      icon: "mdi-food"
     },
   ]);
 
@@ -340,7 +340,7 @@ async function initDBData(db) {
 }
 
 const findLast = async (coll) =>
-  (await coll.find().limit(1).sort({ $natural: -1 }).toArray())[0];
+  (await coll.find().toArray()).reverse()[0];
 
 module.exports = {
   initDB,

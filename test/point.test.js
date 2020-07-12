@@ -76,6 +76,7 @@ test("unit > pointsFromRecord", async function () {
 
   // check record
   const record = await findLast(collections.record);
+  console.log(record)
   assert.equal(record.rewardPoints, amount);
 
   // check activity

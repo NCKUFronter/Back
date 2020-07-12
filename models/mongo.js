@@ -2,16 +2,12 @@
 
 // mongoDB init
 // var config = require('../config');
-const { MongoClient } = require("mongodb");
+// const { MongoClient } = require("mongodb");
 /** @typedef { import('mongodb').Collection } Collection */
 /** @typedef {import('mongodb').ClientSession} ClientSession */
 
 const uri = process.env.DB_URI; // config.mongo.uri;
-const client = new MongoClient(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
+const client = require("./mongo-mock")();
 const collections = {
   /** @type {Collection} */
   record: null,
@@ -50,7 +46,7 @@ async function connectDB() {
   collections.gameUser = db.collection("game-user");
 
   // mock session for lower version mongodb
-  if (process.env.NO_TRANSACTION) {
+  if (true || process.env.NO_TRANSACTION) {
     // @ts-ignore
     client.startSession = () => {
       return {

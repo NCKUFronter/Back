@@ -1,5 +1,5 @@
 // @ts-check
-process.env.DB_URI = "mongodb://localhost/test1";
+// process.env.DB_URI = "mongodb://localhost/uidd";
 process.env.PORT = "5000";
 const { connectDB, client } = process.env.BABEL_TEST
   ? require("../dist/models/mongo")
@@ -28,7 +28,7 @@ async function run() {
   } catch (err) {
     console.log(err);
   }
-  // await server.close();
+  await server.close();
   await client.close();
 }
 run();

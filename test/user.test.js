@@ -112,6 +112,7 @@ test("e2e > user relativeUsers", async () => {
     .then((res) => {
       const users = res.body;
       assert(Array.isArray(users));
+      assert.equal(users.length, 1);
       for (const user of users) {
         assert.notEqual(user._id, "1");
       }

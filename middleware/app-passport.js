@@ -1,10 +1,11 @@
 // @ts-check
 const AppPassport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
+// const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 const { collections, workInTransaction } = require("../models/mongo");
 const keys = require("../config/keys");
 
+/*
 AppPassport.use(
   new GoogleStrategy(
     {
@@ -41,6 +42,7 @@ AppPassport.use(
     }
   )
 );
+*/
 
 AppPassport.use(
   new LocalStrategy({ usernameField: "email" }, function (
@@ -96,5 +98,5 @@ AppPassport.deserializeUser(function (filter, done) {
 module.exports = {
   AppPassport,
   LocalStrategy,
-  GoogleStrategy,
+  // GoogleStrategy,
 };
