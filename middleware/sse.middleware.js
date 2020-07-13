@@ -97,7 +97,7 @@ function sseMiddleware(req, res, next) {
     });
   } else onlineUser[req.userId]++;
 
-  console.log({ onlineUser, connections });
+  // console.log({ onlineUser, connections });
 
   req.socket.setTimeout(0);
   req.socket.setNoDelay(true);

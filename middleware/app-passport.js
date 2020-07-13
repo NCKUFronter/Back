@@ -53,7 +53,7 @@ AppPassport.use(
     const user_coll = collections.user;
     user_coll.findOne({ email: email }, function (err, user) {
       if (err) return done(err);
-      console.log({ now: "local strategy", username: user && user.name });
+      // console.log({ now: "local strategy", username: user && user.name });
       if (!user) {
         return done(null, false, { message: "Incorrect email." });
       }
@@ -82,14 +82,14 @@ async function autoCreateGameUser(user) {
 }
 
 AppPassport.serializeUser(function (user, done) {
-  console.log({ type: "serialize", username: user.name });
+  // console.log({ type: "serialize", username: user.name });
   done(null, { _id: user._id });
 });
 
 AppPassport.deserializeUser(function (filter, done) {
-  console.log({ type: "deserialize", filter });
+  // console.log({ type: "deserialize", filter });
   collections.user.findOne(filter, async function (err, user) {
-    console.log({ err, username: user && user.name });
+    // console.log({ err, username: user && user.name });
     if (user != null && user.gameUserId == null) await autoCreateGameUser(user);
     done(err, user);
   });
