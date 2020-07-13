@@ -24,7 +24,7 @@ async function pointsFromEvent(subtype, amount, user) {
  */
 async function pointsFromRecord(subtype, amount, record, user) {
   record.rewardPoints = amount;
-  record.reviseDate = new Date();
+  record.reviseDate = new Date().toISOString();
   console.log(record);
   return innerGivenPoints(subtype, amount, record, user);
 }

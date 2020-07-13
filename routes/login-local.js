@@ -21,11 +21,11 @@ router.post(
 
 router.post("/pointCheck", loginCheck(collections.user), async (req, res) => {
   const result = {};
-  const userUpdate = { $set: { lastLogin: new Date() } };
+  const userUpdate = { $set: { lastLogin: new Date().toISOString() } };
 
   if (req.user.lastLogin != null) {
     const lastLogin = new Date(req.user.lastLogin);
-    const now = userUpdate.$set.lastLogin;
+    const now = new Date(userUpdate.$set.lastLogin);
     let nextLastDate = new Date(lastLogin);
     nextLastDate.setDate(lastLogin.getDate() + 1);
 

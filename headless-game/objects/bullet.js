@@ -53,7 +53,7 @@ const defaultHurtFn = {
   },
 };
 
-class Bullet extends Phaser.Physics.Arcade.Image {
+class Bullet /* extends Phaser.Physics.Arcade.Image */ {
   /** @type string */ _id;
   /** @type string */ fromObjectId;
   /** @type Role */ from;
@@ -71,109 +71,109 @@ class Bullet extends Phaser.Physics.Arcade.Image {
   /** @type {(to: Role) => void} */ _hurt;
 
   /** @param {ImageParams} params */
-  constructor(params) {
-    super(params.scene, params.x, params.y, params.key);
-    this.scene.add.existing(this);
-    this.scene.physics.add.existing(this);
-    this._hurt = defaultHurtFn[params.type];
-    Object.assign(this, params);
-    this.active = false;
-  }
+  // constructor(params) {
+  //   super(params.scene, params.x, params.y, params.key);
+  //   this.scene.add.existing(this);
+  //   this.scene.physics.add.existing(this);
+  //   this._hurt = defaultHurtFn[params.type];
+  //   Object.assign(this, params);
+  //   this.active = false;
+  // }
 
-  /**
-   * @param {Role} from
-   * @param {-1 | 0 | 1} dx
-   * @param {-1 | 0 | 1} dy
-   */
-  setFirePosition(from, dx, dy) {
-    if (!from) return;
-    this.x = from.x + (dx * (from.width + this.width)) / 2;
-    this.y = from.y - (dy * (from.height + this.height)) / 2;
-    this.directionX = dx;
-    this.directionY = dy;
-  }
+  // /**
+  //  * @param {Role} from
+  //  * @param {-1 | 0 | 1} dx
+  //  * @param {-1 | 0 | 1} dy
+  //  */
+  // setFirePosition(from, dx, dy) {
+  //   if (!from) return;
+  //   this.x = from.x + (dx * (from.width + this.width)) / 2;
+  //   this.y = from.y - (dy * (from.height + this.height)) / 2;
+  //   this.directionX = dx;
+  //   this.directionY = dy;
+  // }
 
-  /** @param {Role} to */
-  hurt(to) {
-    // 如果是重新登入被自己子彈攻擊就不管吧
-    if (to == this.from) return;
-    if (this._hurt) {
-      this._hurt(to);
-      this.emit("onhurt$", this, to);
-    }
-  }
+  // /** @param {Role} to */
+  // hurt(to) {
+  //   // 如果是重新登入被自己子彈攻擊就不管吧
+  //   if (to == this.from) return;
+  //   if (this._hurt) {
+  //     this._hurt(to);
+  //     this.emit("onhurt$", this, to);
+  //   }
+  // }
 
-  /**
-   * @param {Role} from
-   * @param {-1 | 0 | 1} dx
-   * @param {-1 | 0 | 1} dy
-   */
-  fire(from, dx, dy) {
-    this.from = from;
-    this.setFirePosition(from, dx, dy);
+  // /**
+  //  * @param {Role} from
+  //  * @param {-1 | 0 | 1} dx
+  //  * @param {-1 | 0 | 1} dy
+  //  */
+  // fire(from, dx, dy) {
+  //   this.from = from;
+  //   this.setFirePosition(from, dx, dy);
 
-    // this.scene.time.delayedCall(20, () => this.justFire());
-    this.justFire();
-  }
+  //   // this.scene.time.delayedCall(20, () => this.justFire());
+  //   this.justFire();
+  // }
 
-  // 依照子彈本身設定直接射擊
-  justFire() {
-    this.setVelocityX(this.directionX * this.speed);
-    this.setVelocityY(-this.directionY * this.speed);
-    this.setActive(true);
-    this.setVisible(true);
-  }
+  // // 依照子彈本身設定直接射擊
+  // justFire() {
+  //   this.setVelocityX(this.directionX * this.speed);
+  //   this.setVelocityY(-this.directionY * this.speed);
+  //   this.setActive(true);
+  //   this.setVisible(true);
+  // }
 
-  /**
-   * @param {number} time
-   * @param {number} delta
-   */
-  update(time, delta) {
-    if (!this.active) return;
-    if (this.x < 0 || this.x > 1920 || this.y < 0 || this.y > 1920) {
-      this.destroy();
-    }
-  }
+  // /**
+  //  * @param {number} time
+  //  * @param {number} delta
+  //  */
+  // update(time, delta) {
+  //   if (!this.active) return;
+  //   if (this.x < 0 || this.x > 1920 || this.y < 0 || this.y > 1920) {
+  //     this.destroy();
+  //   }
+  // }
 
-  info() {
-    return {
-      _id: this._id,
-      time: Date.now(),
-      x: this.x,
-      y: this.y,
-      directionX: this.directionX,
-      directionY: this.directionY,
-    };
-  }
+  // info() {
+  //   return {
+  //     _id: this._id,
+  //     time: Date.now(),
+  //     x: this.x,
+  //     y: this.y,
+  //     directionX: this.directionX,
+  //     directionY: this.directionY,
+  //   };
+  // }
 
-  serialize() {
-    return {
-      _id: this._id,
-      fromId: this.from && this.from._id,
-      time: Date.now(),
-      x: this.x,
-      y: this.y,
-      directionX: this.directionX,
-      directionY: this.directionY,
-      type: this.type,
-      speed: this.speed,
-      key: this.texture.key,
-      atk: this.atk,
-      heal: this.heal,
-      poison: this.poison,
-      fromObjectId: this.fromObjectId,
-    };
-  }
+  // serialize() {
+  //   return {
+  //     _id: this._id,
+  //     fromId: this.from && this.from._id,
+  //     time: Date.now(),
+  //     x: this.x,
+  //     y: this.y,
+  //     directionX: this.directionX,
+  //     directionY: this.directionY,
+  //     type: this.type,
+  //     speed: this.speed,
+  //     key: this.texture.key,
+  //     atk: this.atk,
+  //     heal: this.heal,
+  //     poison: this.poison,
+  //     fromObjectId: this.fromObjectId,
+  //   };
+  // }
 
-  /**
-   * @param {Phaser.Scene} scene
-   * @param {any} obj
-   * @return Bullet
-   */
-  static deserialize(scene, obj) {
-    obj.scene = scene;
-    return Object.assign(new Bullet(obj), obj);
-  }
+  // /**
+  //  * @param {Phaser.Scene} scene
+  //  * @param {any} obj
+  //  * @return Bullet
+  //  */
+  // static deserialize(scene, obj) {
+  //   obj.scene = scene;
+  //   return Object.assign(new Bullet(obj), obj);
+  // }
 }
 
 module.exports = Bullet;

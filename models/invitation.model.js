@@ -46,8 +46,8 @@ class InvitationModel {
   ledgerId;
   /** @type {number} */
   type = 2;
-  /** @type {Date} */
-  createTime = new Date();
+  /** @type {string} */
+  createTime = new Date().toISOString();
 
   /**
    * @param {string} ledgerId
@@ -65,8 +65,8 @@ class InvitationModel {
    */
   answer(answer) {
     this.type = Number(answer);
-    /** @type {Date} */
-    this.answerTime = new Date();
+    /** @type {string} */
+    this.answerTime = new Date().toISOString();
   }
 
   static fromObject(obj) {

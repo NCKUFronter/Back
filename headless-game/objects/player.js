@@ -53,7 +53,7 @@ class Player extends Role {
     const factorX = Number(this.cursors.right) - Number(this.cursors.left);
     const factorY = Number(this.cursors.up) - Number(this.cursors.down);
     this.setVelocityX(factorX * this.base_vel);
-    this.setVelocityY(-factorY * this.base_vel);
+    this.setVelocityY(-factorY * 160);
     if(factorX != 0 || factorY != 0) {
       this.directionX = factorX;
       this.directionY = factorY;

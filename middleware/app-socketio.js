@@ -11,7 +11,7 @@ const {
   MaybeFnSchema,
 } = require("../models/event.model");
 const uuid = require("uuid");
-const RoomManager = require("../headless-game/room-manager");
+// const RoomManager = require("../headless-game/room-manager");
 const Bag = require("../headless-game/objects/bag");
 
 /**
@@ -44,7 +44,7 @@ const events = {
   },
 };
 
-/** @type RoomManager */ let room;
+///** @type RoomManager */ let room;
 /**
  * @param {AppSocket} socket
  * @param {import('@hapi/joi').Schema} schema
@@ -122,7 +122,7 @@ function loginCheck(socket, next) {
  */
 function AppSocketIO(server, store) {
   const io = SocketIO(server);
-  room = new RoomManager(io, "multiplayer");
+  // room = new RoomManager(io, "multiplayer");
   io.use(
     passportSocketio.authorize({
       secret: process.env.SESSION_SECRET,
@@ -255,7 +255,7 @@ function DefaultSocketHandler(/** @type AppSocket */ socket) {
         .updateOne({ _id: socket.playerId }, { $inc: updateInc })
         .catch(console.error);
     }
-    if (socket.rooms[room.name]) room.playerLeave(socket.id);
+    // if (socket.rooms[room.name]) room.playerLeave(socket.id);
     if (notices$) notices$.dispose();
     if (socket.isLogin) delete playerScoketIdMap[socket.request.user._id];
   });
@@ -264,6 +264,7 @@ function DefaultSocketHandler(/** @type AppSocket */ socket) {
   });
 
   // ---------- multiplayer game events ----------
+  /*
   socket.on(
     events.player.join,
     SocketValidatePipe(socket, FnSchema, (fn) => {
@@ -291,6 +292,7 @@ function DefaultSocketHandler(/** @type AppSocket */ socket) {
       room.name
     )
   );
+  */
 }
 
 module.exports = AppSocketIO;

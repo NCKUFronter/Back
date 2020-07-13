@@ -20,8 +20,8 @@ function getEntityName(name, coll_prefix = "", non_coll_prefix = "") {
 function recordDateCond(start, end, match = {}) {
   // 存在資料庫不統一的情形(以前date假設包含時間，但現在沒有)
   if (start || end) match.date = {};
-  if (start) match.date.$gte = start;
-  if (end) match.date.$lt = end;
+  if (start) match.date.$gte = start.toISOString();
+  if (end) match.date.$lt = end.toISOString();
   return match;
 }
 
@@ -364,8 +364,8 @@ function testPipeline() {
       $match: {
         ledgerId: { $in: ["1", "2"] },
         date: {
-          $gte: new Date("2020-04-19T00:00:00.000Z"),
-          $lt: new Date("2020-04-22T00:00:00.000Z"),
+          $gte: "2020-04-19T00:00:00.000Z",
+          $lt: "2020-04-22T00:00:00.000Z",
         },
       },
     },

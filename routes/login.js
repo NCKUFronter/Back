@@ -5,8 +5,9 @@ const { AppPassport } = require("../middleware/app-passport");
 router.get(
   "/auth/google",
   // AppPassport.authenticate("google", { scope: ["profile", "email"] })
-  (req, res) => {
+  (req, res, next) => {
     req.body = { email: "father@gmail.com", password: "0000" };
+    next();
   },
   AppPassport.authenticate("local", { session: true }),
   function (req, res) {

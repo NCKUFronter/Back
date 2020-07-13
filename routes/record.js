@@ -60,7 +60,7 @@ router.post(
       // @ts-ignore
       ...req.body,
       userId: req.userId,
-      createDate: new Date()
+      createDate: new Date().toISOString(),
     };
     const user = await collections.user.findOne({ _id: req.userId });
     const amount = Math.round(req.body.money / 100);
