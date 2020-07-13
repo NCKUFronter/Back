@@ -1,0 +1,57 @@
+{
+  "resources": [{
+      "type": "image",
+      "key": "star_explosion",
+      "url": "assets/plots/star_explosion.jpg"
+    },
+    {
+      "type": "image",
+      "key": "galaxy",
+      "url": "assets/plots/galaxy.jpg"
+    },
+    {
+      "type": "image",
+      "key": "universal",
+      "url": "assets/plots/universal.png"
+    }
+  ],
+  "plots": [{
+      "type": "bg",
+      "key": "star_explosion"
+    },
+    {
+      "type": "sound-start",
+      "key": "main",
+      "config": {
+        "volume": 0.5
+      }
+    },
+    {
+      "text": "（西元3017年，在距離地球 24的ø星雲，域星系發生超新星爆炸）"
+    },
+    {
+      "text": "（在超新星爆炸後，地球所幸逃過一劫，但銀河系第五旋臂上的星系...）"
+    },
+    {
+      "text": "（在一瞬間淪為死星系，事件被稱為『ø浩劫』）"
+    },
+    {
+      "text": "（在ø星雲閃爆後的幾年間，在地文明衝突不斷）"
+    },
+    {
+      "text": "（在慶幸自己還在的同時，希望能夠有共同組織，更有目的的...）"
+    },
+    {
+      "type": "bg",
+      "key": "universal"
+    },
+    {
+      "text": "（探索宇宙）"
+    },
+    {
+      "type": "sound-stop",
+      "key": "main"
+    }
+  ],
+  "next_scene": "TutorialScene"
+}

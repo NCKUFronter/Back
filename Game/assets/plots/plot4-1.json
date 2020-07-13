@@ -1,0 +1,121 @@
+{
+  "resources": [
+    {
+      "type": "image",
+      "key": "universal",
+      "url": "assets/plots/universal.png"
+    },
+    {
+      "type": "image",
+      "key": "galaxy",
+      "url": "assets/plots/galaxy.jpg"
+    },
+    {
+      "type": "image",
+      "key": "battleship",
+      "url": "assets/plots/Battleship.png"
+    },
+    {
+      "type": "spritesheet",
+      "key": "avatar1",
+      "url": "assets/people/role1.png",
+      "config": {
+        "frameWidth": 144
+      }
+    },
+    {
+      "type": "spritesheet",
+      "key": "avatar2",
+      "url": "assets/people/role2.png",
+      "config": {
+        "frameWidth": 144
+      }
+    },
+    {
+      "type": "spritesheet",
+      "key": "avatar3",
+      "url": "assets/people/role3.png",
+      "config": {
+        "frameWidth": 144
+      }
+    }
+  ],
+  "plots": [{
+      "type": "sound-start",
+      "key": "SWYODA",
+      "config": {
+        "volume": 0.5
+      }
+    },
+    {
+      "type": "bg",
+      "key": "galaxy"
+    },
+    {
+      "text": "長官我們被攻擊了，不確定防護罩還能撐多久。其他艦隊在３分鐘可以達到動力曲速。",
+      "role": "某下屬"
+    },
+    {
+      "text": "只能靠著外圍艦隊的幫助了。",
+      "role": "某長官"
+    },
+    {
+      "type": "bg",
+      "key": "battleship"
+    },
+    {
+      "text": "（艦隊上）"
+    },
+    {
+      "text": "河河你被鎖定了，你趕快右旋。",
+      "role": "阿誇",
+      "avatar": {
+        "key": "avatar1"
+      }
+    },
+    {
+      "text": "白癡阿誇，你也被鎖定了，你是在哭哦！",
+      "role": "河河",
+      "avatar": {
+        "key": "avatar2"
+      }
+    },
+    {
+      "text": "哭啊！乾敵人太多了拉。",
+      "role": "阿誇",
+      "avatar": {
+        "key": "avatar1"
+      }
+    },
+    {
+      "text": "哈哈哈哈哈哈哈哈哈哈。",
+      "role": "哈哈",
+      "avatar": {
+        "key": "avatar3"
+      }
+    },
+    {
+      "text": "哈哈哈哈哈哈哈哈哈。",
+      "role": "哈哈",
+      "avatar": {
+        "key": "avatar3"
+      }
+    },
+    {
+      "text": "ＯＫ。",
+      "role": "阿誇，河河"
+    },
+    {
+      "type": "bg",
+      "key": "universal"
+    },
+    {
+      "text": "（請守護中繼站，並且抵禦敵人）"
+    },
+    {
+      "type": "sound-stop",
+      "key": "SWYODA"
+    }
+  ],
+  "next_scene": "SpaceScene"
+}

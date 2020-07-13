@@ -1,0 +1,256 @@
+{
+  "resources": [{
+      "type": "image",
+      "key": "uidd",
+      "url": "assets/uidd.png"
+    },
+    {
+      "type": "image",
+      "key": "avatar1",
+      "url": "assets/people/aya-touhou-teng-soldier.png"
+    },
+    {
+      "type": "image",
+      "key": "avatar2",
+      "url": "assets/people/ra-einstein.png"
+    },
+    {
+      "type": "image",
+      "key": "avatar3",
+      "url": "assets/people/spyro.png"
+    },
+    {
+      "type": "audio",
+      "key": "main",
+      "url": "assets/sound/starwar-main-mini.mp3"
+    },
+    {
+      "type": "audioSprite",
+      "key": "sfx",
+      "url": "assets/sound/fx_mixdown.json",
+      "url2": ["assets/sound/fx_mixdown.ogg", "assets/sound/fx_mixdown.mp3"]
+    }
+  ],
+  "plots": [{
+      "type": "bg",
+      "key": "uidd"
+    },
+    {
+      "type": "img",
+      "name": "role1",
+      "key": "avatar1"
+    },
+
+
+
+
+    {
+      "text": "（ƒ-7星原生叢林）"
+    },
+    {
+      "text": "這裡是阿誇，請求回報。",
+      "role": "阿誇"
+    },
+    {
+      "text": "（．．．）"
+    },
+    {
+      "text": "這個也不行用了是嗎？",
+      "role": "阿誇"
+    },
+    {
+      "text": "我看大家的墜落位置在不遠處，先去與大家集合好了。",
+      "role": "阿誇"
+    },
+    {
+      "text": "（帶上必需品）"
+    },
+
+    {
+      "text": "（發現墜落物與燒火痕跡）"
+    },
+    {
+      "text": "這應該是哈哈的逃生艦。",
+      "role": "阿誇"
+    },
+    {
+      "text": "哈哈，哈哈，你在哪裡。",
+      "role": "阿誇"
+    },
+
+    {
+      "text": "（哈哈突然從旁突襲）"
+    },
+    {
+      "text": "@#@#&@*%@#*(%#&(!)&%&#*(@!#!(*%@。",
+      "role": "哈哈"
+    },
+    {
+      "text": "幹是誰！？",
+      "role": "阿誇"
+    },
+    {
+      "text": "@#@#%*@*#)@&@*&#。",
+      "role": "哈哈"
+    },
+    {
+      "text": "你媽，是我拉阿誇，誰跟你『蹄坤獸』。",
+      "role": "阿誇"
+    },
+    {
+      "text": "@#@#$@#!。",
+      "role": "哈哈"
+    },
+    {
+      "text": "搞不清楚狀況，你沒事吧！？",
+      "role": "阿誇"
+    },
+    {
+      "text": "@#@#。",
+      "role": "哈哈"
+    },
+    {
+      "text": "看來是被困在ƒ-7星球上了。",
+      "role": "阿誇"
+    },
+
+    {
+      "text": "（窸窸窣窣）"
+    },
+    {
+      "text": "欸哈哈，你有跟別人一起嗎？",
+      "role": "阿誇"
+    },
+    {
+      "text": "@#@#?。",
+      "role": "哈哈"
+    },
+    {
+      "text": "那這個是．．．乾真的『蹄坤獸』。",
+      "role": "阿誇"
+    },
+
+    {
+      "text": "（跑）"
+    },
+    {
+      "text": "（∞打中『蹄坤獸』）"
+    },
+    {
+      "text": "怎麼都是宇宙艦隊船員了，還處理不了『蹄坤獸』啊？",
+      "role": "禾禾"
+    },
+    {
+      "text": "白癡還不都是你哈哈。",
+      "role": "阿誇"
+    },
+    {
+      "text": "@#@#%@@$@#@。",
+      "role": "哈哈"
+    },
+    {
+      "text": "不管了，只有你們嗎？",
+      "role": "禾禾"
+    },
+    {
+      "text": "@#@#*%)@$。",
+      "role": "哈哈"
+    },
+    {
+      "text": "好吧那就先這樣了，我們要想辦法聯絡上『星軌中繼站』。",
+      "role": "禾禾"
+    },
+    {
+      "text": "ƒ-6星和ƒ-7星中間有『重力異曲』，可以先到ƒ-6在聯絡『星軌中繼站』。",
+      "role": "阿誇"
+    },
+    {
+      "text": "@#@#($@$@#。",
+      "role": "哈哈"
+    },
+
+
+
+    {
+      "type": "sound-start",
+      "key": "main",
+      "config": {
+        "volume": 0.2
+      }
+    },
+    {
+      "text": "（動身前往『重力異曲』）"
+    },
+
+    {
+      "text": "（抓住差點掉進『重力異曲』的哈哈）"
+    },
+    {
+      "text": "就是這裡了吧！？你們準備好了嗎？",
+      "role": "禾禾",
+      "avatar": {
+        "key": "avatar1"
+      }
+    },
+    {
+      "text": "你差點就要去ße星系了哈哈。",
+      "role": "阿誇",
+      "avatar": {
+        "key": "avatar2"
+      }
+    },
+    {
+      "text": "．．．",
+      "role": "哈哈",
+      "avatar": {
+        "key": "avatar3"
+      }
+    },
+    {
+      "text": "你們小心了，『重力異曲』應該會直接把我們傳送到ƒ-6的『赤星軌』底下，我們到時候在『星軌中繼站』見。",
+      "role": "阿誇",
+      "avatar": {
+        "key": "avatar2"
+      }
+    },
+    {
+      "text": "（傳傳傳）",
+      "sound": {
+        "key": "sfx",
+        "spriteName": "escape",
+        "config": {
+          "rate": 2
+        }
+      }
+    },
+    {
+      "text": "（重力異曲拉扯中）",
+      "sound": {
+        "key": "sfx",
+        "spriteName": "death"
+      }
+    },
+    {
+      "text": "撤．．．重申．．．星軌．．．溢停。",
+      "role": "C",
+      "sound": {
+        "key": "sfx",
+        "spriteName": "shot",
+        "config": {
+          "delay": 1
+        }
+      }
+    },
+    {
+      "text": "（『星軌中繼站』）",
+      "sound": {
+        "key": "sfx",
+        "spriteName": "ping"
+      }
+    },
+    {
+      "type": "sound-stop",
+      "key": "main"
+    }
+  ]
+}

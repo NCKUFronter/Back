@@ -1,0 +1,43 @@
+{
+  "resources": [{
+    "type": "image",
+    "key": "galaxy",
+    "url": "assets/plots/galaxy.jpg"
+  }],
+  "plots": [
+    {
+      "type": "sound-start",
+      "key": "SWESBFINAL",
+      "config": {
+        "volume": 0.2
+      }
+    },
+    {
+      "type": "bg",
+      "key": "galaxy"
+    },
+    {
+      "text": "（在經歷浩劫之後，各區域的人們蠢蠢欲動）"
+    },
+    {
+      "text": "（我們不能保證和平還能持續多久）"
+    },
+    {
+      "text": "（也不能保證這堂課結束之後會不會有所收穫）"
+    },
+    {
+      "text": "（但我們知道的事，在課堂上的努力還有學習的經過）"
+    },
+    {
+      "text": "（今天我們度過了一次難關）"
+    },
+    {
+      "text": "（讓我們有勇氣面對下一次，再下下次，還有更多更多）"
+    },
+    {
+      "type": "sound-stop",
+      "key": "SWESBFINAL"
+    }
+  ],
+  "next_scene": "HomeScene"
+}

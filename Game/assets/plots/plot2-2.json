@@ -1,0 +1,89 @@
+{
+  "resources": [
+    {
+      "type": "image",
+      "key": "universal",
+      "url": "assets/plots/universal.png"
+    },
+    {
+      "type": "image",
+      "key": "battleship",
+      "url": "assets/plots/Battleship.png"
+    },
+    {
+      "type": "spritesheet",
+      "key": "avatar1",
+      "url": "assets/people/role1.png",
+      "config": {
+        "frameWidth": 144
+      }
+    },
+    {
+      "type": "spritesheet",
+      "key": "avatar2",
+      "url": "assets/people/role2.png",
+      "config": {
+        "frameWidth": 144
+      }
+    },
+    {
+      "type": "spritesheet",
+      "key": "avatar3",
+      "url": "assets/people/role3.png",
+      "config": {
+        "frameWidth": 144
+      }
+    }
+  ],
+  "plots": [
+    {
+      "type": "sound-start",
+      "key": "SWYODA",
+      "config": {
+        "volume": 0.5
+      }
+    },
+    {
+      "type": "bg",
+      "key": "battleship"
+    },
+    {
+      "text": "這就是傳說中的宇宙。戰艦？終於被我給找到了！",
+      "role": "阿誇",
+      "avatar": {
+        "key": "avatar1"
+      }
+    },
+    {
+      "text": "哈哈哈！謝謝你幫我們找到宇宙，戰艦的所在地。現在宇宙，戰艦是我們的了！",
+      "role": "ƒ-7星球人"
+    },
+    {
+      "text": "什麼。。。！我們竟然被跟蹤了？！可惡，宇宙戰艦是不可能交到你們手中的！",
+      "role": "河河",
+      "avatar": {
+        "key": "avatar2",
+        "frame": 1
+      }
+    },
+    {
+      "text": "我們只能撐到重新啟動戰艦了，要相信哈哈。",
+      "role": "河河",
+      "avatar": {
+        "key": "avatar2",
+        "frame": 1
+      }
+    },
+    {
+      "type": "sound-stop",
+      "key": "SWYODA"
+    },
+    {
+      "type": "bg",
+      "key": "universal"
+    },
+    {
+      "text": "（將有大批敵人湧入，請守護戰艦）"
+    }
+  ]
+}

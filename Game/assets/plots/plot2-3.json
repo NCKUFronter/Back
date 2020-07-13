@@ -1,0 +1,105 @@
+{
+  "resources": [
+    {
+      "type": "image",
+      "key": "universal",
+      "url": "assets/plots/universal.png"
+    },
+    {
+      "type": "image",
+      "key": "battleship",
+      "url": "assets/plots/Battleship.png"
+    },
+    {
+      "type": "spritesheet",
+      "key": "avatar1",
+      "url": "assets/people/role1.png",
+      "config": {
+        "frameWidth": 144
+      }
+    },
+    {
+      "type": "spritesheet",
+      "key": "avatar2",
+      "url": "assets/people/role2.png",
+      "config": {
+        "frameWidth": 144
+      }
+    },
+    {
+      "type": "spritesheet",
+      "key": "avatar3",
+      "url": "assets/people/role3.png",
+      "config": {
+        "frameWidth": 144
+      }
+    }
+  ],
+  "plots": [
+    {
+      "type": "sound-start",
+      "key": "SWYODA"
+    },
+    {
+      "type": "bg",
+      "key": "battleship"
+    },
+    {
+      "type": "sound-start",
+      "key": "SWYODA"
+    },
+    {
+      "text": "哈哈。",
+      "role": "哈哈",
+      "avatar": {
+        "key": "avatar3"
+      }
+    },
+    {
+      "text": "河河已經修好了，快上傳！",
+      "role": "阿誇",
+      "avatar": {
+        "key": "avatar1"
+      }
+    },
+    {
+      "text": "不行拉，電機系地下室都沒有網路！",
+      "role": "河河",
+      "avatar": {
+        "key": "avatar2"
+      }
+    },
+    {
+      "text": "哈哈哈哈哈哈。",
+      "role": "哈哈",
+      "avatar": {
+        "key": "avatar3"
+      }
+    },
+    {
+      "text": "發射倒數，５４３２１。異曲啟動！",
+      "role": "河河",
+      "avatar": {
+        "key": "avatar2"
+      }
+    },
+    {
+      "type": "sound-stop",
+      "key": "SWYODA"
+    },
+    {
+      "type": "bg",
+      "key": "universal"
+    },
+    {
+      "text": "（離開了ƒ-7星，前往星際議會的一行人）"
+    },
+    {
+      "text": "（準備去議會中說服長官）"
+    },
+    {
+      "text": "（敵人已經做好了準備，進攻只是時間早晚）"
+    }
+  ],
+  "next_scene": "ParScene"
+}

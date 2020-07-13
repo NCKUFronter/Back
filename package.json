@@ -1,0 +1,35 @@
+{
+  "name": "fronter-demo",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node Back/app.js"
+  },
+  "author": "",
+  "dependencies": {
+    "@babel/core": "^7.10.0",
+    "@babel/runtime": "^7.9.6",
+    "@hapi/joi": "^17.1.1",
+    "compression": "^1.7.4",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.7-alpha.3",
+    "express-promise-router": "^3.0.3",
+    "express-session": "^1.17.1",
+    "express-swagger-generator": "https://github.com/p0o9i8u7y6t5r4e3w2q1/express-swagger-generator",
+    "fast-stable-stringify": "^1.0.0",
+    "fastrx": "^1.0.10",
+    "mongo-mock": "https://github.com/p0o9i8u7y6t5r4e3w2q1/mongo-mock#with-mingo",
+    "passport": "^0.4.1",
+    "passport-google-oauth": "^2.0.0",
+    "passport-local": "^1.0.0",
+    "passport.socketio": "^3.7.0",
+    "query": "https://github.com/protobi/query",
+    "socket.io": "^2.3.0",
+    "swagger-ui-express": "^4.1.4",
+    "uuid": "^8.1.0"
+  }
+}
