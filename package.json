@@ -9,6 +9,7 @@
     "start": "node app.js",
     "start:babel": "node dist/app.js",
     "start:dev": "nodemon app.js",
+    "build:release": "babel -d dist . && copy-files-from-to",
     "build:babel": "babel -d dist .",
     "baretest": "node ./test/index",
     "baretest:babel": "babel -d dist . & node ./test/babel.index",
@@ -60,7 +61,18 @@
     "@types/passport-google-oauth": "^1.0.41",
     "@types/passport-local": "^1.0.33",
     "baretest": "^2.0.0",
+    "copy-files-from-to": "^3.1.2",
     "nodemon": "^2.0.3",
     "supertest": "^4.0.2"
+  },
+  "copyFiles": [{
+    "from": ["./dist/**", "!./dist/config/**"],
+    "to": "../release/Back"
+  }, {
+    "from": "./fronter.db",
+    "to": "../release/Back/fronter.db"
+  }],
+  "copyFilesSettings": {
+    "whenFileExists": "overwrite"
   }
 }

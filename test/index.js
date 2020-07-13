@@ -1,5 +1,6 @@
 // @ts-check
 // process.env.DB_URI = "mongodb://localhost/uidd";
+process.env.dbfile = "mock.test.db"
 process.env.PORT = "5000";
 const { connectDB, client } = process.env.BABEL_TEST
   ? require("../dist/models/mongo")

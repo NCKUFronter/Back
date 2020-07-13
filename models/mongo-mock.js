@@ -1,10 +1,10 @@
 // @ts-check
 const log = console.log;
 const assert = require("assert");
-const mongodb = require("../../../mongo-mock");
+const mongodb = require("mongo-mock");
 mongodb.max_delay = 0;
 const MongoClient = mongodb.MongoClient;
-const dbfile = "fronter.db";
+const dbfile = process.env.dbfile || "fronter.db";
 const uri = "mongodb://localhost/uidd";
 
 function getFronterClient() {
@@ -19,7 +19,8 @@ function getFronterClient() {
       try {
         await MongoClient.load(dbfile);
       } catch (err) {
-        console.log(err)
+        // console.log(err)
+        console.log("db file not exist, will create one.");
       }
       // @ts-ignore
       MongoClient.persist = dbfile;

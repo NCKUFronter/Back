@@ -12,3 +12,4 @@ ngrok
 *.sh
 yarn.lock
 .env
+mock.test.db
