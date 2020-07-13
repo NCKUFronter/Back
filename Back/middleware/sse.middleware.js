@@ -143,12 +143,9 @@ function sseMiddleware(req, res, next) {
       type: "user",
       action: "online"
     });
-  } else onlineUser[req.userId]++;
+  } else onlineUser[req.userId]++; // console.log({ onlineUser, connections });
 
-  console.log({
-    onlineUser: onlineUser,
-    connections: connections
-  });
+
   req.socket.setTimeout(0);
   req.socket.setNoDelay(true);
   req.socket.setKeepAlive(true); // header

@@ -27,7 +27,6 @@
     "passport-google-oauth": "^2.0.0",
     "passport-local": "^1.0.0",
     "passport.socketio": "^3.7.0",
-    "query": "https://github.com/protobi/query",
     "socket.io": "^2.3.0",
     "swagger-ui-express": "^4.1.4",
     "uuid": "^8.1.0"

@@ -185,8 +185,8 @@ function AppSocketIO(server, store) {
 function DefaultSocketHandler(
 /** @type AppSocket */
 socket) {
-  console.log(socket.id + " connect"); // init data
-
+  // console.log(socket.id + " connect");
+  // init data
   socket.playerId = socket.player._id;
   socket.player._id = socket.id; // replace _id with socket.id
 
@@ -290,8 +290,7 @@ socket) {
     if (notices$) notices$.dispose();
     if (socket.isLogin) delete playerScoketIdMap[socket.request.user._id];
   });
-  socket.on("disconnect", function () {
-    console.log(socket.id + " disconnect");
+  socket.on("disconnect", function () {// console.log(socket.id + " disconnect");
   }); // ---------- multiplayer game events ----------
 
   /*

@@ -63,11 +63,7 @@ AppPassport.use(new LocalStrategy({
   user_coll.findOne({
     email: email
   }, function (err, user) {
-    if (err) return done(err);
-    console.log({
-      now: "local strategy",
-      username: user && user.name
-    });
+    if (err) return done(err); // console.log({ now: "local strategy", username: user && user.name });
 
     if (!user) {
       return done(null, false, {
@@ -145,42 +141,31 @@ function _autoCreateGameUser() {
 }
 
 AppPassport.serializeUser(function (user, done) {
-  console.log({
-    type: "serialize",
-    username: user.name
-  });
+  // console.log({ type: "serialize", username: user.name });
   done(null, {
     _id: user._id
   });
 });
 AppPassport.deserializeUser(function (filter, done) {
-  console.log({
-    type: "deserialize",
-    filter: filter
-  });
+  // console.log({ type: "deserialize", filter });
   collections.user.findOne(filter, /*#__PURE__*/function () {
     var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(err, user) {
       return _regenerator["default"].wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              console.log({
-                err: err,
-                username: user && user.name
-              });
-
               if (!(user != null && user.gameUserId == null)) {
-                _context.next = 4;
+                _context.next = 3;
                 break;
               }
 
-              _context.next = 4;
+              _context.next = 3;
               return autoCreateGameUser(user);
 
-            case 4:
+            case 3:
               done(err, user);
 
-            case 5:
+            case 4:
             case "end":
               return _context.stop();
           }
